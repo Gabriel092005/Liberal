@@ -237,7 +237,8 @@ export function Home() {
                   
               </div>
           </header>
-          <section>
+    <section className="flex flex-col justify-center items-center relative right-1 w-full ">
+
               <div className="flex justify-center items-center gap-2">
                 <div className="flex flex-col items-center">
                      <Button variant='outline' className="p-2 w-20">
