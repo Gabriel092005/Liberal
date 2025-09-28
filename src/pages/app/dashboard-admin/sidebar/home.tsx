@@ -1,15 +1,15 @@
-import { Bell, Check, ChevronLeft, ChevronLeftCircle, ChevronRightCircle, Hammer, Hourglass, House, Loader2, MapPinIcon, Phone, Plus, Search,   Settings,   Star,   Timer,   Workflow,   Wrench, X } from "lucide-react";
+import { Bell,  ChevronLeftCircle, ChevronRightCircle, Hammer,  House, Loader2, MapPinIcon, Phone, Plus, Search,   Settings,   Star,      Workflow,   Wrench, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Profiler, useState } from "react";
+import {  useState } from "react";
 import photo1 from '@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg'
-import photo2 from '@/assets/WhatsApp Image 2024-06-27 at 22.21.29_0203fa98.jpg'
-import photo3 from '@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg'
+// import photo2 from '@/assets/WhatsApp Image 2024-06-27 at 22.21.29_0203fa98.jpg'
+// import photo3 from '@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg'
 import photo4 from '@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg'
-import photo5 from '@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg'
-import photo6 from '@/assets/WhatsApp Image 2024-06-27 at 23.12.15_36445ef3.jpg'
+// import photo5 from '@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg'
+// import photo6 from '@/assets/WhatsApp Image 2024-06-27 at 23.12.15_36445ef3.jpg'
 import servico1 from '@/assets/IMG-20250928-WA0054.jpg'
 import servico2 from '@/assets/IMG-20250928-WA0057.jpg'
 import servico3 from '@/assets/IMG-20250928-WA0056.jpg'
@@ -19,14 +19,13 @@ import servico6 from '@/assets/IMG-20250928-WA0069.jpg'
 
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell,  TableRow } from "@/components/ui/table";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import LocationDemo from "./location-demo";
 
 
 export function Home() {
-  const [searchMode, setSearchMode] = useState(false)
   
   const [query, setQuery] = useState("")
     const cards = [

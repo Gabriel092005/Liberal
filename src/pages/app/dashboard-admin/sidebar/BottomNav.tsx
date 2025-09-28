@@ -1,4 +1,4 @@
-import { Home, MessageCircle, Bell, User, Briefcase, Users2, Search, Heart } from "lucide-react";
+import { Home, User,   Search, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function BottomNav() {

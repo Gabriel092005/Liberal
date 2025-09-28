@@ -14,9 +14,6 @@ import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { provinceMunicipalityMap } from "@/data/province";
 
-type MunicipalityMap = {
-  [province: string]: string[];
-};
 
 export function SignUp() {
   const [step, setStep] = useState(1);

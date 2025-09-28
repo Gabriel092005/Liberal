@@ -1,6 +1,3 @@
-import Logo from '@/assets/IMG-20250924-WA0127.png'
-import { Bell, ChevronDown, Timer } from 'lucide-react';
-
 
 export function Header() {
 
