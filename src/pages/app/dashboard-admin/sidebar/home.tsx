@@ -20,7 +20,7 @@ import servico6 from '@/assets/IMG-20250928-WA0069.jpg'
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell,  TableRow } from "@/components/ui/table";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import LocationDemo from "./location-demo";
 
@@ -28,6 +28,7 @@ import LocationDemo from "./location-demo";
 export function Home() {
   
   const [query, setQuery] = useState("")
+  const navigate = useNavigate()
     const cards = [
       {
       name:'Leonel Joao',
@@ -44,6 +45,12 @@ export function Home() {
     },
   ];
   const [index, setIndex] = useState(0);
+
+
+  const seen = !!localStorage.getItem('app_onboarding_seen_v1')
+  if(!seen){
+     navigate('/sign-up')
+  }
 
   const next = () => setIndex((prev) => (prev + 1) % cards.length);
   const prev = () =>
