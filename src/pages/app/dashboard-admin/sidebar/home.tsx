@@ -48,7 +48,7 @@ export function Home() {
 
 
   const seen = !!localStorage.getItem('app_onboarding_seen_v1')
-  if(!seen){
+  if(seen){
      navigate('/sign-up')
   }
 
@@ -62,7 +62,7 @@ export function Home() {
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <div className="lg:flex lg:flex-col lg:flex-1 lg:ml-40 lg:p-4 flex flex-col gap-2 ">
+      <div className="lg:flex lg:flex-col lg:flex-1 lg:ml-40 lg:p-4 flex flex-col relative right-3 gap-2 ">
           <header>
               <div className="flex flex-col gap-3">
 <div className="flex items-center justify-between mt-3">
