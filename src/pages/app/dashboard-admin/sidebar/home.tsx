@@ -22,7 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell,  TableRow } from "@/components/ui/table";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import LocationDemo from "./location-demo";
+// import LocationDemo from "./location-demo";
 
 
 export function Home() {
@@ -407,7 +407,7 @@ export function Home() {
     </div>
 
           </section>
-<LocationDemo/>
+{/* <LocationDemo/> */}
       </div>
     </motion.div>
   );
