@@ -122,15 +122,30 @@ export function SignUp() {
                     />
                   </div>
 
-                      <div className="space-y-1">
-                    <Label htmlFor="e-mail">Email</Label>
-                    <Input
-                      id="e-mail"
-                      onChange={(e) => setNif(e.target.value)}
-                      placeholder="exemplo@gmail.com"
-                      required
-                    />
-                  </div>
+ <div className="space-y-2">
+  <Label className="font-semibold">Profissão / Área de Atuação</Label>
+  <Select>
+    <SelectTrigger className="h-10 w-full">
+      <SelectValue placeholder="Selecione sua profissão" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="engenheiro">Engenheiro</SelectItem>
+      <SelectItem value="medico">Médico</SelectItem>
+      <SelectItem value="professor">Professor</SelectItem>
+      <SelectItem value="advogado">Advogado</SelectItem>
+      <SelectItem value="contabilista">Contabilista</SelectItem>
+      <SelectItem value="enfermeiro">Enfermeiro</SelectItem>
+      <SelectItem value="motorista">Motorista</SelectItem>
+      <SelectItem value="pedreiro">Pedreiro</SelectItem>
+      <SelectItem value="eletricista">Eletricista</SelectItem>
+      <SelectItem value="carpinteiro">Carpinteiro</SelectItem>
+      <SelectItem value="serralheiro">Serralheiro</SelectItem>
+      <SelectItem value="cozinheiro">Cozinheiro</SelectItem>
+      <SelectItem value="estudante">Estudante</SelectItem>
+      <SelectItem value="outro">Outro</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
 
                        <div className="space-y-1">
                     <Label htmlFor="phone">Telefone</Label>
@@ -255,7 +270,7 @@ export function SignUp() {
             </AnimatePresence>
 
           </form>
-        <span className="text-muted-foreground text-xs">Para registar-se na plataforma como cliente (individual/Empresa) de serviços clica em <Link to='/empresa' className="text-blue-300">skip.</Link></span>
+        <span className="text-muted-foreground text-xs">Para registar-se na plataforma como prestador (individual/Empresa) de serviços clica em <Link to='/empresa' className="text-blue-300">skip.</Link></span>
         </div>
       </div>
     </>

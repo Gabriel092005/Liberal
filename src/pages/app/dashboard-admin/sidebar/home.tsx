@@ -1,6 +1,5 @@
 import {
   Bell,
-  ChevronRight,
   ChevronRightCircle,
 
   Hammer,
@@ -22,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardHeader,
   // CardDescription,
   // CardHeader,
   // CardTitle,
@@ -85,7 +83,7 @@ export function Home() {
   //   setIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
   return (
-    <div className=" flex flex-col h-screen  left-3 fixed overflow-hidden bg-background text-foreground">
+    <div className=" flex flex-col h-screen  left-2 fixed overflow-hidden bg-background text-foreground">
       {/* CONTEÚDO */}
       <motion.div
         className="flex flex-col flex-1 px-4 py-4 gap-4 items-center justify-center pb-20"
@@ -162,7 +160,6 @@ export function Home() {
                         </Link>
                       ))}
                     </div>
-
                   )}
 
 <BelezaModa/>
@@ -202,6 +199,9 @@ export function Home() {
 
         {/* CATEGORIAS */}
         <section className="w-full flex flex-col gap-6 items-center justify-center">
+           <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
+              CATEGORIAS POPULARES
+            </span>
           <div className="flex justify-around w-full gap-3">
             {[
               { icon: Wrench, color: "text-blue-400", bg: "from-blue-100 to-blue-50", label: "Assistência Técnica" },
@@ -325,16 +325,6 @@ export function Home() {
           </div>
 
             <section className="relative bottom-3 ">
-
-         <Card>
-           <CardHeader>
-              <Button> 
-                <span> Busque profissionais de qualidade</span>
-                <ChevronRight/>
-              </Button>
-           </CardHeader>
-         
-         </Card>
       </section>
         </section>
     
