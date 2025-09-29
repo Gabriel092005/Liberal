@@ -244,7 +244,7 @@ export function SignUp() {
                       Voltar
                     </Button>
                     <Link to='/'>
-                     <Button className="w-1/2" type="submit">
+                     <Button className="w-40" type="submit">
                     Criar
                     </Button>
                     </Link>
