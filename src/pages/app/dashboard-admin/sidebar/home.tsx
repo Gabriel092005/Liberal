@@ -41,6 +41,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export function Home() {
   const [query, setQuery] = useState("");
+  const [index, setIndex] = useState(0);
+
   const cards = [
     {
       name: "Leonel Joao",
@@ -55,26 +57,28 @@ export function Home() {
       Location: "Viana, Luanda",
     },
   ];
-  const [index, setIndex] = useState(0);
 
   const next = () => setIndex((prev) => (prev + 1) % cards.length);
   const prev = () =>
     setIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
   return (
-    <motion.div
-      className="flex h-screen bg-background text-foreground"
-      initial={{ x: "-100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-    >
-      <div className="flex flex-col w-full max-w-lg mx-auto p-4 gap-4">
-        {/* HEADER */}
-        <header>
-          <div className="flex items-center justify-between">
-            <h1 className="tracking-tight font-bold text-lg sm:text-xl">
-              Boas-Vindas, <span className="text-orange-500">Marcos</span>!
+    <div className=" flex flex-col h-screen  left-1 fixed overflow-hidden bg-background text-foreground">
+      {/* CONTEÚDO */}
+      <motion.div
+        className="flex flex-col flex-1 px-4 py-4 gap-4 items-center justify-center pb-20"
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        {/* HEADER */} 
+        <header className="w-full flex justify-center items-center gap-44">
+          <div className="flex items-center gap-11 justify-between">
+              <div>
+                 <h1 className="tracking-tight font-bold text-lg sm:text-xl">
+              Boas-Vindas, Marcos!
             </h1>
+              </div>
 
             <div className="flex gap-2">
               {/* BOTÃO DE CRIAR */}
@@ -152,8 +156,8 @@ export function Home() {
         </header>
 
         {/* CATEGORIAS */}
-        <section className="flex flex-col gap-6">
-          <div className="flex justify-around">
+        <section className="w-full flex flex-col gap-6 items-center justify-center">
+          <div className="flex justify-around w-full gap-3">
             {[
               { icon: Wrench, color: "text-blue-400", bg: "from-blue-100 to-blue-50", label: "Assistência Técnica" },
               { icon: Hammer, color: "text-orange-400", bg: "from-orange-100 to-orange-50", label: "Reformas & Reparos" },
@@ -171,7 +175,7 @@ export function Home() {
             ))}
           </div>
 
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center w-full">
             <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
               Profissionais em Destaque
             </span>
@@ -182,7 +186,7 @@ export function Home() {
         </section>
 
         {/* CARDS PROFISSIONAIS */}
-        <section className="flex flex-col items-center gap-3">
+        <section className="flex flex-col items-center gap-3 flex-1 justify-center">
           <div className="relative w-80 h-48 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
@@ -234,22 +238,28 @@ export function Home() {
                 </Card>
               </motion.div>
             </AnimatePresence>
+        
           </div>
+          
 
-          <div className="flex gap-4">
-            <ChevronLeftCircle
-              onClick={prev}
-              className="cursor-pointer text-muted-foreground hover:text-orange-500"
-            />
-            <ChevronRightCircle
+          <div className="flex gap-1 relative bottom-36">
+
+                      <ChevronRightCircle
               onClick={next}
-              className="cursor-pointer text-muted-foreground hover:text-orange-500"
+              className="cursor-pointer fixed left-[22.6rem] text-muted-foreground hover:text-orange-500"
             />
+
+             {/* <ChevronLeftCircle
+              onClick={prev}
+              className="cursor-pointer d text-muted-foreground hover:text-orange-500"
+            /> */}
+           
+      
           </div>
         </section>
 
         {/* ÚLTIMOS PEDIDOS */}
-        <section>
+        <section className="w-full">
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-sm">Últimos Pedidos</CardTitle>
@@ -296,7 +306,23 @@ export function Home() {
             </CardContent>
           </Card>
         </section>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      {/* NAV BOTTOM FIXA */}
+      <nav className="fixed bottom-0 left-0 w-full max-w-md mx-auto bg-background border-t shadow-md flex justify-around items-center h-16">
+        <Button variant="ghost" size="icon">
+          <House className="text-orange-500" />
+        </Button>
+        <Button variant="ghost" size="icon">
+          <Search />
+        </Button>
+        <Button variant="ghost" size="icon">
+          <Workflow />
+        </Button>
+        <Button variant="ghost" size="icon">
+          <Settings />
+        </Button>
+      </nav>
+    </div>
   );
 }
