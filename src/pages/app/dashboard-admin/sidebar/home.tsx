@@ -36,7 +36,7 @@ import servico6 from "@/assets/IMG-20250928-WA0069.jpg";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export function Home() {
