@@ -1,6 +1,5 @@
 
 import { Outlet } from "react-router-dom";
-import { Header } from "@/components/header";
 import { Menu } from "../app/dashboard-admin/welcome-page";
 
 export function AuthLayout(){

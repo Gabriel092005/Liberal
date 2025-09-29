@@ -10,7 +10,6 @@ import {
   Plus,
   Search,
   Settings,
-  Star,
   Workflow,
   Wrench,
   X,
@@ -42,7 +41,6 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export function Home() {
   const [query, setQuery] = useState("");
-  const navigate = useNavigate();
   const cards = [
     {
       name: "Leonel Joao",
