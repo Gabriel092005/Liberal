@@ -3,7 +3,7 @@ import {
   ChevronRightCircle,
   Hammer,
   House,
-  Loader2,
+  // Loader2,
   MapPinIcon,
   Phone,
   Plus,
@@ -19,9 +19,9 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  // CardDescription,
+  // CardHeader,
+  // CardTitle,
 } from "@/components/ui/card";
 import { useState } from "react";
 import photo1 from "@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg";
@@ -34,7 +34,7 @@ import servico5 from "@/assets/IMG-20250928-WA0059.jpg";
 import servico6 from "@/assets/IMG-20250928-WA0069.jpg";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+// import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
