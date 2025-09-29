@@ -258,7 +258,7 @@ export function Home() {
         </section>
 
         {/* ÚLTIMOS PEDIDOS */}
-        <section className="w-full">
+        {/* <section className="w-full">
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-sm">Últimos Pedidos</CardTitle>
@@ -304,7 +304,7 @@ export function Home() {
               </Table>
             </CardContent>
           </Card>
-        </section>
+        </section> */}
       </motion.div>
 
       {/* NAV BOTTOM FIXA */}

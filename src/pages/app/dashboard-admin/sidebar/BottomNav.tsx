@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-black md:hidden shadow-t">
+    <nav className="fixed inset-x-0 bottom-0 z-50  bg-white dark:bg-black md:hidden shadow-t">
       <ul className="flex justify-around items-center h-14">
         <li>
           <Link
