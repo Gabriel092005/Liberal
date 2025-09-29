@@ -14,7 +14,7 @@ export function App() {
     <HelmetProvider>
       <Helmet titleTemplate='%s | quintal.'/>
         <Toaster richColors/>
-      <ThemeProvider storageKey="vite-ui-theme" defaultTheme="light">
+      <ThemeProvider storageKey="vite-ui-theme" defaultTheme="dark">
       <QueryClientProvider client={queryClient}>
            <RouterProvider router={router}/>
       </QueryClientProvider>

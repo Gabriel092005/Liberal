@@ -1,8 +1,12 @@
 import {
   Bell,
+  ChevronRight,
   ChevronRightCircle,
+
   Hammer,
   House,
+  Linkedin,
+  Mail,
   // Loader2,
   MapPinIcon,
   Phone,
@@ -11,7 +15,6 @@ import {
   Settings,
   Workflow,
   Wrench,
-  X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -19,11 +22,12 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardHeader,
   // CardDescription,
   // CardHeader,
   // CardTitle,
 } from "@/components/ui/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import photo1 from "@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg";
 import photo4 from "@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg";
 import servico1 from "@/assets/IMG-20250928-WA0054.jpg";
@@ -35,12 +39,25 @@ import servico6 from "@/assets/IMG-20250928-WA0069.jpg";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { BelezaModa } from "./BelezaModa";
+import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { NotificationMenu } from "./Notification/Notification-Content";
 
 export function Home() {
   const [query, setQuery] = useState("");
   const [index, setIndex] = useState(0);
+  const navigate = useNavigate()
+
+  
+  useEffect(()=>{
+    const seen = localStorage.getItem('app_onboarding_seen_v1')
+    if(!seen){
+       navigate('/sign-up')
+    }
+
+  },[navigate])
 
   const cards = [
     {
@@ -48,12 +65,18 @@ export function Home() {
       description: "Eletricista | Canalizador | Pedreiro",
       image: photo4,
       Location: "Viana, Luanda",
+      phoe:+244766345454,
+      mail:'gabriel@gmail.com'
     },
     {
       name: "Gabriel Cavala",
       description: "Eletricista | Canalizador | Pedreiro",
       image: photo1,
       Location: "Viana, Luanda",
+      phoe:+244766345454,
+       mail:'gabriel@gmail.com'
+
+
     },
   ];
 
@@ -62,7 +85,7 @@ export function Home() {
   //   setIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
   return (
-    <div className=" flex flex-col h-screen  left-1 fixed overflow-hidden bg-background text-foreground">
+    <div className=" flex flex-col h-screen  left-3 fixed overflow-hidden bg-background text-foreground">
       {/* CONTEÚDO */}
       <motion.div
         className="flex flex-col flex-1 px-4 py-4 gap-4 items-center justify-center pb-20"
@@ -71,7 +94,7 @@ export function Home() {
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         {/* HEADER */} 
-        <header className="w-full flex justify-center items-center gap-44">
+        <header className="w-full flex justify-center flex-col items-center gap-44">
           <div className="flex items-center gap-11 justify-between">
               <div>
                  <h1 className="tracking-tight font-bold text-lg sm:text-xl">
@@ -90,7 +113,7 @@ export function Home() {
 
                 <DialogContent className="flex flex-col gap-4 h-full sm:h-auto sm:max-w-lg rounded-xl p-6 bg-background shadow-lg">
                   {/* Input pesquisa */}
-                  <div className="relative">
+                  <div className="relative top-5">
                     <Input
                       placeholder="O que você precisa?"
                       value={query}
@@ -117,12 +140,12 @@ export function Home() {
                       </button>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 mt-5">
                       {[
                         { src: servico3, label: "Madeira e Ofícios", to: "/madeira" },
                         { src: servico1, label: "Eletricidade", to: "/electricidade" },
                         { src: servico5, label: "Doméstica", to: "/domestica" },
-                        { src: servico4, label: "Beleza e Moda" },
+                        { src: servico4, label: "Beleza e Moda" , to:"/moda" },
                         { src: servico6, label: "Tecnologia e Design" },
                         { src: servico2, label: "Docente" },
                       ].map((s, i) => (
@@ -139,20 +162,43 @@ export function Home() {
                         </Link>
                       ))}
                     </div>
+
                   )}
+
+<BelezaModa/>
                 </DialogContent>
               </Dialog>
 
               {/* NOTIFICAÇÕES */}
-              <Button className="relative rounded-full h-10 w-10 flex items-center justify-center bg-muted">
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                    <Button className="relative rounded-full h-10 w-10 flex items-center justify-center bg-transparent">
                 <Bell className="h-5 w-5 text-orange-400" />
                 <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-md">
                   8
                 </span>
               </Button>
+                </DropdownMenuTrigger>
+                <NotificationMenu/>
+              </DropdownMenu>
+            
             </div>
           </div>
+
+  
+               
+                 
         </header>
+             <Input
+                      placeholder="O que você precisa?"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      className="pl-10 dark:bg-muted"
+                    />
+                    <Search
+                      className="absolute top-[5.8rem]  -translate-y-1/2 left-9 text-muted-foreground"
+                      size={18}
+                    />
 
         {/* CATEGORIAS */}
         <section className="w-full flex flex-col gap-6 items-center justify-center">
@@ -174,7 +220,12 @@ export function Home() {
             ))}
           </div>
 
-          <div className="flex justify-between items-center w-full">
+         
+        </section>
+
+        {/* CARDS PROFISSIONAIS */}
+        <section className="flex flex-col items-center gap-3 flex-1 relative bottom-120 justify-center">
+           <div className="flex justify-between items-center w-full">
             <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
               Profissionais em Destaque
             </span>
@@ -182,11 +233,7 @@ export function Home() {
               <Settings size={18} />
             </Link>
           </div>
-        </section>
-
-        {/* CARDS PROFISSIONAIS */}
-        <section className="flex flex-col items-center gap-3 flex-1 justify-center">
-          <div className="relative w-80 h-48 overflow-hidden">
+          <div className="relative w-80 h-48 gap-1 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
@@ -196,7 +243,7 @@ export function Home() {
                 transition={{ duration: 0.4 }}
                 className="absolute w-full"
               >
-                <Card className="relative w-full h-48 rounded-2xl shadow-xl overflow-hidden border border-orange-200">
+                <Card className=" sticky w-full h-48 rounded-2xl  shadow-xl overflow-hidden border border-orange-200">
                   <div className="absolute inset-0 bg-gradient-to-br from-orange-100 via-white to-orange-50 dark:from-zinc-900 dark:to-black opacity-90" />
                   <div className="absolute inset-0 backdrop-blur-sm" />
 
@@ -219,13 +266,34 @@ export function Home() {
                             <span className="truncate max-w-[140px]">
                               {cards[index].description}
                             </span>
+
+                            
                           </div>
+                        </div>
+                        <div>
+                       <Button>
+                           <Linkedin className="text-blue"/>
+                       </Button>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                         <MapPinIcon size={14} className="text-orange-500" />
                         {cards[index].Location}
                       </div>
+
+                        <div className="flex items-center">
+                          <Mail size={14}  className="text-orange-500"/>
+                           <span className="truncate max-w-[140px] text-muted-foreground text-xs">
+                              +{cards[index].mail}
+                            </span>
+                        </div>
+
+                         <div className="flex items-center">
+                          <Phone size={14}  className="text-orange-500"/>
+                           <span className="truncate max-w-[140px]">
+                              +{cards[index].phoe}
+                            </span>
+                        </div>
                     </header>
                     <div className="flex justify-end">
                       <Button className="flex gap-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:opacity-90 text-xs">
@@ -255,8 +323,21 @@ export function Home() {
            
       
           </div>
-        </section>
 
+            <section className="relative bottom-3 ">
+
+         <Card>
+           <CardHeader>
+              <Button> 
+                <span> Busque profissionais de qualidade</span>
+                <ChevronRight/>
+              </Button>
+           </CardHeader>
+         
+         </Card>
+      </section>
+        </section>
+    
         {/* ÚLTIMOS PEDIDOS */}
         {/* <section className="w-full">
           <Card className="shadow-md">
@@ -308,20 +389,7 @@ export function Home() {
       </motion.div>
 
       {/* NAV BOTTOM FIXA */}
-      <nav className="fixed bottom-0 left-0 w-full max-w-md mx-auto bg-background border-t shadow-md flex justify-around items-center h-16">
-        <Button variant="ghost" size="icon">
-          <House className="text-orange-500" />
-        </Button>
-        <Button variant="ghost" size="icon">
-          <Search />
-        </Button>
-        <Button variant="ghost" size="icon">
-          <Workflow />
-        </Button>
-        <Button variant="ghost" size="icon">
-          <Settings />
-        </Button>
-      </nav>
+
     </div>
   );
 }

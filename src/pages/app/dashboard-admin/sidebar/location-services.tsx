@@ -44,11 +44,7 @@ export function useUserLocation(): UseUserLocationReturn {
       const addr = data.address || {};
 
       const city: string | null =
-        addr.city ||
-        addr.town ||
-        addr.village ||
-        addr.municipality ||
-        null;
+        addr.city || addr.town || addr.village || addr.municipality || null;
 
       const neighbourhood: string | null =
         addr.suburb || addr.neighbourhood || addr.quarter || null;
@@ -100,8 +96,8 @@ export function useUserLocation(): UseUserLocationReturn {
   }, [reverseGeocode]);
 
   useEffect(() => {
-    // você pode descomentar se quiser pegar ao montar
-    // requestLocation();
+    // 🚀 Chamar automaticamente ao carregar a página
+    requestLocation();
   }, [requestLocation]);
 
   return { coords, place, loading, error, requestLocation };

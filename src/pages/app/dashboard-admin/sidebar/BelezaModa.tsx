@@ -1,8 +1,8 @@
-import servico3 from '@/assets/IMG-20250928-WA0056.jpg'
+import servicoBeleza from '@/assets/IMG-20250928-WA0058.jpg' // 🔹 coloque a imagem certa aqui
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { ChevronRight, MapPinX } from 'lucide-react'
-import { useState } from 'react'
 import { useUserLocation } from './location-services'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -59,22 +59,16 @@ function ServicoDialogContent({ nome }: { nome: string }) {
   )
 }
 
-export function MadeiraOficios() {
+export function BelezaModa() {
   const [servicoSelecionado, setServicoSelecionado] = useState<string>('')
-
-  const servicos = [
-    'Canalizador',
-    'Carpinteiro',
-    'Serrelheiro & Soldador',
-  ]
 
   return (
     <div className="relative -mx-10 w-[40rem] h-56 md:h-72 lg:h-96">
       {/* Imagem de capa */}
       <img
         className="w-full h-full object-cover"
-        src={servico3}
-        alt="Madeira e Oficios"
+        src={servicoBeleza}
+        alt="Beleza & Moda"
       />
 
       {/* Overlay escuro */}
@@ -82,19 +76,31 @@ export function MadeiraOficios() {
 
       {/* Texto centralizado */}
       <div className="absolute inset-0 flex items-center right-56 justify-center">
-        <h2 className="text-white text-xl font-bold">Madeira e Ofícios</h2>
+        <h2 className="text-white text-xl font-bold">Beleza & Moda</h2>
       </div>
 
       {/* Lista de serviços */}
       <div className="flex flex-col relative right-32 gap-3 mt-3 justify-center items-center">
-        {servicos.map((nome) => (
-          <ServicoButton
-            key={nome}
-            nome={nome}
-            selecionado={servicoSelecionado}
-            onSelect={setServicoSelecionado}
-          />
-        ))}
+        <ServicoButton
+          nome="Cabeleireiro"
+          selecionado={servicoSelecionado}
+          onSelect={setServicoSelecionado}
+        />
+        <ServicoButton
+          nome="Manicure & Pedicure"
+          selecionado={servicoSelecionado}
+          onSelect={setServicoSelecionado}
+        />
+        <ServicoButton
+          nome="Maquiadora"
+          selecionado={servicoSelecionado}
+          onSelect={setServicoSelecionado}
+        />
+        <ServicoButton
+          nome="Costureira & Estilista"
+          selecionado={servicoSelecionado}
+          onSelect={setServicoSelecionado}
+        />
       </div>
     </div>
   )

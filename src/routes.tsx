@@ -13,6 +13,7 @@ import { Config } from './pages/app/dashboard-admin/sidebar/config';
 import { MadeiraOficios } from './pages/app/dashboard-admin/sidebar/madeira';
 import { Electricidade } from './pages/app/dashboard-admin/sidebar/Electricidade';
 import { Domestica } from './pages/app/dashboard-admin/sidebar/domestica';
+import { BelezaModa } from './pages/app/dashboard-admin/sidebar/BelezaModa';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
       { path: '/madeira', element: <MadeiraOficios/> },
       { path: '/electricidade', element: <Electricidade/> },
       { path: '/domestica', element: <Domestica/> },
+      { path: '/moda', element: <BelezaModa /> },
       { path: '/pedidos', element: <Pedidos/> },
       { path: '/config', element:<Config/> },
       { path: '/me', element: <Profile/>},
