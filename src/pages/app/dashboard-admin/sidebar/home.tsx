@@ -1,6 +1,5 @@
 import {
   Bell,
-  ChevronLeftCircle,
   ChevronRightCircle,
   Hammer,
   House,
@@ -59,8 +58,8 @@ export function Home() {
   ];
 
   const next = () => setIndex((prev) => (prev + 1) % cards.length);
-  const prev = () =>
-    setIndex((prev) => (prev - 1 + cards.length) % cards.length);
+  // const prev = () =>
+  //   setIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
   return (
     <div className=" flex flex-col h-screen  left-1 fixed overflow-hidden bg-background text-foreground">
