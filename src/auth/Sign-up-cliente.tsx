@@ -243,9 +243,12 @@ export function SignUp() {
                     >
                       Voltar
                     </Button>
-                    <Button className="w-1/2" type="submit">
+                    <Link to='/'>
+                     <Button className="w-1/2" type="submit">
                     Criar
                     </Button>
+                    </Link>
+                   
                   </div>
                 </motion.div>
               )}
