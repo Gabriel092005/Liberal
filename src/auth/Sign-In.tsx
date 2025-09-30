@@ -22,7 +22,7 @@ export function SignIn() {
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">Acessar Painel</h1>
             <p className="text-sm text-muted-foreground">
-             Conecte-se a liberal e seja livre para trabalhar no seu horário.
+             Conecte-se a Liberal : Conectá-se a Liberal onde prestadores e clientes se encontram para crescer juntos .
             </p>
           </div>
           <form className="space-y-4" >
@@ -49,7 +49,7 @@ export function SignIn() {
                           </motion.div>
                    
           </form>
-          <span className="text-muted-foreground text-xs">Se ainda não tiver uma conta deve <Link className="border-b border-solid text-blue-400" to='/sign-up'>registrar-se</Link> primeiro para poder navegar normalmente e obter oportunidades.</span>
+          <span className="text-muted-foreground text-xs">Se já tiver uma conta deve <Link className="border-b border-solid text-blue-400" to='/sign-up'>registrar-se</Link> primeiro para poder navegar normalmente e obter oportunidades.</span>
         </div>
       </div>
     </>
