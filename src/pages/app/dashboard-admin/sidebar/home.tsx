@@ -370,7 +370,6 @@ export function Home() {
           
 
           <div className="flex gap-1 relative bottom-36">
-
                       <ChevronRightCircle
               onClick={next}
               className="cursor-pointer fixed left-[21.8rem] text-muted-foreground hover:text-orange-500"

@@ -273,7 +273,7 @@ export function Menu({
               {effectiveSlides.map((s, i) => (
                 <div
                   key={s.id}
-                  className={`h-2 w-8 rounded-full ${
+                  className={`h-2 w-2 rounded-full ${
                     i === index ? "bg-gray-900" : "bg-gray-300"
                   }`}
                 />
