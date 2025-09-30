@@ -20,6 +20,41 @@ export function SearchPedidos() {
       status:'urgente',
       prestadoresInteressados:34
     },
+      {
+      title: 'Canalizador',
+      description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. ?',
+      image: photo4,
+      location: 'Viana, Luanda',
+      date:'1min ',
+      status:'urgente',
+      prestadoresInteressados:34
+    },  {
+      title: 'Canalizador',
+      description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. ?',
+      image: photo4,
+      location: 'Viana, Luanda',
+      date:'1min ',
+      status:'urgente',
+      prestadoresInteressados:34
+    },
+      {
+      title: 'Canalizador',
+      description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. ?',
+      image: photo4,
+      location: 'Viana, Luanda',
+      date:'1min ',
+      status:'urgente',
+      prestadoresInteressados:34
+    },
+      {
+      title: 'Canalizador',
+      description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. ?',
+      image: photo4,
+      location: 'Viana, Luanda',
+      date:'1min ',
+      status:'urgente',
+      prestadoresInteressados:34
+    },
 
         {
       title: 'Pedreiro',
