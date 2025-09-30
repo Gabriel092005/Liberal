@@ -264,10 +264,12 @@ export function Home() {
               </div>
             ))}
           </div>
-
-         
         </section>
+        <div>
+           <div>
 
+           </div>
+        </div>
         {/* CARDS PROFISSIONAIS */}
         <section className="flex flex-col items-center gap-3 flex-1 relative bottom-50 justify-center">
            <div className="flex justify-between items-center w-full">

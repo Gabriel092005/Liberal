@@ -73,7 +73,7 @@
                             <FileInput.FileList/>
                             <FileInput.Control multiple />
                 </FileInput.Root>
-          <Button className="self-start">Solicitar profissional</Button>
+          <Button className="self-start flex-1 w-full">Solicitar profissional</Button>
         </DialogContent>
       )
     }

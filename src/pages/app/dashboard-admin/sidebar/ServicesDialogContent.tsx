@@ -44,7 +44,7 @@ export function ServicoDialogContent({ nome }: { nome: string|null }) {
                         <FileInput.FileList/>
                         <FileInput.Control multiple />
             </FileInput.Root>
-      <Button className="self-start">Solicitar</Button>
+      <Button className="self-start flex flex-1 w-full">Solicitar Profissional</Button>
     </div>
   )
 }
