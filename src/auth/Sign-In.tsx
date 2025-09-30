@@ -44,7 +44,7 @@ export function SignIn() {
               <Input placeholder="exemplo@gmail.com"></Input>
             </div>
                <Link to='/'>
-                <Button className="flex flex-1 w-full" variant='default'>Acessar</Button>
+                <Button className="flex flex-1 w-full mt-4" variant='default'>Acessar</Button>
                </Link>
                           </motion.div>
                    

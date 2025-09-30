@@ -1,287 +1,93 @@
-import {  Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
-import photo1 from '@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg'
-// import photo2 from '@/assets/WhatsApp Image 2024-06-27 at 22.21.29_0203fa98.jpg'
-// import photo3 from '@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg'
-import photo4 from '@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg'
-// import photo5 from '@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg'
-// import photo6 from '@/assets/WhatsApp Image 2024-06-27 at 23.12.15_36445ef3.jpg'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Table, TableBody, TableCell,TableRow } from "@/components/ui/table";
-
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import photo1 from '@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg'
+import photo4 from '@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg'
 
 export function BuscarPrestadores() {
-
-    const cards = [
-      {
-      name:'Leonel Joao',
-      description:'Eletricista | Canalizador | Pedreiro',
-      image:photo4,
-      Location:'Viana,Luanda'
+  const cards = [
+    {
+      name: 'Leonel Joao',
+      description: 'Eletricista | Canalizador | Pedreiro',
+      image: photo4,
+      location: 'Viana, Luanda'
     },
 
-      {
-      name:'Gabriel Cavala',
-      description:'Eletricista | Canalizador | Pedreiro',
-      image:photo1,
-      Location:'Viana,Luanda'
+       {
+      name: 'Leonel Joao',
+      description: 'Eletricista | Canalizador | Pedreiro',
+      image: photo4,
+      location: 'Viana, Luanda'
+    },
+    {
+      name: 'Gabriel Cavala',
+      description: 'Eletricista | Canalizador | Pedreiro',
+      image: photo1,
+      location: 'Viana, Luanda'
+    },
+       {
+      name: 'Leonel Joao',
+      description: 'Eletricista | Canalizador | Pedreiro',
+      image: photo4,
+      location: 'Viana, Luanda'
     },
   ];
-  const [index, setIndex] = useState(0);
 
-  // const next = () => setIndex((prev) => (prev + 1) % cards.length);
-  // const prev = () =>
-    setIndex((prev) => (prev - 1 + cards.length) % cards.length);
   return (
     <motion.div
-      className="flex h-screen"
+      className="flex h-screen justify-center items-start mt-2"
       initial={{ x: "-100%", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-    <div className="flex mt-2 justify-center">
-      <Card className="overflow-auto border-none">
-          <CardHeader>
-               <CardTitle className="text-xl font-bold">Prestadores </CardTitle>
-               <CardDescription className="text-xs">Aqui você encontra os ultimos pedidos feitos.</CardDescription>
+      <Card className="w-full max-w-lg overflow-hidden border-none">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold">Prestadores</CardTitle>
+          <CardDescription className="text-xs mb-2">
+            Aqui você encontra os últimos pedidos feitos.
+          </CardDescription>
 
-                 <div className="relative">
-                    
-                     <Input placeholder="Oque voce precisa?" className="bg-zinc-200 pl-10 w-80"></Input>
-                     <Search className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400" size={20}/>
-                   </div>
-          </CardHeader>
-          <CardContent className="flex m-o p-o overflow-auto">
+          <div className="relative">
+            <Input placeholder="O que você precisa?" className="bg-zinc-200 dark:bg-black pl-10 w-full max-w-[320px]" />
+            <Search className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400" size={20} />
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-0 max-h-[400px] overflow-auto">
           <Table>
-  <TableBody>
-    <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
+            <TableBody>
+              {cards.map((card, i) => (
+                <TableRow key={i} className="h-14">
+                  <TableCell className="flex items-center gap-3 py-2 px-2">
+                    <Avatar className="w-10 h-10 ring-2 ring-orange-300 shadow-sm">
+                      {card.image ? (
+                        <AvatarImage src={card.image} />
+                      ) : (
+                        <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
+                          {card.name.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <div className="flex flex-col leading-tight">
+                      <span className="text-sm font-medium">{card.name}</span>
+                      <span className="text-[0.65rem] text-muted-foreground">{card.description}</span>
+                    </div>
+                  </TableCell>
 
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow>
-
-
-     <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow>
-
-     <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow> <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow> <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow> <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow> <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow> <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow> <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow> <TableRow className="flex items-center h-10"> {/* altura reduzida */}
-      <TableCell className="flex items-center gap-2 py-1 px-2">
-        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-          {cards[index].image ? (
-            <AvatarImage src={cards[index].image} />
-          ) : (
-            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-              {cards[index].name?.slice(0, 2).toUpperCase() ?? "LS"}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm">exemplo</span>
-          <span className="text-[0.65rem] text-muted-foreground">Cozinheiro | BarMan</span>
-        </div>
-      </TableCell>
-
-      <TableCell className="flex items-center gap-1 px-2">
-       <Button className=" h-7">Contactar</Button>
-          <X size={14}/>
-      </TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
-          </CardContent>
+                  <TableCell className="flex items-center gap-2 px-2">
+                    <Button className="h-7">Contactar</Button>
+                    <X size={16} className="text-red-400 cursor-pointer" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
       </Card>
-    </div>
-
- 
- 
     </motion.div>
   );
 }

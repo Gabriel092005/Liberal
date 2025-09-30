@@ -129,20 +129,33 @@ export function SignUp() {
       <SelectValue placeholder="Selecione sua profissão" />
     </SelectTrigger>
     <SelectContent>
-      <SelectItem value="engenheiro">Engenheiro</SelectItem>
-      <SelectItem value="medico">Médico</SelectItem>
-      <SelectItem value="professor">Professor</SelectItem>
-      <SelectItem value="advogado">Advogado</SelectItem>
-      <SelectItem value="contabilista">Contabilista</SelectItem>
-      <SelectItem value="enfermeiro">Enfermeiro</SelectItem>
-      <SelectItem value="motorista">Motorista</SelectItem>
-      <SelectItem value="pedreiro">Pedreiro</SelectItem>
-      <SelectItem value="eletricista">Eletricista</SelectItem>
-      <SelectItem value="carpinteiro">Carpinteiro</SelectItem>
-      <SelectItem value="serralheiro">Serralheiro</SelectItem>
-      <SelectItem value="cozinheiro">Cozinheiro</SelectItem>
-      <SelectItem value="estudante">Estudante</SelectItem>
-      <SelectItem value="outro">Outro</SelectItem>
+      <SelectItem value="ENGENHEIRO INFORMATICO">Engenheiro Informatico</SelectItem>
+      <SelectItem value="PROFESSOR INGLES">Professor Ingles</SelectItem>
+      <SelectItem value="PROGRAMADOR">Programador</SelectItem>
+      <SelectItem value="MEDICO">Médico</SelectItem>
+      <SelectItem value="PROFESSOR_MATEMATICA">Professor Matematica</SelectItem>
+      <SelectItem value="ADVOGADO">Advogado</SelectItem>
+      <SelectItem value="DESIGNER GRAFICO">Designer Grafico</SelectItem>
+      <SelectItem value="CONTABILISTA">Contabilista</SelectItem>
+      <SelectItem value="MANICURE PEDICURE">Manicure & Pedicure</SelectItem>
+      <SelectItem value="MANICURE PEDICURE">Maquiadora</SelectItem>
+      <SelectItem value="GESTOR_PROJECTOS">Gestor de Projectos</SelectItem>
+      <SelectItem value="CUSTUREIRA_ESTILISTA">Custureira & Estilista</SelectItem>
+      <SelectItem value="CABELEREIRO">Cabelereiro</SelectItem>
+      <SelectItem value="ENFERMEIRO">Enfermeiro</SelectItem>
+      <SelectItem value="ADMINISTRADOR_REDES">Administrador de Redes</SelectItem>
+      <SelectItem value="UX/UI DESIGNER">UX/UI Design</SelectItem>
+      <SelectItem value="MOTORISTA">Motorista</SelectItem>
+      <SelectItem value="PEDREIRO">Pedreiro</SelectItem>
+      <SelectItem value="MACANICO AUTO">Mecânico Auto</SelectItem>
+      <SelectItem value="REPARACAO DE CELULARES">Reparação de Celulares</SelectItem>
+      <SelectItem value="ELECTRICISTA">Eletricista</SelectItem>
+      <SelectItem value="CARPINTEIRO">Carpinteiro</SelectItem>
+      <SelectItem value="SERRELHEIRO_SOLDADOR">Serralheiro & Soldador</SelectItem>
+      <SelectItem value="TECNICO DE FRIO CLIMATIZACAO">Técnico de Frio & Climatização</SelectItem>
+      <SelectItem value="COZINHEIRO">Cozinheiro</SelectItem>
+      <SelectItem value="ESTUDANTE">Estudante</SelectItem>
+      <SelectItem value="OUTRO">Outro</SelectItem>
     </SelectContent>
   </Select>
 </div>

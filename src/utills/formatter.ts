@@ -14,44 +14,20 @@ export const priceFormatter = new Intl.NumberFormat('pt-BR', {
 });
 
 export const  dateISO  = new Date()
-export function formatWeight(weight:number) {
-  return weight.toLocaleString('pt-BR', {
-    style: 'unit',
-    unit: 'kilogram'
-  });
+
+export function formatBytes(bytes: number): string {
+    const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    let value = bytes;
+    let unitIndex = 0;
+
+    while (value >= 1024 && unitIndex < units.length - 1) {
+        value /= 1024;
+        unitIndex++;
+    }
+
+    return `${value.toFixed(1)} ${units[unitIndex]}`;
 }
 
-export function formatGlucose(glucose:number) {
-  return glucose.toLocaleString('pt-BR', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1
-  }) + ' mg/dL';
-}
-
-export function formatBloodPressure(bp:number) {
-  return bp.toLocaleString('pt-BR', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }) + ' mmHg';
-}
-
-export function formatCholesterol(cholesterol:number) {
-  return cholesterol.toLocaleString('pt-BR', {
-    style: 'decimal',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + ' mg/dL';
-}
-
-export function formatTriglycerides(triglycerides:number) {
-  return triglycerides.toLocaleString('pt-BR', {
-    style: 'decimal',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1
-  }) + ' mg/dL';
-}
 
 
 

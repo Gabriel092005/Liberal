@@ -5,15 +5,21 @@ import { SignIn } from './auth/Sign-In';
 import { AuthLayout } from './pages/_layouts/auth';
 import { SignUp } from './auth/Sign-up-cliente';
 import { SignUpEmpresa } from './auth/Sign-up-cliente-empresa';
-import { Pedidos } from './pages/app/dashboard-admin/sidebar/prestadores';
 // import { BuscarPrestadores } from './pages/Buscar/Buscar';
 import { Profile } from './pages/profile';
 // import { BoasVindas } from './pages/app/dashboard-admin/boas-vindas';
 import { Config } from './pages/app/dashboard-admin/sidebar/config';
-import { MadeiraOficios } from './pages/app/dashboard-admin/sidebar/madeira';
-import { Electricidade } from './pages/app/dashboard-admin/sidebar/Electricidade';
-import { Domestica } from './pages/app/dashboard-admin/sidebar/domestica';
-import { BelezaModa } from './pages/app/dashboard-admin/sidebar/BelezaModa';
+import { MadeiraOficios } from './pages/app/dashboard-admin/sidebar/FileInput/madeira';
+import { Electricidade } from './pages/app/dashboard-admin/sidebar/Categorias/Electricidade';
+import { Domestica } from './pages/app/dashboard-admin/sidebar/Categorias/domestica';
+import { BelezaModa } from './pages/app/dashboard-admin/sidebar/Categorias/BelezaModa';
+import { MaisProfissao } from './pages/app/dashboard-admin/sidebar/Categorias/MaisProfissao';
+import { BuscarPrestadores } from './pages/Buscar/Buscar';
+import { SearchPedidos } from './pages/app/dashboard-admin/sidebar/SearchPedidos';
+import { TecnologiaDesign } from './pages/app/dashboard-admin/sidebar/Categorias/TecnologiaDesign';
+import { Docencia } from './pages/app/dashboard-admin/sidebar/Categorias/Docencia';
+import { IdentidadeLayoutAdmin } from './pages/_layouts/indentida-visual';
+import { Indentitidade } from './pages/app/home-inicial/Indentidade';
 
 export const router = createBrowserRouter([
   {
@@ -21,12 +27,15 @@ export const router = createBrowserRouter([
     element: <AppLayoutAdmin />,
     children: [
       { path: '/', element: <Home/> },
-      { path: '/pedidos', element: <Pedidos/> },
+      { path: '/prestadores', element: <BuscarPrestadores/> },  
+      { path: '/pedidos', element: <SearchPedidos/> },
       { path: '/madeira', element: <MadeiraOficios/> },
+      { path: '/ensino', element: <Docencia/> },
+      { path: '/tecnologia', element: <TecnologiaDesign/> },
       { path: '/electricidade', element: <Electricidade/> },
       { path: '/domestica', element: <Domestica/> },
       { path: '/moda', element: <BelezaModa /> },
-      { path: '/pedidos', element: <Pedidos/> },
+      { path: '/mais', element: <MaisProfissao /> },
       { path: '/config', element:<Config/> },
       { path: '/me', element: <Profile/>},
     ],
@@ -38,6 +47,14 @@ export const router = createBrowserRouter([
       { path: '/sign-in', element: <SignIn /> },
       { path: '/sign-up', element: <SignUp/> },
       {path:'/empresa', element:<SignUpEmpresa/>}
+    ],
+  },
+
+    {
+    path: '/',
+    element:<IdentidadeLayoutAdmin/>,
+    children: [
+      { path: '/home', element: <Indentitidade/> },
     ],
   },
 

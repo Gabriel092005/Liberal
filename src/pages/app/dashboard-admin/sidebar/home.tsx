@@ -12,6 +12,8 @@ import {
   Plus,
   Search,
   Settings,
+  Star,
+  User,
   Workflow,
   Wrench,
 } from "lucide-react";
@@ -39,9 +41,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { BelezaModa } from "./BelezaModa";
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { NotificationMenu } from "./Notification/Notification-Content";
+import { SearchServices } from "./Search";
+import { MaisProfissao } from "./Categorias/MaisProfissao";
+import { PrestadoreProfile } from "./PrestadorProfile";
 
 export function Home() {
   const [query, setQuery] = useState("");
@@ -127,15 +131,43 @@ export function Home() {
                   {query ? (
                     <div className="flex flex-col gap-2 text-sm">
                       <p className="text-muted-foreground">Sugestões:</p>
+                    <Link className="flex items-center justify-center"  to='/electricidade'> 
+                         <button  className="px-3 py-2 rounded-md hover:bg-muted transition">
+                        Electricidade & Mecânica⚡
+                         </button>
+                    </Link>
+                        <Link className="flex items-center justify-center"  to='/madeira'> 
                       <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                        Eletricista disponível perto de você ⚡
+                        Oficícios 🌐
                       </button>
+                      </Link>
+                          <Link className="flex items-center justify-center"  to='/moda'> 
                       <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                        Designer gráfico e web 🌐
+                        Cabelereiro &  Moda🧹
                       </button>
+                        </Link>
+                          <Link className="flex items-center justify-center"  to='/electricidade'> 
                       <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                        Serviços de limpeza 🧹
+                        Mecânico
                       </button>
+                       </Link>
+                          <Link className="flex items-center justify-center"  to='/electricidade'> 
+                          <button className="px-3 py-2 rounded-md hover:bg-muted transition">
+                             Serviços de Frio e Climatização
+                          </button>
+                         </Link>
+
+                          <Link className="flex items-center justify-center"  to='/domestica'> 
+                           <button className="px-3 py-2 rounded-md hover:bg-muted transition">
+                            Serviços domesticos
+                          </button>
+                            </Link>
+                      <Link className="flex items-center justify-center"  to='/mais'> 
+                       <button className="px-3 py-2 rounded-md hover:bg-muted transition">
+                         Serviços  Juridicos
+                      </button>
+                        </Link>
+                      
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-4 mt-5">
@@ -144,8 +176,8 @@ export function Home() {
                         { src: servico1, label: "Eletricidade", to: "/electricidade" },
                         { src: servico5, label: "Doméstica", to: "/domestica" },
                         { src: servico4, label: "Beleza e Moda" , to:"/moda" },
-                        { src: servico6, label: "Tecnologia e Design" },
-                        { src: servico2, label: "Docente" },
+                        { src: servico6, label: "Tecnologia e Design", to:'/tecnologia' },
+                        { src: servico2, label: "Docente" , to:'/ensino' },
                       ].map((s, i) => (
                         <Link to={s.to ?? "#"} key={i}>
                           <div className="relative group cursor-pointer">
@@ -161,8 +193,10 @@ export function Home() {
                       ))}
                     </div>
                   )}
-
-<BelezaModa/>
+<Link to='/mais'>
+<MaisProfissao/>
+</Link>
+<MaisProfissao/>
                 </DialogContent>
               </Dialog>
 
@@ -186,16 +220,25 @@ export function Home() {
                
                  
         </header>
-             <Input
+       
+                   <Dialog>
+                    <DialogTrigger>
+                      <div className="flex w-80">
+                       <Input
                       placeholder="O que você precisa?"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      className="pl-10 dark:bg-muted"
+                      className="pl-8 dark:bg-muted"
                     />
                     <Search
                       className="absolute top-[5.8rem]  -translate-y-1/2 left-9 text-muted-foreground"
                       size={18}
                     />
+                   </div>
+                    </DialogTrigger>
+                    <SearchServices/>
+                   </Dialog>
+            
 
         {/* CATEGORIAS */}
         <section className="w-full flex flex-col gap-6 items-center justify-center">
@@ -204,17 +247,19 @@ export function Home() {
             </span>
           <div className="flex justify-around w-full gap-3">
             {[
-              { icon: Wrench, color: "text-blue-400", bg: "from-blue-100 to-blue-50", label: "Assistência Técnica" },
-              { icon: Hammer, color: "text-orange-400", bg: "from-orange-100 to-orange-50", label: "Reformas & Reparos" },
-              { icon: House, color: "text-violet-400", bg: "from-violet-100 to-violet-50", label: "Serviços Domésticos" },
+              { icon: Wrench, color: "text-blue-400", bg: "from-blue-100 to-blue-50", label: "Assistência Técnica" ,to:'/electricidade' },
+              { icon: Hammer, color: "text-orange-400", bg: "from-orange-100 to-orange-50", label: "Reformas & Reparos",to:'/madeira'  },
+              { icon: House, color: "text-violet-400", bg: "from-violet-100 to-violet-50", label: "Serviços Domésticos" ,to:'/domestica' },
             ].map((c, i) => (
               <div className="flex flex-col items-center" key={i}>
-                <Button
+               <Link to={c.to}>
+                 <Button
                   variant="outline"
                   className={`p-4 w-20 h-20 rounded-xl shadow-md border-0 bg-gradient-to-br ${c.bg} hover:scale-105 transition-transform`}
                 >
                   <c.icon className={c.color} size={30} />
                 </Button>
+               </Link>
                 <span className="text-xs mt-2 font-medium">{c.label}</span>
               </div>
             ))}
@@ -260,7 +305,7 @@ export function Home() {
                           )}
                         </Avatar>
                         <div>
-                          <p className="font-bold text-sm">{cards[index].name}</p>
+                   <p className="font-bold text-sm">{cards[index].name}</p>
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Workflow size={12} className="text-orange-500" />
                             <span className="truncate max-w-[140px]">
@@ -269,6 +314,15 @@ export function Home() {
 
                             
                           </div>
+
+                                                   <div className="flex items-center gap-1 mt-1">
+  <Star size={14} className="fill-orange-400 text-orange-400" />
+  <Star size={14} className="fill-orange-400 text-orange-400" />
+  <Star size={14} className="fill-orange-400 text-orange-400" />
+  <Star size={14} className="fill-orange-400 text-orange-400" />
+  <Star size={14} className="fill-orange-400 text-orange-400" />
+</div>
+        
                         </div>
                         <div>
                        <Button>
@@ -295,11 +349,17 @@ export function Home() {
                             </span>
                         </div>
                     </header>
-                    <div className="flex justify-end">
-                      <Button className="flex gap-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:opacity-90 text-xs">
-                        <Phone size={14} />
-                        Contactar
+                    <div className="flex justify-end gap-2">
+                 
+                    <Dialog>
+                        <DialogTrigger>
+                              <Button className="flex gap-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:opacity-90 text-xs">
+                        <User></User>
+                         ver perfil
                       </Button>
+                        </DialogTrigger>
+                        <PrestadoreProfile/>
+                    </Dialog>
                     </div>
                   </CardContent>
                 </Card>

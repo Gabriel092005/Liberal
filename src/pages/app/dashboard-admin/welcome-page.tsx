@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Check, Search, Send, UserRoundPlus } from "lucide-react"
 import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import image_01 from '@/assets/ChatGPT Image 27_09_2025, 20_29_07.png'
 import image_02 from '@/assets/Lovepik_com-832324747-Cartoon vector business meeting, commercial elements.png'
-import image_03 from '@/assets/favpng_e823129121e696754c212fef9d897c1f.png'
+import image_04 from '@/assets/IMG-20250930-WA0003.jpg'
+import image_05 from '@/assets/IMG-20250930-WA0004.jpg'
 
 export type Slide = {
   id: string
@@ -51,11 +52,50 @@ export function Menu({
 
     },
     {
-      id: "s3",
-      title: "Aumente a eficiencia e reduza custos",
+      id: "4",
+      title: "Encontre os Melhores Prestadores de Angola",
       description: "Acesse um pool de profissionais qualificados e experientes.",
-      image:image_03
+      image:image_04
+    },
+      {
+      id: "s4",
+      title: "Por que escolher a Liberal ",
+      description: "Uma plataforma completa para conectar clientes com prestadores de serviços com segurança e eficiência",
+      image:image_05
+    },
 
+    {
+      id: "s5",
+      title: "Como Funciona?",
+      description: "Em apenas 4 passos simples conecte-se aos melhores prestadores de serviços de Angola",
+      image:''
+    },
+
+       {
+      id: "s6",
+      title: "1.Cadastra-se",
+      description: "Crie uma conta gratuita como cliente ou prestador de serviços",
+      image:<UserRoundPlus size={50} className="text-orange-500 "></UserRoundPlus>
+    },
+
+           {
+      id: "s7",
+      title: "2.Busque ou Publique",
+      description: "Clientes publicam pedidos prestadores oferecem serviços",
+      image:<Search size={50} className="text-orange-500 "></Search>
+    },
+
+           {
+      id: "s8",
+      title: "3.Conecte-se",
+      description: "Comunique-se diretamente e negocie os melhores termos.",
+      image:<Send size={50} className="text-orange-500 "></Send>
+    },
+           {
+      id: "s9",
+      title: "4.Finalize",
+      description: "Complete o serviço e avalie mutuamente",
+      image:<Check size={50} className="text-orange-500 "></Check>
     },
   ]
 
@@ -91,7 +131,7 @@ export function Menu({
 
     if (navigate) {
       try {
-        navigate("/sign-up")
+        navigate("/home")
         setIsVisible(false)
         return
       } catch {
