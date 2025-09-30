@@ -46,7 +46,7 @@ import { NotificationMenu } from "./Notification/Notification-Content";
 import { SearchServices } from "./Search";
 import { MaisProfissao } from "./Categorias/MaisProfissao";
 import { PrestadoreProfile } from "./PrestadorProfile";
-import { AvatarScroll } from "./avatarScroll";
+// import { AvatarScroll } from "./avatarScroll";
 
 export function Home() {
   const [query, setQuery] = useState("");

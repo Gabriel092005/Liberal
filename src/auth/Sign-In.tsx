@@ -40,8 +40,8 @@ export function SignIn() {
               <Input placeholder="Palavra-Passe"></Input>
             </div>
               <div>
-              <Label htmlFor="">E-mail</Label>
-              <Input placeholder="exemplo@gmail.com"></Input>
+              <Label htmlFor="">Phone</Label>
+              <Input placeholder="+244 952 xxx xxx"></Input>
             </div>
                <Link to='/'>
                 <Button className="flex flex-1 w-full mt-4" variant='default'>Acessar</Button>
