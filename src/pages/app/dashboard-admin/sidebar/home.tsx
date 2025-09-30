@@ -87,7 +87,7 @@ export function Home() {
   //   setIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
   return (
-    <div className=" flex flex-col h-screen w-full right-3 fixed overflow-hidden bg-background text-foreground">
+    <div className=" flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
       {/* CONTEÚDO */}
       <motion.div
         className="flex flex-col flex-1 px-4 py-4 gap-4 items-center justify-center pb-20"
@@ -367,12 +367,11 @@ export function Home() {
             </AnimatePresence>
         
           </div>
-          
 
           <div className="flex gap-1 relative bottom-36">
                       <ChevronRightCircle
               onClick={next}
-              className="cursor-pointer fixed left-[21.8rem] text-muted-foreground hover:text-orange-500"
+              className="cursor-pointer fixed left-[21.1rem] text-muted-foreground hover:text-orange-500"
             />
 
              {/* <ChevronLeftCircle
