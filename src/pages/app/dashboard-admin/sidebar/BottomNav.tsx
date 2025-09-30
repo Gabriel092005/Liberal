@@ -7,7 +7,7 @@ import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
 
 export function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-11 z-50 left-5 ml-2  bg-white dark:bg-black md:hidden shadow-t">
+    <nav className="fixed inset-x-0 bottom-11 z-50 left-4 ml-2  bg-white dark:bg-black md:hidden shadow-t">
       <ul className="flex justify-around gap-9 items-center h-14">
         <li>
           <Link

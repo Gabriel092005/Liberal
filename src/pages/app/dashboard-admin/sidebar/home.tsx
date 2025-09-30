@@ -87,7 +87,7 @@ export function Home() {
   //   setIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
   return (
-    <div className=" flex flex-col h-screen  left-2 fixed overflow-hidden bg-background text-foreground">
+    <div className=" flex flex-col h-screen w-full right-3 fixed overflow-hidden bg-background text-foreground">
       {/* CONTEÚDO */}
       <motion.div
         className="flex flex-col flex-1 px-4 py-4 gap-4 items-center justify-center pb-20"
@@ -288,11 +288,11 @@ export function Home() {
                 transition={{ duration: 0.4 }}
                 className="absolute w-full"
               >
-                <Card className=" sticky w-full h-48 rounded-2xl  shadow-xl overflow-hidden border border-orange-200">
+                <Card className=" sticky w-full h-40 rounded-2xl left-5  shadow-xl overflow-hidden border border-orange-200">
                   <div className="absolute inset-0 bg-gradient-to-br from-orange-100 via-white to-orange-50 dark:from-zinc-900 dark:to-black opacity-90" />
                   <div className="absolute inset-0 backdrop-blur-sm" />
 
-                  <CardContent className="relative z-10 h-full p-4 flex flex-col justify-between">
+                  <CardContent className="relative z-10 h-full p-4 flex  flex-col justify-between">
                     <header>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-12 w-12 ring-2 ring-orange-400 shadow-md">
@@ -349,7 +349,7 @@ export function Home() {
                             </span>
                         </div>
                     </header>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-2 sticky bottom-5">
                  
                     <Dialog>
                         <DialogTrigger>
@@ -373,7 +373,7 @@ export function Home() {
 
                       <ChevronRightCircle
               onClick={next}
-              className="cursor-pointer fixed left-[22.6rem] text-muted-foreground hover:text-orange-500"
+              className="cursor-pointer fixed left-[21.8rem] text-muted-foreground hover:text-orange-500"
             />
 
              {/* <ChevronLeftCircle
