@@ -269,7 +269,7 @@ export function Home() {
         </section>
 
         {/* CARDS PROFISSIONAIS */}
-        <section className="flex flex-col items-center gap-3 flex-1 relative bottom-120 justify-center">
+        <section className="flex flex-col items-center gap-3 flex-1 relative bottom-50 justify-center">
            <div className="flex justify-between items-center w-full">
             <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
               Profissionais em Destaque
