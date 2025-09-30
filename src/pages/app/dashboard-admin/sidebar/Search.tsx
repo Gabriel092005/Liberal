@@ -44,7 +44,7 @@ export function SearchServices() {
             className="pl-8 dark:bg-muted"
           />
           <Search
-            className="absolute bottom-[34.8rem] left-3 -translate-y-1/2 text-muted-foreground"
+            className="absolute bottom-[37.8rem] left-3 -translate-y-1/2 text-muted-foreground"
             size={18}
           />
         </div>
