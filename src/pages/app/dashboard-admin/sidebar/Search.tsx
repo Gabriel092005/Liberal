@@ -34,20 +34,21 @@ export function SearchServices() {
     <DialogContent className="h-full">
       <header className="relative">
         {/* Campo de busca */}
-        <div className="flex w-full mt-5 ">
-          <Input
-            placeholder="O que você precisa?"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setFoco(true)}
-            onBlur={() => setTimeout(() => setFoco(false), 150)} // fecha a lista ao perder foco
-            className="pl-8 dark:bg-muted"
-          />
-          <Search
-            className="absolute bottom-[37.8rem] left-3 -translate-y-1/2 text-muted-foreground"
-            size={18}
-          />
-        </div>
+     <div className="relative w-full">
+  <Search
+    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+    size={18}
+  />
+  <Input
+    placeholder="O que você precisa?"
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+    onFocus={() => setFoco(true)}
+    onBlur={() => setTimeout(() => setFoco(false), 150)}
+    className="pl-9 dark:bg-muted"
+  />
+</div>
+
 
         {/* Sugestões */}
         {foco && query && (

@@ -46,6 +46,7 @@ import { NotificationMenu } from "./Notification/Notification-Content";
 import { SearchServices } from "./Search";
 import { MaisProfissao } from "./Categorias/MaisProfissao";
 import { PrestadoreProfile } from "./PrestadorProfile";
+import { AvatarScroll } from "./avatarScroll";
 
 export function Home() {
   const [query, setQuery] = useState("");
@@ -115,18 +116,19 @@ export function Home() {
 
                 <DialogContent className="flex flex-col gap-4 h-full sm:h-auto sm:max-w-lg rounded-xl p-6 bg-background shadow-lg">
                   {/* Input pesquisa */}
-                  <div className="relative top-5">
-                    <Input
-                      placeholder="O que você precisa?"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                    <Search
-                      className="absolute top-1/2 -translate-y-1/2 left-3 text-muted-foreground"
-                      size={18}
-                    />
-                  </div>
+              <div className="relative mt-5 w-full">
+  <Input
+    placeholder="O que você precisa?"
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+    className="pl-10 pr-3 py-2 rounded-full dark:bg-muted"
+  />
+  <Search
+    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+    size={18}
+  />
+</div>
+
 
                   {query ? (
                     <div className="flex flex-col gap-2 text-sm">
@@ -270,6 +272,7 @@ export function Home() {
 
            </div>
         </div>
+    {/* <AvatarScroll/> */}
         {/* CARDS PROFISSIONAIS */}
         <section className="flex flex-col items-center gap-3 flex-1 relative bottom-50 justify-center">
            <div className="flex justify-between items-center w-full">
