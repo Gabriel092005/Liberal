@@ -72,7 +72,7 @@ export function SignUp() {
               <h1 className="text-2xl font-semibold tracking-tight">Sign Up Clientes</h1>
             </div>
             <p className="text-sm text-muted-foreground">
-              Se  já tiver um conta ativa podes simplesmente fazer <Link to='/sign-in' className="text-blue-300">login </Link>para ter acessar tua conta
+              Se  já tiver um conta activa pode simplesmente fazer <Link to='/sign-in' className="text-blue-300">login </Link>para ter aceder à sua conta
             </p>
           </div>
 
@@ -281,9 +281,8 @@ export function SignUp() {
                 </motion.div>
               )}
             </AnimatePresence>
-
           </form>
-        <span className="text-muted-foreground text-xs">Para registar-se na plataforma como prestador (individual/Empresa) de serviços clica em <Link to='/empresa' className="text-blue-300">skip.</Link></span>
+        <span className="text-muted-foreground text-xs">Para se registar na plataforma como prestador de serviços (individual/Empresa)  clica em <Link to='/empresa' className="text-blue-300">skip.</Link></span>
         </div>
       </div>
     </>

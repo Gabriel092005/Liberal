@@ -48,8 +48,6 @@ export function SignIn() {
                </Link>
                           </motion.div>
                    
-        
-         
           </form>
           <span className="text-muted-foreground text-xs">Se ainda não tiver uma conta deve <Link className="border-b border-solid text-blue-400" to='/sign-up'>registrar-se</Link> primeiro para poder navegar normalmente e obter oportunidades.</span>
         </div>
