@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { CardContent } from "@/components/ui/card"
 import { Pencil,  } from "lucide-react"
 import photo4 from "@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg"
 import { Link } from "react-router-dom"
@@ -47,7 +47,7 @@ export function Profile() {
           </div>
 
           {/* Sobre mim */}
-          <Card className="mt-6 text-left">
+          <div className="mt-6 text-left">
             <CardContent className="p-4">
               <h3 className="font-semibold text-base mb-2">Sobre</h3>
               <p className="text-sm text-muted-foreground">
@@ -56,7 +56,7 @@ export function Profile() {
                 serviços personalizados.
               </p>
             </CardContent>
-          </Card>
+          </div>
         </div>
       </div>
     </div>

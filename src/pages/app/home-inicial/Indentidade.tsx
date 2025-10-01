@@ -127,14 +127,14 @@ export function Indentitidade() {
       </AnimatePresence>
 
       {/* Footer fixo */}
-      <motion.footer
+      {/* <motion.footer
         className="bg-orange-100 dark:bg-zinc-900 py-3 text-center text-sm text-muted-foreground shadow-inner"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.5 }}
       >
         © {new Date().getFullYear()} Plataforma Liberal - Todos os direitos reservados
-      </motion.footer>
+      </motion.footer> */}
     </div>
   )
 }

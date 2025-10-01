@@ -89,7 +89,11 @@ export function Home() {
 
   return (
     <div className=" flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
-      {/* CONTEÚDO */}
+     <Button>
+        <Link to='/servicos'>
+           prestador
+        </Link>
+     </Button>
       <motion.div
         className="flex flex-col flex-1 px-4 py-4 gap-4 items-center justify-center pb-20"
         initial={{ x: "-100%", opacity: 0 }}
@@ -243,37 +247,7 @@ export function Home() {
             
 
         {/* CATEGORIAS */}
-        <section className="w-full flex flex-col gap-6 items-center justify-center">
-           <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-              CATEGORIAS POPULARES
-            </span>
-          <div className="flex justify-around w-full gap-3">
-            {[
-              { icon: Wrench, color: "text-blue-400", bg: "from-blue-100 to-blue-50", label: "Assistência Técnica" ,to:'/electricidade' },
-              { icon: Hammer, color: "text-orange-400", bg: "from-orange-100 to-orange-50", label: "Reformas & Reparos",to:'/madeira'  },
-              { icon: House, color: "text-violet-400", bg: "from-violet-100 to-violet-50", label: "Serviços Domésticos" ,to:'/domestica' },
-            ].map((c, i) => (
-              <div className="flex flex-col items-center" key={i}>
-               <Link to={c.to}>
-                 <Button
-                  variant="outline"
-                  className={`p-4 w-20 h-20 rounded-xl shadow-md border-0 bg-gradient-to-br ${c.bg} hover:scale-105 transition-transform`}
-                >
-                  <c.icon className={c.color} size={30} />
-                </Button>
-               </Link>
-                <span className="text-xs mt-2 font-medium">{c.label}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-        <div>
-           <div>
 
-           </div>
-        </div>
-    {/* <AvatarScroll/> */}
-        {/* CARDS PROFISSIONAIS */}
         <section className="flex flex-col items-center gap-3 flex-1 relative bottom-50 justify-center">
            <div className="flex justify-between items-center w-full">
             <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
@@ -386,59 +360,40 @@ export function Home() {
            
       
           </div>
-
-            <section className="relative bottom-3 ">
-      </section>
         </section>
-    
-        {/* ÚLTIMOS PEDIDOS */}
-        {/* <section className="w-full">
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="text-sm">Últimos Pedidos</CardTitle>
-              <CardDescription className="text-xs">
-                Aqui você encontra os últimos pedidos feitos.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableBody>
-                  {[
-                    { role: "Cozinheiro | Barman", status: "loading" },
-                    { role: "Doméstica | Engomadeira", status: "error" },
-                  ].map((p, i) => (
-                    <TableRow key={i} className="flex items-center h-10">
-                      <TableCell className="flex items-center gap-2 py-1">
-                        <Avatar className="w-7 h-7 ring-2 ring-orange-300 shadow-sm">
-                          <AvatarImage src={cards[index].image} />
-                        </Avatar>
-                        <div className="flex flex-col leading-tight">
-                          <span className="text-xs font-medium">Exemplo</span>
-                          <span className="text-[0.65rem] text-muted-foreground">
-                            {p.role}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="flex items-center gap-1">
-                        {p.status === "loading" ? (
-                          <Loader2
-                            className="text-orange-400 animate-spin"
-                            size={12}
-                          />
-                        ) : (
-                          <X className="text-red-400" size={12} />
-                        )}
-                        <span className="text-[0.65rem] text-muted-foreground">
-                          1min
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </section> */}
+        <section className="w-full relative bottom-16 flex flex-col gap-6 items-center justify-center">
+           <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
+              CATEGORIAS POPULARES
+            </span>
+          <div className="flex justify-around w-full gap-3">
+            {[
+              { icon: Wrench, color: "text-blue-400", bg: "from-blue-100 to-blue-50", label: "Assistência Técnica" ,to:'/electricidade' },
+              { icon: Hammer, color: "text-orange-400", bg: "from-orange-100 to-orange-50", label: "Reformas & Reparos",to:'/madeira'  },
+              { icon: House, color: "text-violet-400", bg: "from-violet-100 to-violet-50", label: "Serviços Domésticos" ,to:'/domestica' },
+            ].map((c, i) => (
+              <div className="flex flex-col items-center" key={i}>
+               <Link to={c.to}>
+                 <Button
+                  variant="outline"
+                  className={`p-4 w-20 h-20 rounded-xl shadow-md border-0 bg-gradient-to-br ${c.bg} hover:scale-105 transition-transform`}
+                >
+                  <c.icon className={c.color} size={30} />
+                </Button>
+               </Link>
+                <span className="text-xs mt-2 font-medium">{c.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+        <div>
+           <div>
+
+           </div>
+        </div>
+    {/* <AvatarScroll/> */}
+        {/* CARDS PROFISSIONAIS */}
+        
+  
       </motion.div>
 
       {/* NAV BOTTOM FIXA */}

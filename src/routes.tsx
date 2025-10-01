@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { AppLayoutAdmin } from './pages/_layouts/app';
+import { AppLayoutAdmin } from './pages/_layouts/app-clientes';
 import { Home} from './pages/app/dashboard-admin/sidebar/home';
 import { SignIn } from './auth/Sign-In';
 import { AuthLayout } from './pages/_layouts/auth';
@@ -20,7 +20,11 @@ import { TecnologiaDesign } from './pages/app/dashboard-admin/sidebar/Categorias
 import { Docencia } from './pages/app/dashboard-admin/sidebar/Categorias/Docencia';
 import { IdentidadeLayoutAdmin } from './pages/_layouts/indentida-visual';
 import { Indentitidade } from './pages/app/home-inicial/Indentidade';
-
+import { AppLayoutPestadores } from './pages/_layouts/app-prestadores';
+import { PrestadoresDash } from './pages/app/Prestadores-dash/Prestadores-home';
+import { Package } from './pages/app/Prestadores-dash/Pacotes';
+import { PrestadoresPedidos } from './pages/app/Prestadores-dash/Pedidos-Prestadores';
+import { ProfilePage } from './pages/app/Prestadores-dash/PrestadoresProfile';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -49,11 +53,22 @@ export const router = createBrowserRouter([
       {path:'/empresa', element:<SignUpEmpresa/>}
     ],
   },
-
+    {
+    path: '/',
+    element:<AppLayoutPestadores/>,
+    children: [
+      // {path:'/', <PrestadoresLayout}
+      { path: '/servicos', element: <PrestadoresDash/> },
+      { path: '/prestadores-pedidos', element: <PrestadoresPedidos/> },
+      { path: '/profile', element: <ProfilePage/> },
+      { path: '/package', element: <Package/> },
+    ],
+  },
     {
     path: '/',
     element:<IdentidadeLayoutAdmin/>,
     children: [
+      { path: '/home', element: <Indentitidade/> },
       { path: '/home', element: <Indentitidade/> },
     ],
   },

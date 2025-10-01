@@ -88,7 +88,7 @@ export function SignUpEmpresa() {
         >
           {/* Header */}
           <div className="flex flex-col gap-1 -mt-40 lg:mt-0">
-            <div className="flex fixed top-2  justify-between w-full">
+            <div className="flex relative -top-10  justify-between w-full">
               <Link to="/sign-up">
                 <ChevronLeft className="text-blue-400 fixed" />
               </Link>
