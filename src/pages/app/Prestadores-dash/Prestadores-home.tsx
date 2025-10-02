@@ -6,7 +6,6 @@ import {
   LucideCircleDollarSign,
   MapPin,
 
-  Podcast,
 
   X,
 } from "lucide-react";
