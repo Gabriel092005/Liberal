@@ -1,9 +1,12 @@
 import {
   Bell,
+  ChevronDown,
   Handshake,
   InfoIcon,
   LucideCircleDollarSign,
   MapPin,
+
+  Podcast,
 
   X,
 } from "lucide-react";
@@ -21,19 +24,16 @@ import photo4 from "@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu,  DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { NotificationMenu } from "../dashboard-admin/sidebar/Notification/Notification-Content";
 import { Table, TableBody, TableCell,TableRow } from "@/components/ui/table";
 import { ServicesDialogDetails } from "./ServicesDialogDetails";
-
-// import { AvatarScroll } from "./avatarScroll";
-
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Historico } from "./Historico";
+;
 export function PrestadoresDash() {
-
   const navigate = useNavigate()
-
-  
   useEffect(()=>{
     const seen = localStorage.getItem('app_onboarding_seen_v1')
     if(!seen){
@@ -101,12 +101,6 @@ export function PrestadoresDash() {
 
      
   ];
-
-
-
-  // const prev = () =>
-  //   setIndex((prev) => (prev - 1 + cards.length) % cards.length);
-
   return (
     <div className=" flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
       {/* CONTEÚDO */}
@@ -116,18 +110,14 @@ export function PrestadoresDash() {
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        {/* HEADER */} 
-
-
-
     <header className="w-full sticky top-0 z-50 bg-white dark:bg-zinc-950 px-4 py-3 shadow-sm">
       <div className="flex items-center justify-between">
-        {/* Avatar + Nome */}
        <div className="flex items-center gap-3">
   <Avatar className="h-10 w-10 ring-2 ring-orange-400 shadow-md">
     <AvatarImage src="https://i.pravatar.cc/150?img=12" alt="User" />
     <AvatarFallback>AV</AvatarFallback>
   </Avatar>
+
 
   <div className="flex flex-col leading-tight">
     <span className="font-bold text-sm sm:text-base text-zinc-800 dark:text-zinc-200">
@@ -170,13 +160,17 @@ export function PrestadoresDash() {
       <div className="relative w-80 h-48 rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 
                       shadow-[8px_8px_16px_rgba(0,0,0,0.6),-8px_-8px_16px_rgba(255,255,255,0.05)] 
                       text-white p-6 overflow-hidden">
-        
-        {/* Brilho decorativo */}
+  
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-tr from-orange-500 to-pink-500 rounded-full opacity-30 blur-2xl"></div>
-        
-        {/* Logo / Chip */}
         <div className="flex justify-between items-center">
-          <div className="w-10 h-7 bg-gradient-to-br from-orange-900 to-yellow-600 rounded-md shadow-inner"></div>
+             <Sheet>
+          <SheetTrigger asChild>
+          <div className="w-10 h-7 bg-gradient-to-br from-orange-900 to-yellow-600 rounded-md shadow-inner">
+          </div>
+          </SheetTrigger>
+       <SheetContent>
+          </SheetContent>
+      </Sheet> 
           <LucideCircleDollarSign className="text-white opacity-80" size={22} />
         </div>
 
@@ -196,11 +190,28 @@ export function PrestadoresDash() {
             <p className="font-semibold text-sm">12/28</p>
           </div>
         </div>
+        
       </div>
+      
     </div>
-        </section>
-   
+    
 
+    <Dialog>
+       <DialogTrigger>
+                <ChevronDown className="absolute top-80 right-80 text-muted-foreground"/>
+       </DialogTrigger>
+       <DialogContent >
+        <header>
+            <h1 className="text-2xl"> Histórico</h1>
+            <span className="text-xs text-muted-foreground">Um relatório de débitos e créditos efetuadas, nas últimas horas</span>
+        </header>
+               <div className="flex">
+                    <Historico/>
+               </div>
+       </DialogContent>
+    </Dialog>
+  
+        </section>
         <section className="flex flex-col items-center gap-3 flex-1 left-5 relative bottom-50 justify-center">
             <motion.div
                   className="flex h-screen justify-center items-start mt-2"
@@ -293,11 +304,7 @@ export function PrestadoresDash() {
                   </Card>
                 </motion.div>
         </section>
-    
       </motion.div>
-
-      {/* NAV BOTTOM FIXA */}
-
     </div>
   );
 }

@@ -204,6 +204,9 @@ export function SearchPedidos() {
                       <div className="flex">
                         <Phone size={14} className="text-blue-400"></Phone>
                          <span className="text-muted-foreground text-xs">+244 987 737 344 </span>
+                         <Button className=" ml-3">
+                            Fechar
+                         </Button>
                       </div>
                     </div>
                     

@@ -1,4 +1,5 @@
-import { Camera, Pencil, MapPin, Briefcase, Globe } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Camera, Pencil, MapPin, Briefcase, Globe, Podcast } from "lucide-react"
 
 export function ProfilePage() {
   return (
@@ -10,13 +11,10 @@ export function ProfilePage() {
           alt="Capa"
           className=" object-cover"
         />
-        {/* Editar capa */}
         <button className="absolute top-3 right-3 p-2 bg-white dark:bg-zinc-800 rounded-full shadow hover:bg-gray-100 dark:hover:bg-zinc-700">
           <Camera className="h-5 w-5 text-gray-700 dark:text-zinc-300" />
         </button>
       </div>
-
-      {/* Seção principal */}
       <div className="max-w-5xl mx-auto px-4 relative">
         {/* Foto de perfil */}
         <div className="relative -mt-20 flex items-center">
@@ -26,13 +24,10 @@ export function ProfilePage() {
               alt="Perfil"
               className="h-36 w-36 rounded-full border-4 border-white dark:border-zinc-900 object-cover"
             />
-            {/* Editar foto perfil */}
             <button className="absolute bottom-2 right-2 p-2 bg-white dark:bg-zinc-800 rounded-full shadow hover:bg-gray-100 dark:hover:bg-zinc-700">
               <Pencil className="h-5 w-5 text-gray-700 dark:text-zinc-300" />
             </button>
           </div>
-
-          {/* Nome e bio */}
           <div className="ml-6 flex flex-col">
             <span className="text-2xl font-bold">Gabriel Cavala</span>
             <span className="text-sm text-gray-600 dark:text-zinc-400">
@@ -40,11 +35,6 @@ export function ProfilePage() {
             </span>
           </div>
         </div>
-
-        {/* Botões de ação */}
-      
-
-        {/* Informações extras */}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-blue-500" />
@@ -64,9 +54,13 @@ export function ProfilePage() {
               github.com/gabriel
             </a>
           </div>
+           <div>
+          <Button variant='outline'>
+                  <Podcast/>
+                <span className="text-muted-foreground">Colocar na vitrine</span>
+          </Button>
+         </div>
         </div>
-
-     
       </div>
     </div>
   )

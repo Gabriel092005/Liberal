@@ -10,6 +10,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ServicesDialogDetails } from "./ServicesDialogDetails";
 import { useState } from "react";
 
+
 export function PrestadoresPedidos() {
   const cards = [
     {
@@ -174,12 +175,22 @@ export function PrestadoresPedidos() {
                       <span className="font-bold">{card.location}</span>
                     </div>
                     <div>
-                      <Button variant="outline" className="ml-8">
+                        <Dialog>
+                              <DialogTrigger asChild>
+                                  <Button variant="outline" className="ml-8">
                         <Handshake className="text-muted-foreground" />
                         <span className="flex text-xs text-muted-foreground relative items-center">
                           Negociar
                         </span>
                       </Button>
+
+                              </DialogTrigger>
+                         
+                                
+                                {/* <MessagesHOME/> */}
+                            
+                        </Dialog>
+                    
                     </div>
                   </TableCell>
                 </TableRow>

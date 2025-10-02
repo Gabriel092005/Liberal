@@ -48,7 +48,7 @@ export function BuscarPrestadores() {
         <CardHeader>
           <CardTitle className="text-3xl font-bold">Prestadores</CardTitle>
           <CardDescription className="text-xs mb-2">
-            Aqui você encontra os últimos pedidos feitos.
+            Aqui você encontra os prestadores.
           </CardDescription>
 
           <div className="relative">
@@ -80,6 +80,7 @@ export function BuscarPrestadores() {
 
                   <TableCell className="flex items-center gap-2 px-2">
                     <Button className="h-7">Contactar</Button>
+                    <Button className="h-7" variant='outline'>Denunciar</Button>
                     <X size={16} className="text-red-400 cursor-pointer" />
                   </TableCell>
                 </TableRow>

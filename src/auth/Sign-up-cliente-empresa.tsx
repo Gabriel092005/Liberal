@@ -95,7 +95,7 @@ export function SignUpEmpresa() {
             </div>
             <h1 className="text-2xl font-semibold tracking-tight">Sign Up Prestador de Serviços</h1>
             <p className="text-sm text-muted-foreground">
-              Registre-se na plataforma como prestador de serviços e vamos trabalhar juntos.
+              Registe-se na plataforma como prestador de serviços e capte clientes.
             </p>
           </div>
 

@@ -75,7 +75,7 @@ export function Prestadores() {
             Prestadores Favoritos
           </CardTitle>
           <CardDescription className="text-xs">
-            Aqui você encontra os últimos pedidos feitos
+            Aqui você encontra os últimos pedidos feitos1111111111111
           </CardDescription>
 
           {/* Search */}

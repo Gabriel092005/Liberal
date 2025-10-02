@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Home, User, Search, Heart, Plus } from "lucide-react";
+import { Home, User, Search,Plus, Briefcase } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
 
@@ -25,8 +25,8 @@ export function BottomNav() {
             to="/prestadores"
             className="flex flex-col items-center text-sm text-gray-600 dark:text-gray-300 hover:text-orange-500"
           >
-            <Heart className="w-6 h-6" />
-            <span className="text-xs">Favoritos</span>
+            <Briefcase className="w-6 h-6" />
+            <span className="text-xs">Prestadores</span>
           </Link>
         </li>
 

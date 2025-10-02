@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Home, User, Search,Inbox, Box,MapPinIcon } from "lucide-react";
+import { Home, User, Search,Inbox, Box,MapPinIcon} from "lucide-react";
 import { Link } from "react-router-dom";
 import { SkeletonsDemo } from "./NearClientsSearch";
 
@@ -57,7 +57,7 @@ export function BottomNavPrestadores() {
         <li>
           <Link
             to="/prestadores-pedidos"
-            className="flex flex-col items-center text-sm text-gray-600 dark:text-gray-300 hover:text-orange-500"
+            className="flex flex-col items-center relative left-5 text-sm text-gray-600 dark:text-gray-300 hover:text-orange-500"
           >
             <Inbox className="w-6 h-6" />
             <span className="text-xs">Pedidos</span>

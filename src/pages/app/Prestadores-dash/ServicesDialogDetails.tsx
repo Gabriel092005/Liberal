@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DialogContent } from "@/components/ui/dialog";
-import { MapPin, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Handshake, Layers, MapPin, X } from "lucide-react";
 
 export function ServicesDialogDetails() {
   return (
@@ -14,8 +13,6 @@ export function ServicesDialogDetails() {
             JV
           </AvatarFallback>
         </Avatar>
-
-        {/* Conteúdo */}
         <div className="flex-1 flex flex-col">
           <div className="flex justify-between items-start">
             <div>
@@ -26,35 +23,22 @@ export function ServicesDialogDetails() {
                    +244 865  737 635
               </p>
             </div>
-
             <span className="text-[0.65rem] text-muted-foreground">1 min</span>
           </div>
-
-          {/* Localização */}
           <div className="flex items-center gap-1 mt-3 text-orange-500 text-sm">
             <MapPin size={16} />
             <span className="font-medium">Estalagem, Luanda</span>
           </div>
         </div>
       </div>
-
-      {/* Ações */}
-      <div className="flex justify-end gap-3 mt-6">
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-full border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-        >
-          <X size={16} className="mr-1" />
-          Recusar
-        </Button>
-        <Button
-          variant="default"
-          size="sm"
-          className="rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-md"
-        >
-          Negociar
-        </Button>
+      <div className="flex justify-end gap-1 mt-6">
+          <X size={16} className="mr-1 text-red-500" />
+          <div>
+          <Handshake className="text-blue-500" size={16}/>
+          </div>
+          <div>
+            <Layers className="text-orange-500" size={16}/>
+          </div>
       </div>
     </DialogContent>
   );
