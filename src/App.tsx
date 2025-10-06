@@ -9,7 +9,11 @@ import { ThemeProvider } from './components/theme/theme-provider'
 
 
 
+
+
 export function App() {
+
+  
   return(
     <HelmetProvider>
       <Helmet titleTemplate='%s | quintal.'/>
@@ -21,6 +25,7 @@ export function App() {
     </ThemeProvider>
   </HelmetProvider>
   )
+
 }
 
 

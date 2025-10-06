@@ -47,7 +47,8 @@ import { SearchServices } from "./Search";
 import { MaisProfissao } from "./Categorias/MaisProfissao";
 import { PrestadoreProfile } from "./PrestadorProfile";
 // import { MapRoute } from "../mapas";
-import { VerMapas } from "./Ver-Mapas";
+// import { VerMapas } from "./Ver-Mapas";
+import { ButtonPWA } from "@/hooks/ButtonPWA";
 // import { AvatarScroll } from "./avatarScroll";
 
 export function Home() {
@@ -89,14 +90,13 @@ export function Home() {
   // const prev = () =>
   //   setIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
+  
+
   return (
     <div className=" flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
-         <VerMapas></VerMapas>
-     <Button>
-        <Link to='/servicos'>
-           prestador
-        </Link>
-     </Button>
+    
+    <ButtonPWA></ButtonPWA>
+ 
       <motion.div
         className="flex flex-col flex-1 px-4 py-4 gap-4 items-center justify-center pb-20"
         initial={{ x: "-100%", opacity: 0 }}
@@ -108,7 +108,7 @@ export function Home() {
           <div className="flex items-center gap-11 justify-between">
               <div>
                  <h1 className="tracking-tight font-bold text-lg sm:text-xl">
-              Boas-Vindas, Marcos!
+              Boas-Vindas!
             </h1>
               </div>
 

@@ -7,36 +7,59 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "autoUpdate", // atualiza automaticamente quando houver nova versão
-      includeAssets: ["favicon.svg", "favicon.ico", "robots.txt", "apple-touch-icon.png"],
-      manifest: {
-        name: "Minha Aplicação React",
-        short_name: "MeuApp",
-        description: "Uma aplicação React convertida em PWA 🚀",
-        theme_color: "#1E40AF", // azul, podes alterar
-        background_color: "#ffffff",
-        display: "standalone",
-        start_url: "/",
-        icons: [
-          {
-            src: "/pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable",
-          },
-        ],
-      },
-    }),
+  registerType: "autoUpdate",
+  devOptions: {
+    enabled: true, // permite ver a PWA atualizando também no modo dev
+  },
+  strategies:'injectManifest',
+  srcDir:'src',
+  filename:'sw.ts',
+  injectManifest:{
+     swDest:'dist/sw.js'
+  },
+  workbox: {
+    clientsClaim: true,
+    skipWaiting: true, // força o service worker novo a ativar logo
+  },
+  manifest: {
+    name: "Liberal",
+    short_name: "L",
+    start_url: "/",
+    display: "standalone",
+    orientation:'portrait',
+    theme_color: "#1E40AF",
+    background_color: "#ffffff",
+    icons: [
+             
+  {
+    src: "public/manifest-icon",
+    sizes: "192x192",
+    type: "image/png",
+    "purpose": "any"
+  },
+  {
+    src: "public/manifest-icon",
+    sizes: "192x192",
+    type: "image/png",
+    purpose: "maskable"
+  },
+  {
+    src: "public/manifest-icon",
+    sizes: "512x512",
+    type: "image/png",
+    purpose: "any"
+  },
+  {
+    src: "public/manifest-icon",
+    sizes: "512x512",
+    type: "image/png",
+    purpose: "maskable"
+  }
+    ],
+  },
+})
+
+,
   ],
   resolve: {
     alias: {
