@@ -9,9 +9,13 @@
     }
   ],
   "compilerOptions": {
+     "strict": true,
+     "typeRoots": ["./node_modules/@types", "./src/types"],
+         "types": ["leaflet"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  // "include": ["src"]
 }

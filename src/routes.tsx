@@ -25,6 +25,7 @@ import { PrestadoresDash } from './pages/app/Prestadores-dash/Prestadores-home';
 import { Package } from './pages/app/Prestadores-dash/Pacotes';
 import { PrestadoresPedidos } from './pages/app/Prestadores-dash/Pedidos-Prestadores';
 import { ProfilePage } from './pages/app/Prestadores-dash/PrestadoresProfile';
+import { VerMapas } from './pages/app/dashboard-admin/sidebar/Ver-Mapas';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -44,7 +45,7 @@ export const router = createBrowserRouter([
       { path: '/me', element: <Profile/>},
     ],
   },
-    {
+  {
     path: '/',
     element:<AuthLayout/>,
     children: [
@@ -62,13 +63,13 @@ export const router = createBrowserRouter([
       { path: '/prestadores-pedidos', element: <PrestadoresPedidos/> },
       { path: '/profile', element: <ProfilePage/> },
       { path: '/package', element: <Package/> },
+      { path: '/mapas', element: <VerMapas/> },
     ],
   },
     {
     path: '/',
     element:<IdentidadeLayoutAdmin/>,
     children: [
-      { path: '/home', element: <Indentitidade/> },
       { path: '/home', element: <Indentitidade/> },
     ],
   },

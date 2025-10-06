@@ -30,6 +30,7 @@ import { Table, TableBody, TableCell,TableRow } from "@/components/ui/table";
 import { ServicesDialogDetails } from "./ServicesDialogDetails";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Historico } from "./Historico";
+// import { VerMapas } from "../dashboard-admin/sidebar/Ver-Mapas";
 ;
 export function PrestadoresDash() {
   const navigate = useNavigate()
@@ -108,7 +109,7 @@ export function PrestadoresDash() {
         initial={{ x: "-100%", opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-      >
+        >
     <header className="w-full sticky top-0 z-50 bg-white dark:bg-zinc-950 px-4 py-3 shadow-sm">
       <div className="flex items-center justify-between">
        <div className="flex items-center gap-3">
@@ -212,12 +213,13 @@ export function PrestadoresDash() {
   
         </section>
         <section className="flex flex-col items-center gap-3 flex-1 left-5 relative bottom-50 justify-center">
+         
             <motion.div
                   className="flex h-screen justify-center items-start mt-2"
                   initial={{ x: "-100%", opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
-                >
+                  >
                   <Card className="w-full max-w-lg relative right-[1.4rem] overflow-hidden border-none">
                     {/* <CardHeader>
                       <CardTitle className="text-3xl font-bold">Pedidos</CardTitle>

@@ -3,6 +3,16 @@
 @tailwind components;
 @tailwind utilities;
 
+  
+
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+
+
 @layer base {
 
 @layer base {

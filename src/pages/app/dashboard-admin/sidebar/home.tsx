@@ -46,6 +46,8 @@ import { NotificationMenu } from "./Notification/Notification-Content";
 import { SearchServices } from "./Search";
 import { MaisProfissao } from "./Categorias/MaisProfissao";
 import { PrestadoreProfile } from "./PrestadorProfile";
+// import { MapRoute } from "../mapas";
+import { VerMapas } from "./Ver-Mapas";
 // import { AvatarScroll } from "./avatarScroll";
 
 export function Home() {
@@ -89,6 +91,7 @@ export function Home() {
 
   return (
     <div className=" flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
+         <VerMapas></VerMapas>
      <Button>
         <Link to='/servicos'>
            prestador
@@ -99,7 +102,7 @@ export function Home() {
         initial={{ x: "-100%", opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-      >
+        >
         {/* HEADER */} 
         <header className="w-full flex justify-center flex-col items-center gap-44">
           <div className="flex items-center gap-11 justify-between">
@@ -126,11 +129,11 @@ export function Home() {
     value={query}
     onChange={(e) => setQuery(e.target.value)}
     className="pl-10 pr-3 py-2 rounded-full dark:bg-muted"
-  />
+    />
   <Search
     className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
     size={18}
-  />
+    />
 </div>
 
 
@@ -239,7 +242,7 @@ export function Home() {
                     <Search
                       className="absolute top-[5.8rem]  -translate-y-1/2 left-9 text-muted-foreground"
                       size={18}
-                    />
+                      />
                    </div>
                     </DialogTrigger>
                     <SearchServices/>
