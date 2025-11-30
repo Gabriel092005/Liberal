@@ -1,406 +1,640 @@
 import {
-  Bell,
-  ChevronRightCircle,
-
-  Hammer,
-  House,
-  Linkedin,
-  Mail,
-  // Loader2,
-  MapPinIcon,
-  Phone,
+  BookMarked,
+  Camera,
+  ChevronRight,
+  Loader2,
+  LogOut,
+  Menu,
+  MessageCircle,
   Plus,
   Search,
-  Settings,
-  Star,
-  User,
-  Workflow,
-  Wrench,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  // CardDescription,
-  // CardHeader,
-  // CardTitle,
-} from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import photo1 from "@/assets/WhatsApp Image 2024-06-27 at 22.46.31_45dd20ec.jpg";
-import photo4 from "@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg";
+import { useEffect, useRef, useState } from "react";
 import servico1 from "@/assets/IMG-20250928-WA0054.jpg";
 import servico2 from "@/assets/IMG-20250928-WA0057.jpg";
 import servico3 from "@/assets/IMG-20250928-WA0056.jpg";
 import servico4 from "@/assets/IMG-20250928-WA0058.jpg";
 import servico5 from "@/assets/IMG-20250928-WA0059.jpg";
 import servico6 from "@/assets/IMG-20250928-WA0069.jpg";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { Link, useNavigate } from "react-router-dom";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { NotificationMenu } from "./Notification/Notification-Content";
+import { Link,useNavigate,useSearchParams } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SearchServices } from "./Search";
-import { MaisProfissao } from "./Categorias/MaisProfissao";
-import { PrestadoreProfile } from "./PrestadorProfile";
-// import { MapRoute } from "../mapas";
-// import { VerMapas } from "./Ver-Mapas";
-import { ButtonPWA } from "@/hooks/ButtonPWA";
-// import { AvatarScroll } from "./avatarScroll";
+// import { MaisProfissao } from "./Categorias/MaisProfissao";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { GetUserProfile } from "@/api/get-profile";
+import { Skeleton } from "@/components/ui/skeleton";
+import { UpdatePhoto } from "@/api/update-profile-photo";
+import { socket } from "@/lib/socket";
+
+import { NotificationDropdown } from "./Notification/notification-dropdown";
+import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
+import { DestaquesAuto } from "./destacados";
+import { api } from "@/lib/axios";
+import { ModeToggle } from "@/components/theme/theme-toggle";
+import { Logout } from "@/api/log-out";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { GetCategory } from "@/api/get-categories";
+import { getInialts } from "@/lib/utils";
+import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
+import { GetProfissaoByCategory } from "@/api/fetchProfissionByCategory";
+import { GetProfission } from "@/api/get-profissions";
 
 export function Home() {
-  const [query, setQuery] = useState("");
-  const [index, setIndex] = useState(0);
-  const navigate = useNavigate()
 
-  
-  useEffect(()=>{
-    const seen = localStorage.getItem('app_onboarding_seen_v1')
-    if(!seen){
-       navigate('/sign-up')
+ const categorias = [
+    { 
+       image :servico3,
+       title:'Madeira & Oficios',
+       to:'/madeira'
+    },
+      { 
+       image :servico1,
+       title:'Electricidade & Manuntenção',
+       to:'/electricidade'
+      },
+          { 
+       image :servico2,
+       title:'Educação',
+       to:'/ensino'
+      },
+           { 
+       image :servico4,
+       title:'Beleza & Moda',
+       to:'/moda'
+      },
+{ 
+       image :servico5,
+       title:'Serviços Domésticos',
+       to:'/domestica'
+      },
+     { 
+       image :servico6, 
+       title:'Tecnologias & Design',
+       to:'/tecnologia'
+      },
+             { 
+       image :servico4,
+       title:'Mais Profissionais',
+       to:'/mais'
+      }
+ ]
+
+
+
+interface SearchProfissionTypes  {
+  categoryId:string
+}
+
+   const [searchParams, setSearchParams] = useSearchParams();
+   const categoryId = searchParams.get("category")
+
+ function handleSearchProfission({categoryId}:SearchProfissionTypes){
+  console.log("peguei", categoryId)
+     setSearchParams((state) => {
+    categoryId ? state.set("category", categoryId) : state.delete("category");
+    return state;
+  });
+ }
+ const {data:categories,refetch:refetchCategories,isLoading:isLoadingategories} = useQuery({
+  queryKey:['category',categoryId],
+  queryFn:()=>GetCategory({query:''})
+ })
+
+ useEffect(()=>{
+  refetchCategories()
+ },[categoryId,refetchCategories])
+
+  // Filtra o array pelo valor digitado
+  // const profissoesFiltradas = profissoesAngola.filter((p) =>
+  //   p.nome.toLowerCase().includes(filtro.toLowerCase())
+  // );
+  const [query, setQuery] = useState("");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const navigate = useNavigate();
+
+
+
+  const { data: destacados, isLoading: iSLoadingDestaques } = useQuery({
+  queryKey: ["destaques"],
+  refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
+  refetchOnReconnect: true,       // Rebusca se a internet voltar
+  refetchOnMount: true,           // Rebusca sempre que o componente monta
+  staleTime: 0,    
+    queryFn: PrestadoresDestaques,
+  });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+  const {data:profByCategoy} =  useQuery({
+    queryKey:['byCategory',categoryId],
+    queryFn:()=>GetProfissaoByCategory({categoryId:Number(categoryId)})
+  })
+
+
+    const {data:profissao} = useQuery({
+      queryKey:['profissao'],
+      queryFn:GetProfission
+    })
+
+
+
+  const { data: profile, isLoading: isLoadingUserProfile, refetch } = useQuery({
+  queryKey: ["profile"],
+  refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
+  refetchOnReconnect: true,       // Rebusca se a internet voltar
+  refetchOnMount: true,           // Rebusca sempre que o componente monta
+  staleTime: 0,    
+  queryFn: GetUserProfile,
+  });
+
+    const {mutateAsync:Sair} = useMutation({
+      mutationFn:Logout
+    })
+    async function handleSignOut(){
+      await Sair()
+      
     }
 
-  },[navigate])
+  const { mutateAsync: changeProfilePhoto } = useMutation({
+    mutationFn: UpdatePhoto,
+  });
 
-  const cards = [
-    {
-      name: "Leonel Joao",
-      description: "Eletricista | Canalizador | Pedreiro",
-      image: photo4,
-      Location: "Viana, Luanda",
-      phoe:+244766345454,
-      mail:'gabriel@gmail.com'
-    },
-    {
-      name: "Gabriel Cavala",
-      description: "Eletricista | Canalizador | Pedreiro",
-      image: photo1,
-      Location: "Viana, Luanda",
-      phoe:+244766345454,
-       mail:'gabriel@gmail.com'
+  const handleSave = () => {
+    if (!selectedFile) return;
+    changeProfilePhoto({
+      image_path: selectedFile,
+    });
+    console.log("Nova imagem:", selectedFile);
+  };
+
+  const imageSrc =
+    preview ||
+    (profile?.image_path
+      ? `${api.defaults.baseURL}/uploads/${profile.image_path}`
+      : "https://i.pravatar.cc/150?u=placeholder");
+
+  useEffect(() => {
+    const seen = localStorage.getItem("app_onboarding_seen_v1");
+    if (!seen) {
+      navigate("/sign-up");
+    }
+  }, [navigate]);
+
+  const [_, setNotif] = useState<any[]>([]);
+ 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (!profile?.id) return;
+    socket.emit("register", profile.id);
+    console.log("🔗 Registrado no socket como:", profile.id);
+  }, [profile]);
+
+  useEffect(() => {
+    audioRef.current = new Audio("/bell-98033.mp3");
+    audioRef.current.volume = 0.7;
+
+    socket.on("user", (data) => {
+      console.log("🔔 Nova notificação recebida:", data);
+      refetch();
+      setNotif((prev) => {
+        if (prev.length < data.length && audioRef.current) {
+          audioRef.current.play().catch(() => {});
+        }
+        return data;
+      });
+    });
+    return () => {
+      socket.off("user");
+    };
+  }, [refetch]);
+    if(destacados?.usuarios.length===0  || !destacados || !profile){
+        <div className="w-full  overflow scroll-y-auto h-full flex flex-col items-center justify-center gap-4">
+      <motion.div
+        className="relative flex items-center justify-center"
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
+      >
+        <div className="absolute w-16 h-16 rounded-full border-t-4 border-b-4 border-transparent border-t-orange-500 border-b-pink-500" />
+        <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
+      </motion.div>
+
+      <motion.p
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="text-sm font-medium text-muted-foreground"
+      >
+         <Loader2 className="animate-spin"></Loader2>
+      </motion.p>
+    </div>
+  }
+
+   if(profile?.role =='PRESTADOR_COLECTIVO' || profile?.role=='PRESTADOR_INDIVIDUAL'){
+     navigate("/servicos")
+  }
+
+     if(profile?.role=='ADMIN'){
+     navigate("/início")
+  }
 
 
-    },
-  ];
+  if(!categories || !profByCategoy || !profissao){
+    return
+  }
 
-  const next = () => setIndex((prev) => (prev + 1) % cards.length);
-  // const prev = () =>
-  //   setIndex((prev) => (prev - 1 + cards.length) % cards.length);
+ 
 
   
-
   return (
-    <div className=" flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
-    
-    <ButtonPWA></ButtonPWA>
- 
+    <div className="flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
       <motion.div
-        className="flex flex-col flex-1 px-4 py-4 gap-4 items-center justify-center pb-20"
+        className="flex flex-col relative -top-2 flex-1 px-4 py-4 gap-4 items-center justify-center pb-[1rem]"
         initial={{ x: "-100%", opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         >
-        {/* HEADER */} 
-        <header className="w-full flex justify-center flex-col items-center gap-44">
+        {/* HEADER */}
+        <header className="w-full flex justify-center   flex-col items-center gap-44">
           <div className="flex items-center gap-11 justify-between">
-              <div>
-                 <h1 className="tracking-tight font-bold text-lg sm:text-xl">
-              Boas-Vindas!
-            </h1>
-              </div>
+            <div className="flex items-center gap-2 mr-3">
+              <div className="relative inline-block">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    {isLoadingUserProfile ? (
+                      <Skeleton className="h-16 w-16 rounded-full" />
+                    ) : (
+                      <Avatar className="w-9 h-9 cursor-pointer ring-2 ring-orange-400">
+                        <AvatarImage src={imageSrc} />
+                        <AvatarFallback>
+                          {profile?.nome?.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                  </DialogTrigger>
 
+                  <DialogContent className="max-w-md">
+                   
+                    <DialogHeader>
+                      <DialogTitle>Editar Foto de Perfil</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="flex flex-col items-center gap-5 py-4">
+                      <div className="relative">
+                        <img
+                          src={imageSrc}
+                          alt="Preview"
+                          className="w-40 h-40 rounded-full object-cover ring-4 ring-orange-400 shadow-lg"
+                        />
+                        <label
+                          htmlFor="file-upload"
+                          className="absolute bottom-2 right-2 bg-orange-500 hover:bg-orange-600 p-2 rounded-full cursor-pointer shadow-md transition"
+                        >
+                          <Camera className="w-4 h-4 text-white" />
+                        </label>
+                        <input
+                          id="file-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFileChange}
+                        />
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        Clique no ícone da câmera para escolher uma nova foto.
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                         <DialogFooter>
+                      <Button onClick={handleSave}>Salvar foto</Button>
+                    </DialogFooter>
+                    <Link to='/sign-in'>
+           <Button onClick={handleSignOut} className="text-red-500 flex-1 w-full" variant='outline'>
+             <LogOut></LogOut>
+             <span>Sair</span>
+          </Button></Link>
+
+                    </div>
+                 
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <div className="flex flex-col">
+                {isLoadingUserProfile ? (
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="w-24 h-4" />
+                    <Skeleton className="w-32 h-3" />
+                  </div>
+                ) : (
+                  <div className="flex flex-col">
+                    <span className="text-nowrap text-muted-foreground text-xs truncate max-w-28">{profile?.nome}</span>
+                    <span className="text-muted-foreground text-xs text-nowrap">
+                    +244{profile?.celular}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+              <Menu className="hidden lg:block" />
             <div className="flex gap-2">
-              {/* BOTÃO DE CRIAR */}
-              <Dialog>
-                <DialogTrigger>
-                  <Button className="rounded-full h-10 w-10 flex items-center justify-center bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:opacity-90">
-                    <Plus />
+            <Dialog>
+      <DialogTrigger asChild>
+        <Button className="rounded-full h-10 w-10 flex items-center justify-center bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:opacity-90">
+          <Plus />
+        </Button>
+      </DialogTrigger>
+           <ModeToggle></ModeToggle>
+
+      <DialogContent className="flex flex-col overlay-none border-0  items-center gap-4 h-full sm:h-auto sm:max-w-lg rounded-xl p-6 bg-background shadow-lg">
+        {/* Input única */}
+        <div className="relative flex items-center mt-5 w-full max-w-md mx-auto">
+          <Search className="absolute left-3 text-gray-400 dark:text-gray-500 pointer-events-none" size={18} />
+          <Input
+            type="text"
+            placeholder="O que você precisa?"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-muted text-sm shadow-sm focus-visible:ring-2 focus-visible:ring-orange-400 transition-all"
+            />
+        </div>
+        {query && (
+          <div className="flex flex-col gap-2 mt-2 text-sm">
+            <p className="text-muted-foreground">Sugestões:</p>
+            {profissao.profissao.length > 0 ? (
+              profissao.profissao.map((p) => (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                       <Button variant="outline" className=" flex flex-1 w-screen justify-between">
+                    <span className="text-orange-600">{p.titulo}</span>
+                    <ChevronRight className="text-orange-600" />
+                  </Button>
+                    </DialogTrigger>
+                     <FastFazerPedido selecionado={p.titulo}/>
+                  </Dialog>
+              ))
+            ) : (
+              <p className="text-gray-400">Nenhuma profissão encontrada.</p>
+            )}
+          </div>
+        )}
+
+     <ScrollArea className="max-h-90 w-screen p-4">
+  {categories?.length <= 0 && (
+    <span className="text-muted-foreground text-sm">Nenhuma Categoria</span>
+  )}
+  {isLoadingategories && (
+    <div>
+       <Skeleton className="w-24  h-10"></Skeleton>
+       <Skeleton className="w-24  h-10"></Skeleton>
+       <Skeleton className="w-24  h-10"></Skeleton>
+       <Skeleton className="w-24  h-10"></Skeleton>
+    </div>
+  )}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-1 border-0 ">
+    {categories?.map((c) => (
+      <Dialog key={c.id}>
+        <div
+          onClick={() => handleSearchProfission({ categoryId: String(c.id) })}
+          className="
+            group cursor-pointer rounded-xl overflow-hidden bg-card border-0
+            hover:shadow-lg transition-all duration-300 
+            hover:-translate-y-1 
+          "
+        >
+          <div className="flex flex-col items-center p-4 gap-3">
+
+            {/* Título */}
+            <h2 className="text-lg font-semibold text-muted-foreground group-hover:text-primary transition">
+              {c.titulo}
+            </h2>
+
+            {/* IMAGEM */}
+         <DialogTrigger asChild>
+  {c.image_path ? (
+    <div
+      tabIndex={0}
+      role="button"
+      className="w-full cursor-pointer"
+    >
+      <img
+        src={`${api.defaults.baseURL}/uploads/${c.image_path}`}
+        alt=""
+        className="
+          h-48 w-full rounded-lg object-cover 
+          group-hover:brightness-105 group-hover:scale-[1.02]
+          transition-all duration-300 shadow
+        "
+      />
+    </div>
+  ) : (
+    <div
+      tabIndex={0}
+      role="button"
+      className="h-32 w-full rounded-lg bg-muted flex items-center 
+                 justify-center text-3xl font-bold cursor-pointer"
+    >
+      {getInialts(c.titulo)}
+    </div>
+  )}
+</DialogTrigger>
+
+          </div>
+        </div>
+
+        {/* DIÁLOGO PRINCIPAL */}
+        <DialogContent className="max-h-[90vh] overflow-auto rounded-xl shadow-xl">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-xl font-bold">Profissões</DialogTitle>
+            <DialogDescription className="text-sm">
+              Profissões organizadas por categoria.
+            </DialogDescription>
+
+            <span className="text-muted-foreground font-medium border-b pb-1">
+              {c.titulo}
+            </span>
+          </DialogHeader>
+
+          {/* Caso sem profissões */}
+          {profByCategoy.length <= 0 && (
+            <div className="p-3 rounded-md bg-muted/30 text-muted-foreground text-sm">
+              Nenhuma profissão encontrada nesta categoria
+            </div>
+          )}
+
+          {/* Lista de Profissões */}
+          <div className="mt-1 flex flex-col gap-3">
+            {profByCategoy?.map((i) => (
+              <Dialog key={i.id}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="
+                      w-full flex justify-between items-center py-4 rounded-lg
+                      border-primary/20 hover:border-primary 
+                      hover:bg-primary/10 transition-all
+                    "
+                  >
+                    <span className="text-primary font-semibold">
+                      {i.titulo}
+                    </span>
+                    <ChevronRight className="text-primary" />
                   </Button>
                 </DialogTrigger>
 
-                <DialogContent className="flex flex-col gap-4 h-full sm:h-auto sm:max-w-lg rounded-xl p-6 bg-background shadow-lg">
-                  {/* Input pesquisa */}
-              <div className="relative mt-5 w-full">
-  <Input
-    placeholder="O que você precisa?"
-    value={query}
-    onChange={(e) => setQuery(e.target.value)}
-    className="pl-10 pr-3 py-2 rounded-full dark:bg-muted"
-    />
-  <Search
-    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-    size={18}
-    />
-</div>
-
-
-                  {query ? (
-                    <div className="flex flex-col gap-2 text-sm">
-                      <p className="text-muted-foreground">Sugestões:</p>
-                    <Link className="flex items-center justify-center"  to='/electricidade'> 
-                         <button  className="px-3 py-2 rounded-md hover:bg-muted transition">
-                        Electricidade & Mecânica⚡
-                         </button>
-                    </Link>
-                        <Link className="flex items-center justify-center"  to='/madeira'> 
-                      <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                        Oficícios 🌐
-                      </button>
-                      </Link>
-                          <Link className="flex items-center justify-center"  to='/moda'> 
-                      <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                        Cabelereiro &  Moda🧹
-                      </button>
-                        </Link>
-                          <Link className="flex items-center justify-center"  to='/electricidade'> 
-                      <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                        Mecânico
-                      </button>
-                       </Link>
-                          <Link className="flex items-center justify-center"  to='/electricidade'> 
-                          <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                             Serviços de Frio e Climatização
-                          </button>
-                         </Link>
-
-                          <Link className="flex items-center justify-center"  to='/domestica'> 
-                           <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                            Serviços domesticos
-                          </button>
-                            </Link>
-                      <Link className="flex items-center justify-center"  to='/mais'> 
-                       <button className="px-3 py-2 rounded-md hover:bg-muted transition">
-                         Serviços  Juridicos
-                      </button>
-                        </Link>
-                      
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-4 mt-5">
-                      {[
-                        { src: servico3, label: "Madeira e Ofícios", to: "/madeira" },
-                        { src: servico1, label: "Eletricidade", to: "/electricidade" },
-                        { src: servico5, label: "Doméstica", to: "/domestica" },
-                        { src: servico4, label: "Beleza e Moda" , to:"/moda" },
-                        { src: servico6, label: "Tecnologia e Design", to:'/tecnologia' },
-                        { src: servico2, label: "Docente" , to:'/ensino' },
-                      ].map((s, i) => (
-                        <Link to={s.to ?? "#"} key={i}>
-                          <div className="relative group cursor-pointer">
-                            <img
-                              src={s.src}
-                              className="h-32 w-full object-cover rounded-lg shadow-md group-hover:scale-105 transition"
-                            />
-                            <span className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black/60 px-2 py-1 rounded-md">
-                              {s.label}
-                            </span>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-<Link to='/mais'>
-<MaisProfissao/>
-</Link>
-<MaisProfissao/>
+                <DialogContent className="rounded-xl shadow-lg">
+                  <FastFazerPedido selecionado={i.titulo} />
                 </DialogContent>
               </Dialog>
-
-              {/* NOTIFICAÇÕES */}
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                    <Button className="relative rounded-full h-10 w-10 flex items-center justify-center bg-transparent">
-                <Bell className="h-5 w-5 text-orange-400" />
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-md">
-                  8
-                </span>
-              </Button>
-                </DropdownMenuTrigger>
-                <NotificationMenu/>
-              </DropdownMenu>
-            
-            </div>
-          </div>
-
-  
-               
-                 
-        </header>
-       
-                   <Dialog>
-                    <DialogTrigger>
-                      <div className="flex w-80">
-                       <Input
-                      placeholder="O que você precisa?"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="pl-8 dark:bg-muted"
-                    />
-                    <Search
-                      className="absolute top-[5.8rem]  -translate-y-1/2 left-9 text-muted-foreground"
-                      size={18}
-                      />
-                   </div>
-                    </DialogTrigger>
-                    <SearchServices/>
-                   </Dialog>
-            
-
-        {/* CATEGORIAS */}
-
-        <section className="flex flex-col items-center gap-3 flex-1 relative bottom-50 justify-center">
-           <div className="flex justify-between items-center w-full">
-            <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-              Profissionais em Destaque
-            </span>
-            <Link to="/config" className="hover:rotate-90 transition-transform">
-              <Settings size={18} />
-            </Link>
-          </div>
-          <div className="relative w-80 h-48 gap-1 overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={index}
-                initial={{ x: 200, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -200, opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="absolute w-full"
-              >
-                <Card className=" sticky w-full h-40 rounded-2xl left-5  shadow-xl overflow-hidden border border-orange-200">
-                  <div className="absolute inset-0 bg-gradient-to-br from-orange-100 via-white to-orange-50 dark:from-zinc-900 dark:to-black opacity-90" />
-                  <div className="absolute inset-0 backdrop-blur-sm" />
-
-                  <CardContent className="relative z-10 h-full p-4 flex  flex-col justify-between">
-                    <header>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-12 w-12 ring-2 ring-orange-400 shadow-md">
-                          {cards[index].image ? (
-                            <AvatarImage src={cards[index].image} />
-                          ) : (
-                            <AvatarFallback className="bg-gradient-to-tr from-orange-400 to-pink-500 text-white font-bold">
-                              {cards[index].name?.slice(0, 2).toUpperCase()}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <div>
-                   <p className="font-bold text-sm">{cards[index].name}</p>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Workflow size={12} className="text-orange-500" />
-                            <span className="truncate max-w-[140px]">
-                              {cards[index].description}
-                            </span>
-
-                            
-                          </div>
-
-                                                   <div className="flex items-center gap-1 mt-1">
-  <Star size={14} className="fill-orange-400 text-orange-400" />
-  <Star size={14} className="fill-orange-400 text-orange-400" />
-  <Star size={14} className="fill-orange-400 text-orange-400" />
-  <Star size={14} className="fill-orange-400 text-orange-400" />
-  <Star size={14} className="fill-orange-400 text-orange-400" />
-</div>
-        
-                        </div>
-                        <div>
-                       <Button>
-                           <Linkedin className="text-blue"/>
-                       </Button>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                        <MapPinIcon size={14} className="text-orange-500" />
-                        {cards[index].Location}
-                      </div>
-
-                        <div className="flex items-center">
-                          <Mail size={14}  className="text-orange-500"/>
-                           <span className="truncate max-w-[140px] text-muted-foreground text-xs">
-                              +{cards[index].mail}
-                            </span>
-                        </div>
-
-                         <div className="flex items-center">
-                          <Phone size={14}  className="text-orange-500"/>
-                           <span className="truncate max-w-[140px]">
-                              +{cards[index].phoe}
-                            </span>
-                        </div>
-                    </header>
-                    <div className="flex justify-end gap-2 sticky bottom-5">
-                 
-                    <Dialog>
-                        <DialogTrigger>
-                              <Button className="flex gap-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:opacity-90 text-xs">
-                        <User></User>
-                         ver perfil
-                      </Button>
-                        </DialogTrigger>
-                        <PrestadoreProfile/>
-                    </Dialog>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </AnimatePresence>
-        
-          </div>
-
-          <div className="flex gap-1 relative bottom-36">
-                      <ChevronRightCircle
-              onClick={next}
-              className="cursor-pointer fixed left-[21.1rem] text-muted-foreground hover:text-orange-500"
-            />
-
-             {/* <ChevronLeftCircle
-              onClick={prev}
-              className="cursor-pointer d text-muted-foreground hover:text-orange-500"
-            /> */}
-           
-      
-          </div>
-        </section>
-        <section className="w-full relative bottom-16 flex flex-col gap-6 items-center justify-center">
-           <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-              CATEGORIAS POPULARES
-            </span>
-          <div className="flex justify-around w-full gap-3">
-            {[
-              { icon: Wrench, color: "text-blue-400", bg: "from-blue-100 to-blue-50", label: "Assistência Técnica" ,to:'/electricidade' },
-              { icon: Hammer, color: "text-orange-400", bg: "from-orange-100 to-orange-50", label: "Reformas & Reparos",to:'/madeira'  },
-              { icon: House, color: "text-violet-400", bg: "from-violet-100 to-violet-50", label: "Serviços Domésticos" ,to:'/domestica' },
-            ].map((c, i) => (
-              <div className="flex flex-col items-center" key={i}>
-               <Link to={c.to}>
-                 <Button
-                  variant="outline"
-                  className={`p-4 w-20 h-20 rounded-xl shadow-md border-0 bg-gradient-to-br ${c.bg} hover:scale-105 transition-transform`}
-                >
-                  <c.icon className={c.color} size={30} />
-                </Button>
-               </Link>
-                <span className="text-xs mt-2 font-medium">{c.label}</span>
-              </div>
             ))}
           </div>
-        </section>
-        <div>
-           <div>
+        </DialogContent>
+      </Dialog>
+    ))}
+  </div>
+</ScrollArea>
 
+     
+      </DialogContent>
+    </Dialog>
+            {isLoadingUserProfile || !profile ? (
+              <Skeleton className="h-10 w-10 rounded-full" />
+            ) : (
+              <NotificationDropdown {...profile} />
+            )}
+
+            </div>
+          </div>
+        </header>
+           <div className="flex items-center gap-1">
+            <Link to='/vitrine'>
+              <Button variant='outline' className="flex">
+                <BookMarked size={12} className="text-xs text-orange-300"></BookMarked>
+                <span className="text-xs">Vitrine</span>
+              </Button>
+            </Link>
+             <Link to='/comment'>
+                <Button variant='outline' className="flex">
+                <MessageCircle size={12} className="text-xs text-blue-300"></MessageCircle>
+                <span className="text-xs">Comentários</span>
+              </Button>
+             </Link>
            </div>
-        </div>
-    {/* <AvatarScroll/> */}
-        {/* CARDS PROFISSIONAIS */}
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <form className="relative -mt-2 w-full max-w-md mx-auto">
+              <Input
+                placeholder="O que você precisa?"
+                className="pl-11 pr-4 py-2.5 rounded-full bg-white dark:bg-muted text-sm focus-visible:ring-2 focus-visible:ring-orange-400 shadow-sm transition-all"
+              />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                size={20}
+              />
+            </form>
+          </DialogTrigger>
+          <SearchServices />
+        </Dialog>
+    <AnimatePresence mode="wait">
+      {iSLoadingDestaques ? (
+        <motion.div
+        key="loading"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1 }}
+          className="w-full grid grid-cols-2 sm:grid-cols-3 gap-4 -mt-1"
+          >
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full rounded-xl" />
+          ))}
+        </motion.div>
+      ) : (
         
-  
+        <DestaquesAuto usuarios={destacados?.usuarios} />
+        
+      )}
+      <ScrollArea className="max-h-60 border  border-none w-screen p-2">
+            {categories?.length<=0 &&(
+               <>
+                <span className="text-muted-foreground">Nenhuma Categoria</span>
+               </>
+            )}
+    
+           <Dialog>
+             {/* <div onClick={()=>handleSearchProfission({categoryId:String(c.id)})}  >
+                     <h2 className="text-xl lg:text-xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
+                       {c.titulo}
+                        </h2>
+                <DialogTrigger asChild>
+              {c.image_path ?(
+                           <img src={`${api.defaults.baseURL}/uploads/${c.image_path}`} alt="" className="h-32 w-full gap-2 object-cover rounded-lg transform group-hover:scale-105 transition-transform duration-300 ease-in-out"
+ />
+              ):(
+                <div>{getInialts(c.titulo)}</div>
+                )}
+                </DialogTrigger>
+          </div> */}
+             {!query && (
+    <div className="grid grid-cols-2 gap-4 mt-5">
+  {categorias.map((o) => (
+    <Link to={o.to} key={o.title}>
+      <div className="relative group cursor-pointer overflow-hidden rounded-lg shadow-md">
+        {/* Imagem de fundo */}
+        <img
+          src={o.image}
+          alt={o.title}
+          className="h-32 w-full object-cover rounded-lg transform group-hover:scale-105 transition-transform duration-300 ease-in-out"
+          />
+
+        {/* Overlay suave para destacar o texto */}
+        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300 rounded-lg" />
+
+        {/* Título */}
+        <span className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black/60 px-2 py-1 rounded-md">
+          {o.title}
+        </span>
+      </div>
+    </Link>
+  ))}
+</div>
+
+        )}
+                <DialogContent className="h-full">
+                       {/* {profByCategoy.length<=0 &&(
+                          <div>
+                          <span className="text-muted-foreground">Nenhuma profissão encontrada nesta categoria</span>
+                          </div>
+                          )} */}
+                
+                       
+       
+                      
+                    
+                </DialogContent>
+            </Dialog>
+     
+      </ScrollArea>
+    </AnimatePresence>
       </motion.div>
-
-      {/* NAV BOTTOM FIXA */}
-
     </div>
   );
 }

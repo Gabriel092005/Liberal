@@ -7,6 +7,7 @@ import image_01 from '@/assets/ChatGPT Image 27_09_2025, 20_29_07.png'
 import image_02 from '@/assets/Lovepik_com-832324747-Cartoon vector business meeting, commercial elements.png'
 import image_04 from '@/assets/IMG-20250930-WA0003.jpg'
 import image_05 from '@/assets/IMG-20250930-WA0004.jpg'
+import { queryClient } from "@/lib/react-query"
 
 export type Slide = {
   id: string
@@ -30,72 +31,75 @@ export function Menu({
 }: Props) {
   const navigate = (function () {
     try {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
       return useNavigate()
     } catch {
       return undefined as unknown as ReturnType<typeof useNavigate>
     }
   })()
+  const user = queryClient.getQueriesData({queryKey:['profile']})
+  console.log(" query data", user)
+
+  // Estado para splash
+  const [_,setShowSplash] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 2500)
+    return () => clearTimeout(timer)
+  }, [])
 
   const defaultSlides: Slide[] = [
     {
       id: "s1",
       title: "Bem-vindo à nossa plataforma Liberal",
       description: "Nossa plataforma conecta profissionais com clientes que buscam os melhores serviços.",
-      image:image_01
+      image: image_01
     },
     {
       id: "s2",
-      title: "Aumente a viabilidade de seu negócio ",
-      description: "Conecte-se com oportunidades de trabalho incríveis",
-      image:image_02
-
+      title: "Aumente a viabilidade de seu negócio",
+      description: "Conecte-se com oportunidades de trabalho incríveis.",
+      image: image_02
     },
     {
-      id: "4",
+      id: "s3",
       title: "Encontre os Melhores Prestadores de Angola",
       description: "Acesse um pool de profissionais qualificados e experientes.",
-      image:image_04
+      image: image_04
     },
-      {
+    {
       id: "s4",
-      title: "Por que escolher a Liberal ",
-      description: "Uma plataforma completa para conectar clientes com prestadores de serviços com segurança e eficiência",
-      image:image_05
+      title: "Por que escolher a Liberal",
+      description: "Uma plataforma completa para conectar clientes com prestadores de serviços com segurança e eficiência.",
+      image: image_05
     },
-
     {
       id: "s5",
       title: "Como Funciona?",
-      description: "Em apenas 4 passos simples conecte-se aos melhores prestadores de serviços de Angola",
-      image:''
+      description: "Em apenas 4 passos simples conecte-se aos melhores prestadores de serviços de Angola.",
     },
-
-       {
+    {
       id: "s6",
-      title: "1.Cadastra-se",
-      description: "Crie uma conta gratuita como cliente ou prestador de serviços",
-      image:<UserRoundPlus size={50} className="text-orange-500 "></UserRoundPlus>
+      title: "1. Cadastra-se",
+      description: "Crie uma conta gratuita como cliente ou prestador de serviços.",
+      image: <UserRoundPlus size={50} className="text-orange-500" />
     },
-
-           {
+    {
       id: "s7",
-      title: "2.Busque ou Publique",
-      description: "Clientes publicam pedidos prestadores oferecem serviços",
-      image:<Search size={50} className="text-orange-500 "></Search>
+      title: "2. Busque ou Publique",
+      description: "Clientes publicam pedidos, prestadores oferecem serviços.",
+      image: <Search size={50} className="text-orange-500" />
     },
-
-           {
+    {
       id: "s8",
-      title: "3.Conecte-se",
+      title: "3. Conecte-se",
       description: "Comunique-se diretamente e negocie os melhores termos.",
-      image:<Send size={50} className="text-orange-500 "></Send>
+      image: <Send size={50} className="text-orange-500" />
     },
-           {
+    {
       id: "s9",
-      title: "4.Finalize",
-      description: "Complete o serviço e avalie mutuamente",
-      image:<Check size={50} className="text-orange-500 "></Check>
+      title: "4. Finalize",
+      description: "Complete o serviço e avalie mutuamente.",
+      image: <Check size={50} className="text-orange-500" />
     },
   ]
 
@@ -103,7 +107,7 @@ export function Menu({
 
   const [index, setIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
-  const [direction, setDirection] = useState(0) // controla direção da animação
+  const [direction, setDirection] = useState(0)
 
   useEffect(() => {
     try {
@@ -114,38 +118,55 @@ export function Menu({
     }
   }, [localStorageKey])
 
+  // if (showSplash) {
+  //   return (
+  //     <motion.div
+  //       initial={{ opacity: 0 }}
+  //       animate={{ opacity: 1 }}
+  //       exit={{ opacity: 0 }}
+  //       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white text-white"
+  //     >
+  //       <motion.img
+  //         src={logo}
+  //         alt="Logo Liberal"
+  //         className="w-52 h-36"
+  //         animate={{ scale: 1 }}
+  //         transition={{ duration: 1, ease: "easeOut" }}
+  //       />
+  //       <motion.h1
+  //         className="text-3xl font-bold tracking-wide"
+  //         initial={{ y: 50, opacity: 0 }}
+  //         animate={{ y: 0, opacity: 1 }}
+  //         transition={{ delay: 0.5 }}
+  //       >
+  //         Liberal
+  //       </motion.h1>
+  //       <motion.p
+  //         className="text-sm opacity-80 mt-2"
+  //         initial={{ opacity: 0 }}
+  //         animate={{ opacity: 1 }}
+  //         transition={{ delay: 1 }}
+  //       >
+  //         Conectando profissionais e clientes
+  //       </motion.p>
+  //     </motion.div>
+  //   )
+  // }
+
   if (!isVisible) return null
 
   function finish() {
     try {
       localStorage.setItem(localStorageKey, new Date().toISOString())
-    } catch {
-      /* ignore */
-    }
-
-    if (onFinish) {
-      onFinish()
-      setIsVisible(false)
-      return
-    }
-
-    if (navigate) {
-      try {
-        navigate("/home")
-        setIsVisible(false)
-        return
-      } catch {
-        /* ignore */
-      }
-    }
-
+    } catch {}
+    if (onFinish) return onFinish()
+    navigate?.("/home")
     setIsVisible(false)
   }
 
   function next() {
-    if (index + 1 >= effectiveSlides.length) {
-      finish()
-    } else {
+    if (index + 1 >= effectiveSlides.length) finish()
+    else {
       setDirection(1)
       setIndex((i) => i + 1)
     }
@@ -158,13 +179,7 @@ export function Menu({
     }
   }
 
-  function skip() {
-    finish()
-  }
-
   const slide = effectiveSlides[index]
-
-  // Variants para animar a entrada/saída
   const variants = {
     enter: (dir: number) => ({
       x: dir > 0 ? 300 : -300,
@@ -181,9 +196,9 @@ export function Menu({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
-      {/* Header com ícone voltar + skip */}
-      <div className="flex items-center justify-between p-4">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 sticky top-0 bg-white z-10">
         <button
           onClick={prev}
           disabled={index === 0}
@@ -196,7 +211,7 @@ export function Menu({
 
         {showSkip && (
           <button
-            onClick={skip}
+            onClick={finish}
             className="text-sm text-gray-500 hover:text-gray-700"
           >
             Pular
@@ -204,8 +219,8 @@ export function Menu({
         )}
       </div>
 
-      {/* Conteúdo animado */}
-      <div className="relative flex-1 flex items-center justify-center overflow-hidden px-6">
+      {/* Conteúdo */}
+      <div className="flex-1 flex flex-col items-center justify-start text-center gap-4 px-6 pt-4">
         <AnimatePresence custom={direction} mode="wait">
           <motion.div
             key={slide.id}
@@ -215,51 +230,17 @@ export function Menu({
             animate="center"
             exit="exit"
             transition={{ duration: 1, ease: "easeInOut" }}
-            className="absolute flex flex-col items-center text-center gap-4 w-full"
+            className="w-full flex flex-col items-center gap-4"
           >
-            {/* imagem */}
             <div className="h-44 w-full flex items-center justify-center">
-              {slide.image ? (
-                typeof slide.image === "string" ? (
-                  <img
-                    src={slide.image}
-                    alt={slide.title}
-                    className="h-52 object-contain"
-                  />
-                ) : (
-                  <div className="h-40 w-full flex items-center justify-center">
-                    {slide.image}
-                  </div>
-                )
+              {typeof slide.image === "string" ? (
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="h-48 object-contain"
+                />
               ) : (
-                <div className="h-40 w-full flex items-center justify-center">
-                  {/* Placeholder */}
-                  <svg
-                    width="160"
-                    height="120"
-                    viewBox="0 0 160 120"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <rect width="160" height="120" rx="16" fill="#F3F4F6" />
-                    <circle
-                      cx="80"
-                      cy="45"
-                      r="22"
-                      fill="#fff"
-                      stroke="#E5E7EB"
-                    />
-                    <rect
-                      x="40"
-                      y="70"
-                      width="80"
-                      height="30"
-                      rx="8"
-                      fill="#fff"
-                      stroke="#E5E7EB"
-                    />
-                  </svg>
-                </div>
+                slide.image
               )}
             </div>
 
@@ -268,8 +249,7 @@ export function Menu({
               <p className="text-gray-600">{slide.description}</p>
             )}
 
-            {/* Dots */}
-            <div className="flex items-center justify-center gap-2 mt-6">
+            <div className="flex items-center justify-center gap-2 mt-4">
               {effectiveSlides.map((s, i) => (
                 <div
                   key={s.id}
@@ -283,8 +263,8 @@ export function Menu({
         </AnimatePresence>
       </div>
 
-      {/* Rodapé com botão */}
-      <div className="p-4">
+      {/* Botão */}
+      <div className="p-4 mt-2 sticky bottom-0 bg-white">
         <Button onClick={next} className="w-full py-6 text-lg">
           {index + 1 >= effectiveSlides.length ? "Começar" : "Próximo"}
         </Button>

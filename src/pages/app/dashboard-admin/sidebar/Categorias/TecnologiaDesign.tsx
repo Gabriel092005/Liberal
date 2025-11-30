@@ -1,9 +1,9 @@
 import servico3 from '@/assets/IMG-20250928-WA0069.jpg'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { ChevronRight} from 'lucide-react'
 import { useState } from 'react'
-import { ServicoDialogContent } from '../ServicesDialogContent'
+import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
 type ServicoButtonProps = {
   nome: string
@@ -20,10 +20,7 @@ function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
           <ChevronRight className="text-orange-600" />
         </Button>
       </DialogTrigger>
-
-      <DialogContent>
-        <ServicoDialogContent nome={selecionado} />
-      </DialogContent>
+        <FastFazerPedido selecionado={selecionado} />
     </Dialog>
   )
 }
@@ -38,6 +35,8 @@ export function TecnologiaDesign() {
     'Gestor de Projectos',
     'Designer Gráfico',
     'UX/UI Designer',
+    'Fotógrafo',
+    'DJ',
     'Administrador de Redes',
   ]
 

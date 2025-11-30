@@ -1,9 +1,9 @@
 import servico5 from '@/assets/IMG-20250928-WA0059.jpg'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog,  DialogTrigger } from '@/components/ui/dialog'
 import { ChevronRight} from 'lucide-react'
-import { ServicoDialogContent } from '../ServicesDialogContent'
+import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
 
 // 🔹 Reaproveitando ServicoButton para abrir modal em todos os serviços
@@ -22,10 +22,7 @@ function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
           <ChevronRight className="text-orange-600" />
         </Button>
       </DialogTrigger>
-
-      <DialogContent>
-        <ServicoDialogContent nome={selecionado} />
-      </DialogContent>
+        <FastFazerPedido selecionado={selecionado} />
     </Dialog>
   )
 }
@@ -58,6 +55,12 @@ export function Domestica() {
         />
         <ServicoButton
           nome="Empregada Doméstica"
+          selecionado={servicoSelecionado}
+          onSelect={setServicoSelecionado}
+        />
+
+             <ServicoButton
+          nome="Segurança"
           selecionado={servicoSelecionado}
           onSelect={setServicoSelecionado}
         />

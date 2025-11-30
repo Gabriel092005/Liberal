@@ -1,10 +1,9 @@
 import servicoBeleza from '@/assets/IMG-20250928-WA0058.jpg' // 🔹 coloque a imagem certa aqui
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import { ChevronRight, MapPinX } from 'lucide-react'
-import { useUserLocation } from '../location-services'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Dialog,DialogTrigger } from '@/components/ui/dialog'
+import { ChevronRight } from 'lucide-react'
+import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
 type ServicoButtonProps = {
   nome: string
@@ -22,42 +21,14 @@ function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
-        <ServicoDialogContent nome={selecionado} />
-      </DialogContent>
+
+        <FastFazerPedido selecionado={selecionado} />
+
     </Dialog>
   )
 }
 
-function ServicoDialogContent({ nome }: { nome: string }) {
-  const { place, loading } = useUserLocation()
 
-  return (
-    <div className="flex flex-col gap-3">
-      <header className="font-bold text-lg">Tipo de Serviço</header>
-      <span className="text-muted-foreground">{nome}</span>
-
-      <div className="flex items-center gap-2">
-        <MapPinX className="text-red-400" />
-        <span>
-          {loading ? (
-            <Skeleton className="w-32 h-4" />
-          ) : (
-            <span>
-            {place?.city},{place?.country}, {place?.neighbourhood}
-            </span>
-          )}
-        </span>
-      </div>
-
-      <textarea
-        placeholder="Descrição do serviço que pretende"
-        className="bg-gray-950 p-2 rounded-md"
-      />
-      <Button className="self-start">Solicitar</Button>
-    </div>
-  )
-}
 
 export function MaisProfissao() {
   const [servicoSelecionado, setServicoSelecionado] = useState<string>('')

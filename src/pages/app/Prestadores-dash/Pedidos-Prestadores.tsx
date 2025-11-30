@@ -1,56 +1,78 @@
-import { Handshake, InfoIcon, MapPin, MoveDownLeft,MoveUpRight, Search, X } from "lucide-react";
-import { motion } from "framer-motion";
+import {  File,InfoIcon, MapPin, MoveDownLeft, MoveUpRight, Search} from "lucide-react";
+import {  motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import photo4 from "@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ServicesDialogDetails } from "./ServicesDialogDetails";
-import { useState } from "react";
+import { useEffect,  useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { InterestedOrdersPrestadores } from "@/api/fetch-interrested-orders";
+import { FetchAllOrders } from "@/api/fetch-all";
+import { SkeletonsDemo } from "./NearClientsSearch";
+import { InteressarPedidos } from "@/api/interessar-pedido";
+import { useSearchParams } from "react-router-dom";
+import { BotaoNegociar } from "./botao-negociar";
+import { toast } from "sonner";
+import { api } from "@/lib/axios";
 
+
+
+function useDebounce<T>(value: T, delay = 400): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debounced;
+}
 
 export function PrestadoresPedidos() {
-  const cards = [
-    {
-      title: "Canalizador",
-      description: "Troca de cano rompido.",
-      image: photo4,
-      location: "Viana, Luanda",
-      date: "1min",
-      status: "urgente",
-      prestadoresInteressados: 34,
-      accepted: true, // aceito ✅
-    },
-    {
-      title: "Pedreiro",
-      description: "Reparação de parede.",
-      image: photo4,
-      location: "Estalagem, Luanda",
-      date: "5min",
-      status: "médio",
-      prestadoresInteressados: 12,
-      accepted: false, // não aceito ❌
-    },
-    {
-      title: "Electricista",
-      description: "Troca de disjuntor queimado.",
-      image: photo4,
-      location: "Talatona, Luanda",
-      date: "10min",
-      status: "baixo",
-      prestadoresInteressados: 7,
-      accepted: true, // aceito ✅
-    },
-  ];
-
-  // estado para controlar a filtragem
   const [filter, setFilter] = useState<"all" | "accepted">("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryFromParams = searchParams.get("query") || "";
+  const [searchTerm, setSearchTerm] = useState(queryFromParams);
+  const debouncedQuery = useDebounce(searchTerm, 400);
 
-  // lista filtrada
-  const filteredCards =
-    filter === "all" ? cards : cards.filter((c) => c.accepted);
+  // 🔹 Atualiza os parâmetros de busca na URL automaticamente
+  useEffect(() => {
+    const newParams = new URLSearchParams();
+    if (debouncedQuery) newParams.set("query", debouncedQuery);
+    setSearchParams(newParams);
+  }, [debouncedQuery, setSearchParams]);
+
+  // 🔹 Query principal com base no filtro atual
+  const { data: orders, isLoading } = useQuery({
+    queryKey: ["orders", filter, debouncedQuery],
+    queryFn: async () => {
+      if (filter === "all") {
+        return await FetchAllOrders({ query: debouncedQuery });
+      } else {
+        return await InterestedOrdersPrestadores();
+      }
+    },
+    // keepPreviousData: true, // mantém os resultados antigos enquanto carrega novos
+    staleTime: 1000 * 30, // 30s de cache fresco
+  });
+
+  const { mutateAsync: SeInteressar,isSuccess } = useMutation({
+    mutationFn: InteressarPedidos,
+    onSuccess: () => toast.success("Pedido marcado para negociação!"),
+    onError: () => toast.error("Oops! Só pode negociar uma vez!"),
+  });
+
+  // 🔹 Loader elegante
+  if (isLoading) {
+    return (
+      <div>
+        <SkeletonsDemo />
+        <SkeletonsDemo />
+        <SkeletonsDemo />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -59,39 +81,39 @@ export function PrestadoresPedidos() {
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Card className="w-full max-w-lg relative right-[2.5rem] overflow-hidden border-none">
+      <Card className="max-w-lg relative right-[2.5rem] overflow-hidden border-none">
         <CardHeader>
           <CardTitle className="text-3xl font-bold">Pedidos</CardTitle>
           <CardDescription className="text-xs mb-2">
-            Aqui você encontra os últimos pedidos feitos pelos clientes.
+            {filter === "all"
+              ? "Aqui você encontra todos os pedidos do sistema."
+              : "Aqui estão os pedidos que você demonstrou interesse."}
           </CardDescription>
 
-          {/* Barra de busca */}
+          {/* 🔹 Barra de busca */}
           <div className="relative mb-3">
             <Input
               placeholder="O que você precisa?"
               className="bg-zinc-200 dark:bg-black pl-10 w-full max-w-[320px]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Search
-              className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400"
-              size={20}
-            />
+            <Search className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400" size={20} />
           </div>
 
-          {/* Botões de filtro */}
+          {/* 🔹 Filtros */}
           <div className="flex gap-3">
             <Button
               variant={filter === "all" ? "default" : "outline"}
               onClick={() => setFilter("all")}
             >
-               Todos Pedidos  <MoveUpRight/>
+              Todos Pedidos <MoveUpRight />
             </Button>
             <Button
               variant={filter === "accepted" ? "default" : "outline"}
               onClick={() => setFilter("accepted")}
             >
-              Pedidos Aceites
-              <MoveDownLeft/>
+              Pedidos Negociar <MoveDownLeft />
             </Button>
           </div>
         </CardHeader>
@@ -99,102 +121,92 @@ export function PrestadoresPedidos() {
         <CardContent className="p-0 max-h-[400px] overflow-auto">
           <Table>
             <TableBody>
-              {filteredCards.map((card, i) => (
-                <TableRow
-                  key={i}
-                  className="h-14 cursor-pointer hover:bg-muted/40"
-                >
-                  <TableCell className="flex items-center gap-3 py-2 px-2">
-                    <Avatar className="w-10 h-10 ring-2 ring-orange-300 shadow-sm">
-                      {card.image ? (
-                        <AvatarImage src={card.image} />
-                      ) : (
-                        <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-                          {card.title}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-
-                    <div className="flex flex-col leading-tight">
-                      <div className="flex gap-4">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium">
-                            {card.title}
-                          </span>
-                          <span className="text-[0.65rem] text-muted-foreground">
-                            {card.description}
-                          </span>
-                        </div>
-                        <div className=" relative left-32 flex items-baseline">
-                       
-                               <Dialog>
-                          <DialogTrigger asChild>
-                            <div>
-                              <InfoIcon
-                                size={15}
-                                className="dark:text-white text-blue-400 cursor-pointer"
-                              />
+              {!orders?.length ? (
+                <div className="flex items-center justify-center flex-col p-4">
+                  <File className="text-muted-foreground" size={74} />
+                  <span className="text-muted-foreground">Nenhum pedido encontrado.</span>
+                </div>
+              ) : (
+                orders.map((card) => {
+                  const isInteresseComPedido = "pedido" in card;
+                  const pedido = isInteresseComPedido ? card.pedido : card;
+                  return (
+                    <TableRow key={card.id} className="h-14 cursor-pointer hover:bg-muted/40">
+                      <TableCell className="flex items-center gap-3 py-2 px-2">
+                        <Avatar className="w-10 h-10 ring-2 ring-orange-300 shadow-sm">
+                          {pedido?.image_path ? (
+                            <AvatarImage src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} />
+                          ) : (
+                            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
+                              {pedido?.title?.slice(0, 2).toUpperCase() ?? "SN"}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <div className="flex flex-col leading-tight">
+                          <div className="flex gap-4">
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium">{pedido?.title ?? "Sem título"}</span>
+                              <span className="text-[0.65rem] w-[10rem] truncate text-muted-foreground">
+                                {pedido?.content ?? "Sem descrição"}
+                              </span>
                             </div>
-                          </DialogTrigger>
-                          <ServicesDialogDetails />
-                        </Dialog>
-                        </div>
-                   
-                      </div>
-
-                      <div>
-                        <span className="text-muted-foreground text-xs font-bold">
-                          status :{" "}
-                          <span
-                            className={
-                              card.status === "urgente"
-                                ? "text-red-500"
-                                : card.status === "médio"
-                                ? "text-yellow-500"
-                                : "text-green-500"
-                            }
-                          >
-                            {card.status}
+                            <div className="relative left-32 flex items-baseline">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <InfoIcon size={24} className="dark:text-blue-400 text-blue-400 relative right-12 cursor-pointer" />
+                                </DialogTrigger>
+                                <ServicesDialogDetails
+                                  isSucces={isSuccess}
+                                  nome={pedido.autor.nome}
+                                  celular={pedido.autor.celular}
+                                  provincia={pedido.autor.provincia}
+                                  image_path={pedido.autor.image_path}
+                                  municipio={pedido.autor.municipio}
+                                />
+                              </Dialog>
+                            </div>
+                          </div>
+                          <span className="text-muted-foreground text-xs font-bold">
+                            status:{" "}
+                            <span
+                              className={
+                                pedido?.brevidade === "URGENTE"
+                                  ? "text-red-500"
+                                  : pedido?.brevidade === "MEDIO"
+                                  ? "text-yellow-500"
+                                  : "text-green-500"
+                              }
+                            >
+                              {pedido?.brevidade ?? ""}
+                            </span>
                           </span>
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
+                        </div>
+                      </TableCell>
 
-                  <div className="flex items-start ml-52">
-                
-                  </div>
-
-                  <TableCell className="flex items-center gap-2 px-2">
-                    <X size={16} className="text-red-400 cursor-pointer" />
-                    <div className="flex text-orange-400">
-                      <MapPin
-                        size={16}
-                        className="text-orange-400 cursor-pointer"
-                      />
-                      <span className="font-bold">{card.location}</span>
-                    </div>
-                    <div>
+                      <TableCell className="flex items-center gap-2 px-2">
+                        {/* <X size={16} className="text-red-400 cursor-pointer" /> */}
+                        <div className="flex text-orange-400">
+                          <MapPin size={16} />
+                          <span className="font-bold w-[10rem] truncate">
+                            {pedido?.location ?? "Local não informado"}
+                          </span>
+                        </div>
                         <Dialog>
-                              <DialogTrigger asChild>
-                                  <Button variant="outline" className="ml-8">
-                        <Handshake className="text-muted-foreground" />
-                        <span className="flex text-xs text-muted-foreground relative items-center">
-                          Negociar
-                        </span>
-                      </Button>
-
-                              </DialogTrigger>
-                         
-                                
-                                {/* <MessagesHOME/> */}
-                            
+                          <DialogTrigger asChild>
+                             <BotaoNegociar  celular={pedido.autor.celular} image_path={pedido.autor.image_path} isSuccess={isSuccess} nome={pedido.autor.nome}  onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} />
+                          </DialogTrigger>
                         </Dialog>
-                    
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                      </TableCell>
+
+      
+
+           
+                    </TableRow>
+                  );
+                })
+
+                
+              )}
             </TableBody>
           </Table>
         </CardContent>

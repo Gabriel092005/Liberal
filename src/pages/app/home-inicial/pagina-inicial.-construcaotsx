@@ -1,0 +1,77 @@
+import { ModeToggle } from '@/components/theme/theme-toggle'
+import { Check, Handshake, LogIn, Star, Timer } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Link } from 'react-router-dom'
+import phones  from '@/assets/phone.png'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Home } from '../dashboard-admin/sidebar/home'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+
+export function Indentitidade() {
+  return ( 
+    <div className="h-screen flex flex-col  mr-1 ">
+      {/* Header fixo */} 
+      <div>
+        <header className="flex items-center  lg:w-screen justify-between mt-1 border-b p-3">
+            <Link to="/início" className="text-xl font-bold text-orange-400">
+        <div className="bg-100-400 shadow-lg flex rounded-full items-center justify-center p-2">
+          <Handshake></Handshake>
+          Liberal
+        </div>
+      </Link>
+        <div>
+          <ModeToggle />
+        <Link to='/sign-in'>
+          <Button className="rounded-full" >
+            <LogIn />
+            Entrar
+          </Button>
+        </Link>
+        </div>
+        
+      </header>
+      </div>
+
+      <div className='flex flex-col gap-1 justify-center items-center h-full'> 
+          <div className='flex justify-center items-center flex-col'>
+              <h1 className='lg:text-4xl font-bold'>Junte-se a esta Comunidade profissionais e clientes</h1>
+              <p className='text-muted-foreground'>Use de forma gratuita durante os 6 primeiros meses.</p>
+          </div>
+          <div className='flex items-center justify-center gap-10'>
+            <Card className='bg-muted border-0'>
+              <CardHeader className='h-2 flex'>
+                <div className='flex gap-1'>
+                                    <span className='bg-orange-400 rounded-sm'> Ranking 6mth</span>com 90mil clientes
+
+                </div>
+              </CardHeader>
+              <CardContent>
+                1
+              </CardContent>
+            </Card>
+
+              <Card>
+              1
+            </Card>
+
+              <Card>
+              1
+            </Card>
+          </div>
+      </div>
+
+      {/* Conteúdo com scroll animado */}
+      
+
+      {/* Footer fixo */}
+      {/* <motion.footer
+        className="bg-orange-100 dark:bg-zinc-900 py-3 text-center text-sm text-muted-foreground shadow-inner"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.5 }}
+      >
+        © {new Date().getFullYear()} Plataforma Liberal - Todos os direitos reservados
+      </motion.footer> */}
+    </div>
+  )
+}

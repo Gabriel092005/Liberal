@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
   registerType: "autoUpdate",
   devOptions: {
-    enabled: true, // permite ver a PWA atualizando também no modo dev
+    enabled: false, // permite ver a PWA atualizando também no modo dev
   },
   strategies:'injectManifest',
   srcDir:'src',

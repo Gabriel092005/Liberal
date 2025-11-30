@@ -63,7 +63,7 @@ export function Prestadores() {
 
   return (
     <motion.div
-      className="flex justify-center items-center h-screen p-2"
+      className="flex justify-center items-center h-screen p-10"
       initial={{ x: "-100%", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}

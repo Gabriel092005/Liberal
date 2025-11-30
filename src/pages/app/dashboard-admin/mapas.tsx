@@ -1,354 +1,230 @@
-"use client";
-
-import { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useEffect, useState, useRef } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  useMap,
+  ZoomControl,
+} from "react-leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { Button } from "@/components/ui/button";
+import { Loader2, Navigation2 } from "lucide-react";
 
-// Correção para ícones quebrados no React :cite[1]
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+// === Ícones personalizados ===
+const userIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+  iconSize: [45, 45],
+  iconAnchor: [22, 45],
 });
 
-// Definição de tipos para o Leaflet Routing Machine
-declare module "leaflet" {
-    namespace Routing {
-    interface Control {
-        on(event: string, callback: (e: any) => void): this;
-        off(event: string): this;
-    }
-}
-}
+const pedidoIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/854/854894.png",
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+});
 
-// Interfaces TypeScript para melhor tipagem
-interface Pedido {
-    id: number;
-    lat: number;
-    lng: number;
-  nome: string;
-  endereco: string;
-}
-
-interface RouteInfo {
-    distancia: number;
-  tempoCarro: number;
-  tempoPe: number;
-}
-
-// Funções utilitárias
-const formatarTempo = (segundos: number): string => {
-    const horas = Math.floor(segundos / 3600);
-  const minutos = Math.floor((segundos % 3600) / 60);
-  return horas > 0 ? `${horas}h ${minutos}min` : `${minutos} min`;
-};
-
-const formatarDistancia = (metros: number): string => {
-    return metros < 1000 ? `${Math.round(metros)} m` : `${(metros / 1000).toFixed(1)} km`;
-};
-
-// Componente de Roteamento Corrigido
-function Routing({ from, to, onRouteFound }: { 
-    from: [number, number]; 
-  to: [number, number]; 
-  onRouteFound: (info: RouteInfo) => void;
-}) {
+// === Corrige o tamanho do mapa dentro de modais ===
+function FixMapResize() {
   const map = useMap();
-  const routeLineRef = useRef<L.Polyline | null>(null);
-  
   useEffect(() => {
-      if (!to) return;
-
-      // Remove rota anterior
-    if (routeLineRef.current) {
-        map.removeLayer(routeLineRef.current);
-      routeLineRef.current = null;
-    }
-
-    const waypoints = [L.latLng(from[0], from[1]), L.latLng(to[0], to[1])];
-    
-    // Criar uma linha simples entre os pontos como fallback
-    const simpleRoute = L.polyline(waypoints as any, {
-        color: '#2929A3',
-      weight: 5,
-      opacity: 0.7,
-      dashArray: '10, 10'
-    }).addTo(map);
-    
-    routeLineRef.current = simpleRoute;
-
-    // Calcular distância e tempo estimado
-    const distancia = waypoints[0].distanceTo(waypoints[1]);
-    const velocidadeCarro = 50; // km/h
-    const velocidadePe = 5; // km/h
-    
-    const routeInfo: RouteInfo = {
-      distancia: distancia,
-      tempoCarro: Math.round((distancia / 1000) / velocidadeCarro * 3600),
-      tempoPe: Math.round((distancia / 1000) / velocidadePe * 3600)
-    };
-    
-    onRouteFound(routeInfo);
-    
-    // Tentar usar OSRM para rota mais precisa
-    const calculateOSRMRoute = async () => {
-      try {
-        const response = await fetch(
-            `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`
-        );
-        const routeLineRef = useRef<L.Polyline | L.GeoJSON | null>(null);
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          if (data.routes && data.routes[0]) {
-            const route = data.routes[0];
-            // const routeGeometry = route.geometry;
-            
-            // Remover rota simples
-            if (routeLineRef.current) {
-              map.removeLayer(routeLineRef.current);
-            }
-            
-            // Adicionar rota OSRM
-// const osrmRoute = L.geoJSON(routeGeometry as any, {
-//   style: {
-//     color: '#2929A3',
-//     weight: 6,
-//     opacity: 0.9
-//   }
-// }).addTo(map);
-
-
-
-            
-                                 
-            // Atualizar informações da rota
-            const updatedRouteInfo: RouteInfo = {
-              distancia: route.distance,
-              tempoCarro: route.duration,
-              tempoPe: Math.round((route.distance / 1000) / 5 * 3600)
-            };
-            
-            onRouteFound(updatedRouteInfo);
-          }
-        }
-      } catch (error) {
-        console.log("Usando rota simples - OSRM não disponível");
-      }
-    };
-
-    calculateOSRMRoute();
-
-    return () => {
-      if (routeLineRef.current) {
-        map.removeLayer(routeLineRef.current);
-      }
-    };
-  }, [from, to, map, onRouteFound]);
-
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+  }, [map]);
   return null;
 }
 
-// Componente Principal
+// === Interface de Pedido ===
+interface Pedido {
+  id: number;
+  nome: string;
+  endereco: string;
+  lat: number;
+  lng: number;
+}
+
 export function MapRoute() {
-  const [from, setFrom] = useState<[number, number]>([-8.8383, 13.2344]);
+  const [from, setFrom] = useState<[number, number] | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
-  const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [mapReady, setMapReady] = useState(false);
+  const [selected, setSelected] = useState<Pedido | null>(null);
+  const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
+  const [loading, setLoading] = useState(true);
+  const mapRef = useRef<L.Map | null>(null);
 
-  // Carregar pedidos e localização :cite[5]:cite[6]
+  // === Obter localização atual ===
   useEffect(() => {
-    const initializeMap = async () => {
-      // Obter localização do usuário
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            setFrom([pos.coords.latitude, pos.coords.longitude]);
-            setMapReady(true);
-          },
-          (error) => {
-            console.warn("Erro de geolocalização, usando localização padrão:", error);
-            setMapReady(true);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000
-          }
-        );
-      } else {
-        setMapReady(true);
-      }
-
-      // Pedidos simulados
-      const pedidosSimulados: Pedido[] = [
-        { 
-          id: 1, 
-          lat: -8.8383, 
-          lng: 13.2400, 
-          nome: "Pedido #001", 
-          endereco: "Avenida 4 de Fevereiro" 
-        },
-        { 
-          id: 2, 
-          lat: -8.8300, 
-          lng: 13.2300, 
-          nome: "Pedido #002", 
-          endereco: "Baía de Luanda" 
-        }
-      ];
-      
-      setPedidos(pedidosSimulados);
-    };
-
-    initializeMap();
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFrom([pos.coords.latitude, pos.coords.longitude]);
+        setLoading(false);
+      },
+      (err) => {
+        console.error("Erro ao obter localização:", err);
+        setFrom([-8.8383, 13.2344]); // fallback (Luanda)
+        setLoading(false);
+      },
+      { enableHighAccuracy: true }
+    );
   }, []);
 
-  const handlePedidoClick = (pedido: Pedido) => {
-    setSelectedPedido(pedido);
-    setRouteInfo(null);
-    setLoading(true);
+  // === Simular pedidos próximos ===
+  useEffect(() => {
+    if (!from) return;
+    const pedidosSimulados: Pedido[] = [
+      {
+        id: 1,
+        nome: "Reparo Elétrico",
+        endereco: "Avenida 4 de Fevereiro",
+        lat: from[0] + 0.002,
+        lng: from[1] + 0.004,
+      },
+      {
+        id: 2,
+        nome: "Canalização Rápida",
+        endereco: "Rua da Missão",
+        lat: from[0] - 0.003,
+        lng: from[1] - 0.003,
+      },
+      {
+        id: 3,
+        nome: "Pintura Express",
+        endereco: "Kinaxixi",
+        lat: from[0] + 0.004,
+        lng: from[1] - 0.002,
+      },
+    ];
+    setPedidos(pedidosSimulados);
+  }, [from]);
+
+  // === Traçar rota ===
+  const calculateRoute = async (dest: Pedido) => {
+    if (!from) return;
+    try {
+      const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${dest.lng},${dest.lat}?overview=full&geometries=geojson`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.routes && data.routes[0]) {
+        const coords = data.routes[0].geometry.coordinates.map(
+          ([lng, lat]: [number, number]) => [lat, lng]
+        );
+        setRouteCoords(coords);
+        setSelected(dest);
+
+        // 🔎 Ajustar zoom para mostrar a rota inteira
+        if (mapRef.current) {
+          const bounds = L.latLngBounds(coords);
+          mapRef.current.fitBounds(bounds, { padding: [60, 60] });
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao calcular rota:", err);
+    }
   };
 
-  const handleClearRoute = () => {
-    setSelectedPedido(null);
-    setRouteInfo(null);
-    setLoading(false);
-  };
-
-  if (!mapReady) {
+  if (loading || !from) {
     return (
-      <div className="relative w-full h-[60vh] md:h-[500px] rounded-xl overflow-hidden shadow-md border flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando mapa...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center h-[400px]">
+        <Loader2 className="animate-spin text-orange-500 w-8 h-8 mb-2" />
+        <p className="text-sm text-muted-foreground">
+          Obtendo sua localização...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-[60vh] md:h-[500px] rounded-xl overflow-hidden shadow-md border">
-      {/* Header do Mapa */}
-      <div className="absolute top-4 left-4 z-[1000] bg-white px-3 py-2 rounded-lg shadow-md">
-        <h3 className="font-semibold text-gray-800">🗺️ Roteirizador</h3>
-        <p className="text-sm text-gray-600">
-          {selectedPedido ? `Rota para: ${selectedPedido.nome}` : "Clique em um pedido"}
-        </p>
-      </div>
-
-      {/* Botão para limpar rota */}
-      {selectedPedido && (
-        <div className="absolute top-4 right-4 z-[1000]">
-          <button
-            onClick={handleClearRoute}
-            className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md"
-          >
-            ✕ Limpar Rota
-          </button>
-        </div>
-      )}
-
-      <MapContainer 
-        center={from} 
-        zoom={14} 
-        className="w-full h-full"
-        style={{ height: "100%", width: "100%" }}
+    <div className="relative w-full h-[600px] sm:h-[500px] rounded-xl overflow-hidden">
+      <MapContainer
+        center={from}
+        zoom={15}
+        zoomControl={false}
+        ref={(ref) => (mapRef.current = ref)}
+        className="w-full h-full z-0"
       >
+        <FixMapResize />
+        <ZoomControl position="bottomright" />
+
         <TileLayer
+          attribution='&copy; <a href="https://osm.org">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         />
 
-        {/* Minha localização */}
-        <Marker position={from}>
+        {/* 🧭 Posição atual */}
+        <Marker position={from} icon={userIcon}>
           <Popup>
-            <div className="text-center">
-              <div className="font-bold text-blue-600">📍 Minha Localização</div>
-              <div className="text-sm text-gray-600 mt-1">
-                {from[0].toFixed(4)}, {from[1].toFixed(4)}
-              </div>
+            <div className="text-sm">
+              <p className="font-semibold">Você está aqui 📍</p>
             </div>
           </Popup>
         </Marker>
 
-        {/* Marcadores dos pedidos */}
-        {pedidos.map(pedido => (
+        {/* 🧱 Pedidos próximos */}
+        {pedidos.map((p) => (
           <Marker
-            key={pedido.id}
-            position={[pedido.lat, pedido.lng]}
+            key={p.id}
+            position={[p.lat, p.lng]}
+            icon={pedidoIcon}
             eventHandlers={{
-              click: () => handlePedidoClick(pedido)
+              click: () => calculateRoute(p),
             }}
           >
             <Popup>
-              <div className="min-w-[250px] p-2">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-gray-800">{pedido.nome}</h2>
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-                    #{pedido.id}
-                  </span>
-                </div>
-                
-                <div className="mb-3">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Endereço:</span> {pedido.endereco}
-                  </p>
-                </div>
-                
-                {selectedPedido?.id === pedido.id && routeInfo && (
-                  <div className="space-y-3 mb-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="p-2 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                      <h3 className="font-semibold text-blue-800">🚗 De Carro</h3>
-                      <div className="mt-1 text-sm text-gray-700 space-y-1">
-                        <p><strong>Distância:</strong> {formatarDistancia(routeInfo.distancia)}</p>
-                        <p><strong>Tempo:</strong> {formatarTempo(routeInfo.tempoCarro)}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="p-2 bg-green-50 rounded-lg border-l-4 border-green-500">
-                      <h3 className="font-semibold text-green-800">🚶 A Pé</h3>
-                      <div className="mt-1 text-sm text-gray-700 space-y-1">
-                        <p><strong>Distância:</strong> {formatarDistancia(routeInfo.distancia)}</p>
-                        <p><strong>Tempo:</strong> {formatarTempo(routeInfo.tempoPe)}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {selectedPedido?.id === pedido.id && loading && !routeInfo && (
-                  <div className="text-center py-3 bg-yellow-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Calculando melhor rota...</p>
-                  </div>
-                )}
-
-                <button
-                  className="mt-2 w-full bg-blue-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-blue-700 transition duration-200 text-sm"
-                  onClick={() => alert(`Aceitar pedido: ${pedido.nome}`)}
+              <div className="text-sm">
+                <p className="font-semibold">{p.nome}</p>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {p.endereco}
+                </p>
+                <Button
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => calculateRoute(p)}
                 >
-                  Aceitar Pedido
-                </button>
+                  Traçar rota
+                </Button>
               </div>
             </Popup>
           </Marker>
         ))}
 
-        {/* Componente de roteamento */}
-        {selectedPedido && (
-          <Routing
-            from={from}
-            to={[selectedPedido.lat, selectedPedido.lng]}
-            onRouteFound={(info) => {
-              setRouteInfo(info);
-              setLoading(false);
+        {/* 🛣️ Linha da rota */}
+        {routeCoords.length > 0 && (
+          <Polyline
+            positions={routeCoords}
+            pathOptions={{
+              color: "#ff6b00",
+              weight: 6,
+              opacity: 0.9,
+              lineJoin: "round",
             }}
           />
         )}
       </MapContainer>
+
+      {/* 📦 Painel de detalhes do pedido selecionado */}
+      {selected && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/95 dark:bg-zinc-900 p-4 rounded-2xl shadow-lg w-[90%] flex justify-between items-center backdrop-blur-md border border-zinc-200 dark:border-zinc-800">
+          <div>
+            <h3 className="font-semibold text-lg">{selected.nome}</h3>
+            <p className="text-xs text-muted-foreground">{selected.endereco}</p>
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full"
+            onClick={() => {
+              setSelected(null);
+              setRouteCoords([]);
+              if (mapRef.current) mapRef.current.setView(from, 15);
+            }}
+          >
+            <Navigation2 className="text-orange-500" size={18} />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,24 +10,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { provinceMunicipalityMap } from "@/data/province";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { signUp } from "@/api/sign-up";
+import z from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { Role } from "./Role";
+import { toast } from "sonner";
+import { GetProfission } from "@/api/get-profissions";
+
+
+
 
 
 export function SignUp() {
   const [step, setStep] = useState(1);
+  const navigate = useNavigate()
 
-  // Estados do formulário
-  const [fullname, setFullname] = useState("");
-  const [nif, setNif] = useState("");
-  const [province, setProvince] = useState<string>("Luanda");
-  const [municipalities, setMunicipalities] = useState<string[]>(
-    provinceMunicipalityMap["Luanda"]
-  );
-  const [municipality, setMunicipality] = useState<string>("Viana");
-  const [category, setCategory] = useState<string>("");
+const registerBodySchema = z.object({
+       nome : z.string(),
+       celular : z.string(),
+       nif : z.string(),
+       palavraPasse: z.string(),
+       profissao : z.string(),
+       provincia : z.string(),
+       municipio : z.string(),
+       nomeRepresentante : z.string().optional(),
+       phone:z.coerce.string().optional(),
+       role:z.enum([Role.ADMIN,Role.CLIENTE_COLECTIVO,Role.CLIENTE_INDIVIDUAL,Role.PRESTADOR_COLECTIVO,Role.PRESTADOR_INDIVIDUAL])
+    })
+    type RegisterUsersBodySchema = z.infer< typeof registerBodySchema>
+
+    const {register, control,handleSubmit} = useForm<RegisterUsersBodySchema>()
+
+
   const [photo, setPhoto] = useState<File | null>(null);
+
+  const {data:profissao} = useQuery({
+    queryKey:['profissao'],
+    queryFn:GetProfission
+  })
+  
 
   // Animações de transição entre passos
   const variants = {
@@ -36,24 +61,36 @@ export function SignUp() {
     exit: { x: -50, opacity: 0, scale: 0.95 },
   };
 
-  const handleProvinceChange = (prov: string) => {
-    setProvince(prov);
-    setMunicipalities(provinceMunicipalityMap[prov] || []);
-    setMunicipality(provinceMunicipalityMap[prov]?.[0] || "");
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({
-      fullname,
-      nif,
-      province,
-      municipality,
-      category,
-      photo,
-    });
-    alert("Cadastro enviado com sucesso!");
-  };
+  const {mutateAsync:Register} = useMutation({
+    mutationFn:signUp
+  })
+
+  async function handleRegisterUsers(data:RegisterUsersBodySchema) {
+    console.log(data)
+    const {nome, celular,municipio,nif,palavraPasse,profissao,provincia,role,nomeRepresentante} = data
+       Register({
+        celular,
+        image_path:photo,
+        municipio,
+        nif,
+        nome,
+        nomeRepresentante,
+        palavraPasse,
+        profissao,
+        provincia,
+        role
+       })
+        navigate("/sign-in")
+       toast.success('usuario registado com sucesso')
+  }
+
+  
+  if(!profissao){
+    return
+  }
+
+
 
   return (
     <>
@@ -62,14 +99,14 @@ export function SignUp() {
         <div className="w-full max-w-md flex flex-col items-center text-center gap-6">
           {/* Cabeçalho */}
           <div className="flex flex-col gap-1 -mt-40 lg:mt-0">
-             <Link to="/empresa">
-                <span className="text-muted-foreground relative left-36 bottom-1 text-xs" >
-                   skip
-                </span>
-              </Link>
+              {/* <Link to="/empresa">
+                  <span className="text-muted-foreground relative left-36 bottom-1 text-xs" >
+                    skip
+                  </span>
+                </Link> */}
             <div className="flex items-center justify-center">
              
-              <h1 className="text-2xl font-semibold tracking-tight">Sign Up Clientes</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">Sign Up </h1>
             </div>
             <p className="text-sm text-muted-foreground">
               Se  já tiver um conta activa pode simplesmente fazer <Link to='/sign-in' className="text-blue-300">login </Link>para ter aceder à sua conta
@@ -77,7 +114,7 @@ export function SignUp() {
           </div>
 
           {/* Formulário */}
-          <form onSubmit={handleSubmit} className="w-full text-left">
+          <form onSubmit={handleSubmit(handleRegisterUsers)} className="w-full text-left">
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <motion.div
@@ -93,80 +130,83 @@ export function SignUp() {
                     <Label htmlFor="fullname">Nome</Label>
                     <Input
                       id="fullname"
-                      value={fullname}
-                      onChange={(e) => setFullname(e.target.value)}
+                       {...register('nome')}
                       placeholder="Nome (cliente / Empresa)"
                       required
                     />
+                  </div>
+                         <div className="space-y-2">
+                    <Label className="font-semibold">Profissão / Área de Atuação</Label>
+                   <Controller
+                     name="profissao"
+                     control={control}
+                     render={({field:{name,onChange,value}})=>{
+                       return(
+                      <Select value={value} name={name} onValueChange={onChange}>
+  <SelectTrigger className="h-10 w-full">
+    <SelectValue placeholder="Selecione sua profissão" />
+  </SelectTrigger>
+
+  <SelectContent>
+    {profissao.profissao
+      ?.filter((p) => p.titulo && p.titulo.trim() !== "") // evita valores vazios
+      .map((p) => (
+        <SelectItem key={p.titulo} value={p.titulo}>
+          {p.titulo}
+        </SelectItem>
+      ))}
+  </SelectContent>
+</Select>
+
+                       )
+                     }}
+                   />
                   </div>
 
                   <div className="space-y-1">
                     <Label htmlFor="nif">NIF</Label>
                     <Input
+                    max={30}
+                    min={1}
                       id="nif"
-                      value={nif}
-                      onChange={(e) => setNif(e.target.value)}
+                       {...register('nif')}
                       placeholder="Número de Identificação Fiscal"
                       required
                     />
                   </div>
 
                      <div className="space-y-1">
-                    <Label htmlFor="nif">Palavra-Passe</Label>
+                    <Label htmlFor="password">Palavra-Passe</Label>
                     <Input
                       id="password"
-                      onChange={(e) => setNif(e.target.value)}
+                       {...register('palavraPasse')}
                       placeholder="Palavra Passe"
                       type="password"
+                      max={12}
+                      min={6}
                       required
                     />
                   </div>
-
- <div className="space-y-2">
-  <Label className="font-semibold">Profissão / Área de Atuação</Label>
-  <Select>
-    <SelectTrigger className="h-10 w-full">
-      <SelectValue placeholder="Selecione sua profissão" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="ENGENHEIRO INFORMATICO">Engenheiro Informatico</SelectItem>
-      <SelectItem value="PROFESSOR INGLES">Professor Ingles</SelectItem>
-      <SelectItem value="PROGRAMADOR">Programador</SelectItem>
-      <SelectItem value="MEDICO">Médico</SelectItem>
-      <SelectItem value="PROFESSOR_MATEMATICA">Professor Matematica</SelectItem>
-      <SelectItem value="ADVOGADO">Advogado</SelectItem>
-      <SelectItem value="DESIGNER GRAFICO">Designer Grafico</SelectItem>
-      <SelectItem value="CONTABILISTA">Contabilista</SelectItem>
-      <SelectItem value="MANICURE PEDICURE">Manicure & Pedicure</SelectItem>
-      <SelectItem value="MANICURE PEDICURE">Maquiadora</SelectItem>
-      <SelectItem value="GESTOR_PROJECTOS">Gestor de Projectos</SelectItem>
-      <SelectItem value="CUSTUREIRA_ESTILISTA">Custureira & Estilista</SelectItem>
-      <SelectItem value="CABELEREIRO">Cabelereiro</SelectItem>
-      <SelectItem value="ENFERMEIRO">Enfermeiro</SelectItem>
-      <SelectItem value="ADMINISTRADOR_REDES">Administrador de Redes</SelectItem>
-      <SelectItem value="UX/UI DESIGNER">UX/UI Design</SelectItem>
-      <SelectItem value="MOTORISTA">Motorista</SelectItem>
-      <SelectItem value="PEDREIRO">Pedreiro</SelectItem>
-      <SelectItem value="MACANICO AUTO">Mecânico Auto</SelectItem>
-      <SelectItem value="REPARACAO DE CELULARES">Reparação de Celulares</SelectItem>
-      <SelectItem value="ELECTRICISTA">Eletricista</SelectItem>
-      <SelectItem value="CARPINTEIRO">Carpinteiro</SelectItem>
-      <SelectItem value="SERRELHEIRO_SOLDADOR">Serralheiro & Soldador</SelectItem>
-      <SelectItem value="TECNICO DE FRIO CLIMATIZACAO">Técnico de Frio & Climatização</SelectItem>
-      <SelectItem value="COZINHEIRO">Cozinheiro</SelectItem>
-      <SelectItem value="ESTUDANTE">Estudante</SelectItem>
-      <SelectItem value="OUTRO">Outro</SelectItem>
-    </SelectContent>
-  </Select>
-</div>
 
                        <div className="space-y-1">
                     <Label htmlFor="phone">Telefone</Label>
                     <Input
                       id="phone"
-                      onChange={(e) => setNif(e.target.value)}
-                      placeholder="Ex : 938-xxx-xxx"
-                      required
+
+                      {...register('celular')}
+                        type="text"
+                            placeholder="Telefone"
+                            required
+                            maxLength={9} // Limita a 9 caracteres (apenas números)
+                            pattern="9\d{8}" // Valida números de telefone de Angola (deve começar com 9 seguido de 8 dígitos)
+                            title="Número de telefone inválido. Deve começar com 9, seguido de 8 dígitos."
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                let value = input.value.replace(/\D/g, ''); // Remove tudo que não for número
+                                if (value.length > 9) value = value.slice(0, 9); // Limita a 9 números
+                                input.value = value;
+                            }}
+
                     />
                   </div>
 
@@ -193,7 +233,12 @@ export function SignUp() {
                   {/* Província */}
                   <div className="space-y-2">
                     <Label>Província</Label>
-                    <Select value={province} onValueChange={handleProvinceChange}>
+                  <Controller
+                    control={control}
+                    name="provincia"
+                    render={({field:{value,onChange,name}})=>{
+                      return(
+                    <Select value={value} onValueChange={onChange} name={name} >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione a província" />
                       </SelectTrigger>
@@ -205,37 +250,60 @@ export function SignUp() {
                         ))}
                       </SelectContent>
                     </Select>
+                      )
+                    }}
+                  />
                   </div>
 
                   {/* Município */}
                   <div className="space-y-2">
                     <Label>Município</Label>
-                    <Select value={municipality} onValueChange={setMunicipality}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o município" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {municipalities.map((mun) => (
-                          <SelectItem key={mun} value={mun}>
-                            {mun}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                 <Controller
+  control={control}
+  name="municipio"
+  render={({ field: { name, onChange, value } }) => (
+    <Select
+      value={value}
+      onValueChange={onChange}
+      name={name}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="Selecione o município" />
+      </SelectTrigger>
+      <SelectContent className="max-h-48 overflow-y-auto">
+          <SelectItem value="Viana">Viana</SelectItem>
+      </SelectContent>
+    </Select>
+  )}
+/>
+
+
+              
+      
                   </div>
 
-                  {/* Categoria */}
                   <div className="space-y-2">
                     <Label>Categoría</Label>
-                    <Select value={category} onValueChange={setCategory}>
+                     <Controller
+                       control={control}
+                       name="role"
+                       render={({field:{name,onChange,value}})=>{
+                          return(
+                            <Select value={value} onValueChange={onChange} name={name}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione a categoria" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="CI">Cliente Individual</SelectItem>
-                        <SelectItem value="CC">Cliente Empresa</SelectItem>
+                        <SelectItem value="CLIENTE_INDIVIDUAL">Cliente Individual</SelectItem>
+                        <SelectItem value="CLIENTE_COLECTIVO">Cliente Colectivo</SelectItem>
+                        <SelectItem value="PRESTADOR_COLECTIVO">Prestador Empresa</SelectItem>
+                        <SelectItem value="PRESTADOR_INDIVIDUAL">Prestador Individual</SelectItem>
                       </SelectContent>
                     </Select>
+                          )
+                       }}
+                       
+                     />
                   </div>
 
                   {/* Foto */}
@@ -252,13 +320,11 @@ export function SignUp() {
                   </div>
 
                     <div className="space-y-2">
-                    <Label htmlFor="fullname">Nome do Representante Legal</Label>
+                    <Label htmlFor="fullname">Representante Legal (opcional)</Label>
                     <Input
                       id="fullname"
-                      value={fullname}
-                      onChange={(e) => setFullname(e.target.value)}
+                      {...register('nomeRepresentante')}
                       placeholder="Nome do cliente / Empresa"
-                      required
                     />
                   </div>
 
@@ -271,18 +337,18 @@ export function SignUp() {
                     >
                       Voltar
                     </Button>
-                    <Link to='/'>
-                     <Button className="w-40" type="submit">
-                    Criar
+                
+                     <Button className="w-56" type="submit">
+                       Registar
                     </Button>
-                    </Link>
+               
                    
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </form>
-        <span className="text-muted-foreground text-xs">Para se registar na plataforma como prestador de serviços (individual/Empresa)  clica em <Link to='/empresa' className="text-blue-300">skip.</Link></span>
+        {/* <span className="text-muted-foreground text-xs">Para se registar na plataforma como prestador de serviços (individual/Empresa)  clica em <Link to='/empresa' className="text-blue-300">skip.</Link></span> */}
         </div>
       </div>
     </>

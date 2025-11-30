@@ -1,9 +1,9 @@
 import servico3 from '@/assets/IMG-20250928-WA0056.jpg'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog,DialogTrigger } from '@/components/ui/dialog'
 import { ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { ServicoDialogContent } from '../ServicesDialogContent'
+import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
 type ServicoButtonProps = {
   nome: string
@@ -21,9 +21,7 @@ function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
-        <ServicoDialogContent nome={selecionado} />
-      </DialogContent>
+        <FastFazerPedido selecionado={selecionado}/>
     </Dialog>
   )
 }
@@ -34,8 +32,11 @@ export function MadeiraOficios() {
 
   const servicos = [
     'Canalizador',
+    'Motorista',
     'Carpinteiro',
+    'Pintor',
     'Serrelheiro & Soldador',
+    'Sapeteiro',
     'Pedreiro',
   ]
 
@@ -53,7 +54,7 @@ export function MadeiraOficios() {
 
       {/* Texto centralizado */}
       <div className="absolute inset-0 flex items-center right-56 justify-center">
-        <h2 className="text-white text-xl font-bold">Madeira e Ofícios</h2>
+        <h2 className="text-white text-xl font-bold">Serviços & Ofícios</h2>
       </div>
 
       {/* Lista de serviços */}

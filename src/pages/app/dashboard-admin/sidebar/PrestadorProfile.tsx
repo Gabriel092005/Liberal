@@ -1,17 +1,31 @@
 import { DialogContent } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { MessageCircle, Phone} from "lucide-react"
-import photo4 from "@/assets/WhatsApp Image 2024-06-27 at 22.59.42_29efed05.jpg"
+import { BriefcaseBusinessIcon, MapPinIcon,  Phone} from "lucide-react"
+import { api } from "@/lib/axios"
+import { useQuery } from "@tanstack/react-query"
+import { GetUserProfileById } from "@/api/get-profileById"
 
-export function PrestadoreProfile() {
+export function PrestadoreProfile({id}:{id:string|null}) {
+
+
+   const { data} = useQuery({
+  queryKey: ["profileById"],
+  refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
+  refetchOnReconnect: true,       // Rebusca se a internet voltar
+  refetchOnMount: true,           // Rebusca sempre que o componente monta
+  staleTime: 0,    
+  queryFn:()=> GetUserProfileById({userId:id}),
+  });
+  if(!data){
+      return
+  }
   return (
-    <DialogContent className="max-w-2xl p-0 rounded-xl overflow-hidden">
+    <DialogContent className="max-w-2xl p-10 rounded-xl overflow-hidden">
       <div className="relative">
         {/* Capa */}
         <div className="h-40 md:h-56 w-full">
           <img
-            src={photo4}
+            src={`${api.defaults.baseURL}/uploads/${data.image_path}`}
             alt="Capa"
             className="w-full h-full object-cover"
           />
@@ -20,7 +34,7 @@ export function PrestadoreProfile() {
         {/* Foto de perfil */}
         <div className="absolute -bottom-12 left-6">
           <img
-            src={photo4}
+           src={`${api.defaults.baseURL}/uploads/${data.image_path}`}
             alt="Perfil"
             className="w-28 h-28 rounded-full border-4 border-background shadow-md object-cover"
           />
@@ -30,21 +44,31 @@ export function PrestadoreProfile() {
       {/* Conteúdo */}
       <div className="mt-16 px-6 pb-6">
         {/* Nome e bio */}
-        <h2 className="text-xl font-bold">João Silva</h2>
+        <h2 className="text-xl font-bold">{}</h2>
         <p className="text-muted-foreground text-sm">
-          Especialista em serviços domésticos e jardinagem
+        {data?.nome}
         </p>
+           <div className="flex items-center gap-1">
+            <BriefcaseBusinessIcon className="text-red-500" size={14}></BriefcaseBusinessIcon>
+            <span className="text-muted-foreground">{data.profissao}</span>
+        
+          </div>   
 
         {/* Ações */}
         <div className="flex gap-3 mt-4">
-          <Button className="flex items-center gap-2">
+          <div className="flex items-center ">
             <Phone size={18} />
-             Solicitar
-          </Button>
-          <Button variant="outline" className="flex items-center gap-2">
-            <MessageCircle size={18} />
-            Mensagem
-          </Button>
+            <span className="text-muted-foreground">+{data.celular}</span>
+          </div>
+
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <MapPinIcon className="text-red-500" size={14}></MapPinIcon>
+            <span>{data.municipio}</span>
+            <span>{data.provincia}</span>
+          </div>     
+
+          
+          
         </div>
 
         {/* Sobre mim */}
@@ -52,9 +76,7 @@ export function PrestadoreProfile() {
           <CardContent className="p-4">
             <h3 className="font-semibold text-base mb-2">Sobre</h3>
             <p className="text-sm text-muted-foreground">
-              Tenho mais de 5 anos de experiência em jardinagem e manutenção de
-              quintais. Trabalho com dedicação e responsabilidade, oferecendo
-              serviços personalizados.
+              {data?.description}
             </p>
           </CardContent>
         </Card>

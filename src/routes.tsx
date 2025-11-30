@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { AppLayoutAdmin } from './pages/_layouts/app-clientes';
+import { AppLayoutClients} from './pages/_layouts/app-clientes';
 import { Home} from './pages/app/dashboard-admin/sidebar/home';
 import { SignIn } from './auth/Sign-In';
 import { AuthLayout } from './pages/_layouts/auth';
@@ -26,15 +26,31 @@ import { Package } from './pages/app/Prestadores-dash/Pacotes';
 import { PrestadoresPedidos } from './pages/app/Prestadores-dash/Pedidos-Prestadores';
 import { ProfilePage } from './pages/app/Prestadores-dash/PrestadoresProfile';
 import { VerMapas } from './pages/app/dashboard-admin/sidebar/Ver-Mapas';
+import { AppLayoutAdmin } from './pages/_layouts/app-admin';
+import { Dashboard } from './pages/dash-admin/dasboard';
+import { CostumerTableFilters } from './pages/dash-admin/Clients/clients';
+import { PedidosFilters } from './pages/dash-admin/Clients/Pedidos';
+import { NotificacoesMobile } from './pages/app/dashboard-admin/sidebar/Notification/todas-notificacoes';
+import { LoadingPage } from './pages/Loading';
+import { PrestadoresTableFilters } from './pages/dash-admin/prestadores/prestadores';
+import { Notificacoes } from './pages/dash-admin/notificacoes';
+import { Vitrine } from './pages/app/Prestadores-dash/Vitrine';
+import { CommentsList } from './pages/app/dashboard-admin/sidebar/comentarios';
 export const router = createBrowserRouter([
   {
+
+  },
+  {
     path: '/',
-    element: <AppLayoutAdmin />,
+    element: <AppLayoutClients/>,
     children: [
       { path: '/', element: <Home/> },
-      { path: '/prestadores', element: <BuscarPrestadores/> },  
+      { path: '/favoritos', element: <BuscarPrestadores/> },  
       { path: '/pedidos', element: <SearchPedidos/> },
       { path: '/madeira', element: <MadeiraOficios/> },
+      { path: '/vitrine', element: <Vitrine/> },
+      { path: '/comment', element: <CommentsList/> },
+      { path: '/notif', element: <NotificacoesMobile/> },
       { path: '/ensino', element: <Docencia/> },
       { path: '/tecnologia', element: <TecnologiaDesign/> },
       { path: '/electricidade', element: <Electricidade/> },
@@ -59,11 +75,28 @@ export const router = createBrowserRouter([
     element:<AppLayoutPestadores/>,
     children: [
       // {path:'/', <PrestadoresLayout}
+      {path: '/loading', element:<LoadingPage/> },
       { path: '/servicos', element: <PrestadoresDash/> },
+      { path: '/notif-prestadores', element: <NotificacoesMobile/> },
+      { path: '/config-prestadores', element: <Config/> },
       { path: '/prestadores-pedidos', element: <PrestadoresPedidos/> },
       { path: '/profile', element: <ProfilePage/> },
       { path: '/package', element: <Package/> },
       { path: '/mapas', element: <VerMapas/> },
+    ],
+  },
+
+     {
+    path: '/',
+    element:<AppLayoutAdmin/>,
+    children: [
+      {path: '/loading', element:<LoadingPage/> },
+      { path: '/Início', element: <Dashboard/> },
+      { path: '/clientes', element: <CostumerTableFilters/> },
+      { path: '/serviços', element: <PrestadoresTableFilters/> },
+      { path: '/notif-admin', element: <Notificacoes/> },
+      { path: '/admin-pedidos', element: <PedidosFilters/> },
+
     ],
   },
     {

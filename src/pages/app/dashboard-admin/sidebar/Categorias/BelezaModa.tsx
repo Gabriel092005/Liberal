@@ -1,9 +1,10 @@
 import servicoBeleza from '@/assets/IMG-20250928-WA0058.jpg' // 🔹 coloque a imagem certa aqui
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { ChevronRight } from 'lucide-react'
-import { ServicoDialogContent } from '../ServicesDialogContent'
+
+import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
 type ServicoButtonProps = {
   nome: string
@@ -21,9 +22,8 @@ function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
-        <ServicoDialogContent nome={selecionado} />
-      </DialogContent>
+
+        <FastFazerPedido selecionado={selecionado} />
     </Dialog>
   )
 }
@@ -67,6 +67,12 @@ export function BelezaModa() {
         />
         <ServicoButton
           nome="Costureira & Estilista"
+          selecionado={servicoSelecionado}
+          onSelect={setServicoSelecionado}
+        />
+
+            <ServicoButton
+          nome="Esteticista"
           selecionado={servicoSelecionado}
           onSelect={setServicoSelecionado}
         />
