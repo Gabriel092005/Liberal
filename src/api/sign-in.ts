@@ -16,8 +16,7 @@ export async function signIn({password,phone}:SignInRequest) {
     
       try {
           const response  = await api.post<SignInResponse>("/sessions",{password, phone})
-          console.log(response.data.role)
-
+   
      const  token  = response.data.token
      document.cookie=`token=${token}; Secure; SameSite=Lax; Path=/`;  
 
