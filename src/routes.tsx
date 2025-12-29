@@ -36,6 +36,7 @@ import { PrestadoresTableFilters } from './pages/dash-admin/prestadores/prestado
 import { Notificacoes } from './pages/dash-admin/notificacoes';
 import { Vitrine } from './pages/app/Prestadores-dash/Vitrine';
 import { CommentsList } from './pages/app/dashboard-admin/sidebar/comentarios';
+import { NotificacoesMobileCostumer } from './pages/app/dashboard-admin/sidebar/Notification/todas-n-costumer';
 export const router = createBrowserRouter([
   {
 
@@ -50,7 +51,7 @@ export const router = createBrowserRouter([
       { path: '/madeira', element: <MadeiraOficios/> },
       { path: '/vitrine', element: <Vitrine/> },
       { path: '/comment', element: <CommentsList/> },
-      { path: '/notif', element: <NotificacoesMobile/> },
+      { path: '/notif-costumer', element: <NotificacoesMobileCostumer/> },
       { path: '/ensino', element: <Docencia/> },
       { path: '/tecnologia', element: <TecnologiaDesign/> },
       { path: '/electricidade', element: <Electricidade/> },
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
       { path: '/moda', element: <BelezaModa /> },
       { path: '/mais', element: <MaisProfissao /> },
       { path: '/config', element:<Config/> },
+
       { path: '/me', element: <Profile/>},
     ],
   },

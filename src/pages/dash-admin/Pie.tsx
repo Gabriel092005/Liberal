@@ -11,17 +11,14 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Metrics } from "@/api/get-metrics";
 
-
-
-
-
-
 export function ChartPieLabelCustom() {
     const {data:metrics,isLoading:isLoadingMetrics} =useQuery({
     queryKey:['metrics'],
     queryFn:Metrics
   })
-
+   if(!metrics){
+      return
+   }
   const chartData = [
   { browser: "prestadores Individual", visitors: metrics?.clientesIndividual, color: "#8884d8" },
   { browser: "prestdores Coletivos", visitors: metrics?.prestadoresEmpresa, color: "#82ca9d" },
@@ -36,6 +33,7 @@ export function ChartPieLabelCustom() {
       </CardHeader>
 
       <CardContent className="flex-1 pb-0">
+    
         {isLoadingMetrics ? (
           <Loader className="text-orange-400 animate-spin"></Loader>
         ):(

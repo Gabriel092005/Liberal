@@ -1,5 +1,3 @@
-  "use client";
-
   import { useState } from "react";
   import { useForm, Controller } from "react-hook-form";
   import { z } from "zod";
@@ -123,13 +121,7 @@ function handleDeleteFilters() {
     page: 1,
   });
 }
-
- 
-
-
 const queryClient = useQueryClient();
-
-
 const { mutateAsync: deleteCostumer } = useMutation({
   mutationFn: async (userId: number) => {
     await Delete({ userId: String(userId) });

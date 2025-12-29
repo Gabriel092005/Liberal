@@ -8,7 +8,6 @@ import { RegisterNewCategory } from "@/api/new-category";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
 export function NewCategorySheetContent(){
     const queryClient = useQueryClient();
     const  registerNewCategoryParams = z.object({

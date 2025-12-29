@@ -38,7 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { UpdatePhoto } from "@/api/update-profile-photo";
 import { socket } from "@/lib/socket";
 
-import { NotificationDropdown } from "./Notification/notification-dropdown";
+// import { NotificationDropdown } from "./Notification/notification-dropdown";
 import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
 import { DestaquesAuto } from "./destacados";
 import { api } from "@/lib/axios";
@@ -50,6 +50,7 @@ import { getInialts } from "@/lib/utils";
 import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
 import { GetProfissaoByCategory } from "@/api/fetchProfissionByCategory";
 import { GetProfission } from "@/api/get-profissions";
+import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
 
 export function Home() {
 
@@ -185,11 +186,18 @@ interface SearchProfissionTypes  {
     console.log("Nova imagem:", selectedFile);
   };
 
-  const imageSrc =
-    preview ||
-    (profile?.image_path
-      ? `${api.defaults.baseURL}/uploads/${profile.image_path}`
-      : "https://i.pravatar.cc/150?u=placeholder");
+ // 1. Limpa o baseURL para não ter barra no final
+const baseUrl = api.defaults.baseURL?.replace(/\/$/, "");
+
+// 2. Garante que o path não tenha barra no início
+const cleanPath = profile?.image_path?.replace(/^\//, "");
+
+const imageSrc =
+  preview ||
+  (profile?.image_path
+    ? encodeURI(`${baseUrl}/uploads/${cleanPath}`)
+    : "https://i.pravatar.cc/150?u=placeholder");
+
 
   useEffect(() => {
     const seen = localStorage.getItem("app_onboarding_seen_v1");
@@ -255,6 +263,7 @@ interface SearchProfissionTypes  {
      if(profile?.role=='ADMIN'){
      navigate("/início")
   }
+  console.log("imagem-api:", imageSrc)
 
 
   if(!categories || !profByCategoy || !profissao){
@@ -267,7 +276,7 @@ interface SearchProfissionTypes  {
   return (
     <div className="flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
       <motion.div
-        className="flex flex-col relative -top-2 flex-1 px-4 py-4 gap-4 items-center justify-center pb-[1rem]"
+        className="flex flex-col relative -top-5 flex-1 px-4 py-4 gap-4 items-center justify-center pb-[1rem]"
         initial={{ x: "-100%", opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
@@ -282,7 +291,9 @@ interface SearchProfissionTypes  {
                     {isLoadingUserProfile ? (
                       <Skeleton className="h-16 w-16 rounded-full" />
                     ) : (
-                      <Avatar className="w-9 h-9 cursor-pointer ring-2 ring-orange-400">
+                      <Avatar 
+                      key={imageSrc} 
+                      className="w-9 h-9 cursor-pointer ring-2 ring-orange-400">
                         <AvatarImage src={imageSrc} />
                         <AvatarFallback>
                           {profile?.nome?.slice(0, 2).toUpperCase()}
@@ -300,6 +311,7 @@ interface SearchProfissionTypes  {
                     <div className="flex flex-col items-center gap-5 py-4">
                       <div className="relative">
                         <img
+                          key={imageSrc}
                           src={imageSrc}
                           alt="Preview"
                           className="w-40 h-40 rounded-full object-cover ring-4 ring-orange-400 shadow-lg"
@@ -510,14 +522,12 @@ interface SearchProfissionTypes  {
     ))}
   </div>
 </ScrollArea>
-
-     
       </DialogContent>
     </Dialog>
             {isLoadingUserProfile || !profile ? (
               <Skeleton className="h-10 w-10 rounded-full" />
             ) : (
-              <NotificationDropdown {...profile} />
+              <NotificationDropdownCostumer {...profile} />
             )}
 
             </div>
@@ -525,13 +535,13 @@ interface SearchProfissionTypes  {
         </header>
            <div className="flex items-center gap-1">
             <Link to='/vitrine'>
-              <Button variant='outline' className="flex">
+              <Button variant='ghost' className="flex border-b">
                 <BookMarked size={12} className="text-xs text-orange-300"></BookMarked>
                 <span className="text-xs">Vitrine</span>
               </Button>
             </Link>
              <Link to='/comment'>
-                <Button variant='outline' className="flex">
+                <Button variant='ghost' className="flex border-b">
                 <MessageCircle size={12} className="text-xs text-blue-300"></MessageCircle>
                 <span className="text-xs">Comentários</span>
               </Button>
