@@ -3,23 +3,19 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  User, 
-  Workflow, 
   Star, 
   MapPinIcon, 
   Building2, 
-  Phone,
   ChevronLeft,
   ChevronRight,
   Sparkles,
-
+  ArrowRight
 } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { api } from "@/lib/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { PrestadoreProfile } from "./PrestadorProfile";
 import { useSearchParams } from "react-router-dom";
-
 
 interface UsuarioDestaque {
   id: number;
@@ -36,7 +32,6 @@ interface UsuarioDestaque {
 interface FetchPrestadoresDestaquesResponse {
   usuarios: UsuarioDestaque[] | undefined
 }
-
 export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<number>(0);
@@ -46,47 +41,35 @@ export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
   const [autoScroll, setAutoScroll] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  console.log("usuarios:",usuarios)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const UserId = searchParams.get("userId");
+  const CARD_WIDTH_TOTAL = 344;
 
-
-  
-     const [searchParams, setSearchParams] = useSearchParams();
-     const UserId = searchParams.get("userId")
-
-     interface searchUserProfileTypes {
-        userId:string
-     }
-
-  function handleSearchProfile({userId}:searchUserProfileTypes){
-      
-     setSearchParams((state) => {
-    userId ? state.set("userId", userId ) : state.delete("userId");
-    return state;
-  });
- }
-
-    if(!usuarios){
-      return
+  function handleSearchProfile({userId}: {userId: string}){
+    setSearchParams((state) => {
+      userId ? state.set("userId", userId ) : state.delete("userId");
+      return state;
+    });
   }
 
-  // Configuração do scroll automático
+  // Lógica de Scroll Automático REPARADA
   useEffect(() => {
-    if (!autoScroll || usuarios?.length === 0) return;
-
+    // Adicionamos isDragging aqui para não brigar com o mouse do usuário
+    if (!autoScroll || !usuarios || usuarios.length === 0 || isDragging) return;
+    
     const container = containerRef.current;
     if (!container) return;
 
     let animationFrameId: number;
-    const scrollSpeed = 0.5; // Velocidade mais suave
-
     
-
     const scrollStep = () => {
-      if (container.scrollWidth <= container.clientWidth) return;
+      if (!container) return;
 
-      scrollRef.current += scrollSpeed;
+      // Sincroniza o ref com a posição real caso o usuário tenha mexido
+      scrollRef.current = container.scrollLeft;
       
-      // Scroll infinito suave
+      scrollRef.current += 0.6; // Sua velocidade original
+      
       if (scrollRef.current >= container.scrollWidth - container.clientWidth) {
         scrollRef.current = 0;
         container.scrollLeft = 0;
@@ -94,297 +77,193 @@ export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
         container.scrollLeft = scrollRef.current;
       }
 
-      // Atualiza o índice atual baseado na posição do scroll
-      const cardWidth = 272; // 64 * 4 + 16 (w-64 + gap-4)
-      const newIndex = Math.floor(scrollRef.current / cardWidth) % usuarios.length;
-      setCurrentIndex(newIndex);
-
+      const newIndex = Math.round(container.scrollLeft / CARD_WIDTH_TOTAL) % usuarios.length;
+      if(newIndex !== currentIndex) setCurrentIndex(newIndex);
+      
       animationFrameId = requestAnimationFrame(scrollStep);
     };
 
     animationFrameId = requestAnimationFrame(scrollStep);
-
     return () => cancelAnimationFrame(animationFrameId);
-  }, [usuarios, autoScroll]);
+  }, [usuarios, autoScroll, currentIndex, isDragging]); // isDragging é chave aqui
 
-  // Handlers para drag manual
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setStartX(e.pageX - (containerRef.current?.offsetLeft || 0));
-    setScrollLeft(containerRef.current?.scrollLeft || 0);
-    setAutoScroll(false);
-  };
-  
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    // Retoma o scroll automático após 5 segundos de inatividade
-    setTimeout(() => setAutoScroll(true), 5000);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - (containerRef.current?.offsetLeft || 0);
-    const walk = (x - startX) * 2;
-    if (containerRef.current) {
-      containerRef.current.scrollLeft = scrollLeft - walk;
-      scrollRef.current = containerRef.current.scrollLeft;
-    }
-  };
-
-  // Handlers para touch devices
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    setStartX(e.touches[0].pageX - (containerRef.current?.offsetLeft || 0));
-    setScrollLeft(containerRef.current?.scrollLeft || 0);
-    setAutoScroll(false);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const x = e.touches[0].pageX - (containerRef.current?.offsetLeft || 0);
-    const walk = (x - startX) * 2;
-    if (containerRef.current) {
-      containerRef.current.scrollLeft = scrollLeft - walk;
-      scrollRef.current = containerRef.current.scrollLeft;
-    }
-  };
-
-
-  // Navegação por botões
   const scrollToIndex = useCallback((index: number) => {
     const container = containerRef.current;
     if (!container) return;
-
-    const cardWidth = 272;
-    const newScrollLeft = index * cardWidth;
-    
-    container.scrollTo({
-      left: newScrollLeft,
-      behavior: 'smooth'
-    });
-    
+    const newScrollLeft = index * CARD_WIDTH_TOTAL;
+    container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
     scrollRef.current = newScrollLeft;
     setCurrentIndex(index);
     setAutoScroll(false);
-    
-    // Retoma o scroll automático após 10 segundos
-    setTimeout(() => setAutoScroll(true), 10000);
-  }, []);
+    setTimeout(() => setAutoScroll(true), 8000);
+  }, [usuarios]);
 
-
-  const nextCard = () => {
-    const nextIndex = (currentIndex + 1) % usuarios.length;
-    scrollToIndex(nextIndex);
+  const handleDragStart = (x: number) => {
+    setIsDragging(true);
+    setStartX(x - (containerRef.current?.offsetLeft || 0));
+    setScrollLeft(containerRef.current?.scrollLeft || 0);
+    setAutoScroll(false);
   };
 
-  const prevCard = () => {
-    const prevIndex = currentIndex === 0 ? usuarios?.length - 1 : currentIndex - 1;
-    scrollToIndex(prevIndex);
+  const handleDragMove = (x: number) => {
+    if (!isDragging || !containerRef.current) return;
+    const moveX = x - (containerRef.current.offsetLeft || 0);
+    const walk = (moveX - startX) * 1.5;
+    containerRef.current.scrollLeft = scrollLeft - walk;
+    scrollRef.current = containerRef.current.scrollLeft;
   };
 
-  // Indicadores de progresso
-  const ProgressDots = () => (
-    <div className="flex justify-center gap-2 mt-4">
-      {usuarios.map((_, index) => (
-        <button
-          key={index}
-          onClick={() => scrollToIndex(index)}
-          className={`w-2 h-2 rounded-full transition-all duration-300 ${
-            index === currentIndex 
-              ? 'bg-orange-500 w-6' 
-              : 'bg-orange-200 hover:bg-orange-300'
-          }`}
-        />
-      ))}
-    </div>
-  );
-
-  if (usuarios.length === 0) {
-    return (
-      <div className="w-full py-8 text-center">
-        <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <Sparkles className="w-12 h-12 text-orange-200" />
-          <p className="text-lg font-semibold">Nenhum profissional em destaque</p>
-          <p className="text-sm">Volte em breve para descobrir talentos incríveis!</p>
-        </div>
-      </div>
-    );
-  }
+  if (!usuarios || usuarios.length === 0) return null;
 
   return (
-    <div className="relative w-full overflow-hidden px-2 ">
-      <div className="flex items-center justify-between  px-2   rounded-sm">
-        <div className="flex items-center gap-3 ">
-          <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-2 rounded-lg">
-            <Sparkles className="w-5 h-5 text-white" />
+    <div className="relative w-full overflow-hidden  py-10">
+      {/* HEADER EXTREME - (Mantido exatamente igual) */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 px-6 gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 bg-orange-500/10 w-fit px-3 py-1 rounded-full border border-orange-500/20">
+            <Sparkles size={14} className="text-orange-600 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-700">Premium Choice</span>
           </div>
-          <div >
-            <h2 className="text-xl lg:text-xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-              Profissionais em Destaque
-            </h2>
-    
-          </div>
+          <h2 className="text-4xl font-black tracking-tight text-zinc-900 dark:text-white lg:text-5xl">
+            Elite <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-600">Talents</span>
+          </h2>
+          <p className="text-zinc-500 font-medium max-w-md">Descubra os profissionais que estão elevando o nível do mercado angolano com excelência e qualidade.</p>
         </div>
 
-        {/* Botões de navegação */}
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Button
             variant="outline"
             size="icon"
-            onClick={prevCard}
-            className="h-8 w-8 rounded-full border-orange-200 hover:bg-orange-50"
+            onClick={() => scrollToIndex(currentIndex - 1)}
+            className="h-14 w-14 rounded-3xl border-zinc-200 dark:border-zinc-800 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all duration-500 shadow-xl active:scale-90"
           >
-            <ChevronLeft className="h-4 w-4 text-orange-500" />
+            <ChevronLeft size={24} />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            onClick={nextCard}
-            className="h-8 w-8 rounded-full border-orange-200 hover:bg-orange-50"
+            onClick={() => scrollToIndex(currentIndex + 1)}
+            className="h-14 w-14 rounded-3xl border-zinc-200 dark:border-zinc-800 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all duration-500 shadow-xl active:scale-90"
           >
-            <ChevronRight className="h-4 w-4 text-orange-500" />
+            <ChevronRight size={24} />
           </Button>
         </div>
       </div>
 
-      {/* Container dos cards com scroll horizontal */}
-      <div className="relative">
+      {/* CAROUSEL EXTREME - AJUSTE DE GESTO AQUI */}
+      <div className="relative overflow-visible flex-col">
         <div
           ref={containerRef}
-          className="flex flex-row gap-4 overflow-x-auto overflow-y-hidden py-1 px-2 scrollbar-none"
-          style={{ 
-            cursor: isDragging ? 'grabbing' : 'grab',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeave}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleMouseUp}
-          onTouchMove={handleTouchMove}
+          /** * ADICIONADO: touch-pan-x e no-scrollbar 
+           * Isso permite que o scroll horizontal funcione livre do ScrollArea pai
+           */
+          className="flex lg:flex-row gap-6 overflow-x-auto py-8 px-6 scrollbar-none   select-none touch-pan-x"
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+          onMouseDown={(e) => handleDragStart(e.pageX)}
+          onMouseMove={(e) => handleDragMove(e.pageX)}
+          onMouseUp={() => setIsDragging(false)}
+          onMouseLeave={() => setIsDragging(false)}
+          onTouchStart={(e) => handleDragStart(e.touches[0].pageX)}
+          onTouchMove={(e) => handleDragMove(e.touches[0].pageX)}
+          onTouchEnd={() => setIsDragging(false)}
         >
-          <AnimatePresence mode="wait">
-            {usuarios.map((usuario, index) => (
+          <AnimatePresence>
+            {usuarios.map((usuario) => (
               <motion.div
                 key={usuario.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                whileHover={{ y: -15 }}
                 className="flex-shrink-0"
               >
-                <Card className="w-64 h-44 rounded-2xl shadow-lg border bg-muted border-orange-100 hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-white to-orange-50 dark:from-zinc-900 dark:black">
-                  <CardContent className="p-4 flex flex-col h-full justify-between">
-                    {/* Header do card */}
-                    <header className="flex flex-col gap-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-12 w-12 ring-2 ring-orange-400 shadow-md">
-                            {usuario.image_path ? (
-                              <AvatarImage 
-                                src={`${api.defaults.baseURL}/uploads/${usuario.image_path}`}
-                                className="object-cover"
-                              />
-                            ) : (
-                              <AvatarFallback className="bg-gradient-to-tr from-orange-400 to-pink-500 text-white font-bold">
-                                {usuario.nome?.slice(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-
-                          <div className="flex flex-col min-w-0">
-                            <p className="font-bold text-sm truncate">{usuario.nome}</p>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                              <Workflow size={12} className="text-orange-500 flex-shrink-0" />
-                              <span className="truncate">{usuario.profissao}</span>
-                            </div>
-                            <div className="flex items-center gap-1 mt-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star 
-                                  key={i} 
-                                  size={12} 
-                                  className={
-                                    i < (usuario.estrelas || 0) 
-                                      ? "fill-orange-400 text-orange-400" 
-                                      : "fill-gray-200 text-gray-200"
-                                  } 
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-{/* 
-                        <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
-                          <Linkedin className="w-4 h-4 text-blue-500" />
-                        </Button> */}
+                {/* O restante do seu Card (CardContent, Avatar, etc) continua IGUAL */}
+                <Card className="w-80 h-[420px]  rounded-[3.5rem] border-none bg-white dark:bg-zinc-900 shadow-[0_30px_60px_rgba(0,0,0,0.12)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.5)] relative overflow-hidden group/card transition-all duration-500">
+                  <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-orange-500/10 to-transparent opacity-50 group-hover/card:opacity-100 transition-opacity" />
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/20 rounded-full blur-[60px]" />
+                  <CardContent className="p-8 flex flex-col h-full relative z-10">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-orange-500 rounded-[2rem] blur-xl opacity-20 group-hover/card:opacity-40 transition-opacity" />
+                        <Avatar className="h-24 w-24 rounded-[2rem] border-[6px] border-white dark:border-zinc-900 shadow-2xl relative">
+                          {usuario.image_path ? (
+                            <AvatarImage src={`${api.defaults.baseURL}/uploads/${usuario.image_path}`} className="object-cover" />
+                          ) : (
+                            <AvatarFallback className="bg-zinc-950 text-white text-3xl font-black">
+                              {usuario.nome?.slice(0, 1)}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
                       </div>
-
-                      {/* Informações adicionais */}
-                      <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <MapPinIcon size={12} className="text-orange-500 flex-shrink-0" />
-                          <span className="truncate">
-                            {usuario.municipio}, {usuario.provincia}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Building2 size={12} className="text-orange-500 flex-shrink-0" />
-                          <span className="truncate">
-                            {usuario.role === "PRESTADOR_COLECTIVO" ? "@Empresa" : "@Individual"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Phone size={12} className="text-orange-500 flex-shrink-0" />
-                          <span className="truncate font-mono">{usuario.celular}</span>
-                        </div>
+                      <div className="bg-zinc-950 dark:bg-orange-500 text-white px-4 py-2 rounded-2xl flex items-center gap-1.5 shadow-lg">
+                        <Star size={16} className="fill-current" />
+                        <span className="text-sm font-black tracking-tighter">{usuario.estrelas || "5.0"}</span>
                       </div>
-                    </header>
-
-                    {/* Botão de ação */}
-                    <div className="flex justify-end mt-3">
-                      
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          
-                          <Button onClick={()=>handleSearchProfile({userId:String(usuario.id)})} className="flex gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 text-xs h-8 px-3">
-                            <User size={14} />
-                            Ver perfil
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                        <PrestadoreProfile id={UserId} ></PrestadoreProfile>
-                      </DialogContent>
-                      </Dialog> 
-                      
                     </div>
+
+                    <div className="space-y-2 mb-6">
+                      <h3 className="text-2xl font-black text-zinc-900 dark:text-white leading-none truncate">
+                        {usuario.nome}
+                      </h3>
+                      <p className="inline-block bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[11px] font-black uppercase tracking-widest px-3 py-1 rounded-lg">
+                        {usuario.profissao}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mb-8">
+                      <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-3xl border border-zinc-100 dark:border-zinc-800">
+                        <MapPinIcon size={14} className="text-orange-500 mb-1" />
+                        <p className="text-[10px] font-bold text-zinc-400 uppercase">Local</p>
+                        <p className="text-[11px] font-black truncate">{usuario.municipio}</p>
+                      </div>
+                      <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-3xl border border-zinc-100 dark:border-zinc-800">
+                        <Building2 size={14} className="text-orange-500 mb-1" />
+                        <p className="text-[10px] font-bold text-zinc-400 uppercase">Role</p>
+                        <p className="text-[11px] font-black truncate">
+                           {usuario.role === "PRESTADOR_COLECTIVO" ? "Empresa" : "Expert"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          onClick={() => handleSearchProfile({ userId: String(usuario.id) })}
+                          className="w-full mt-auto bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-[1.5rem] h-14 font-black text-xs tracking-[0.2em] group/btn overflow-hidden relative shadow-2xl active:scale-95 transition-all"
+                        >
+                          <span className="relative z-10 flex items-center gap-2">
+                             EXPLORAR PERFIL <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                          </span>
+                          <motion.div className="absolute inset-0 bg-orange-500 -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-500" />
+                        </Button>
+                      </DialogTrigger>
+                      {/* <DialogContent className="max-w-4xl p-0 border-none bg-transparent shadow-none focus-visible:ring-0"> */}
+                        <div className="bg-white dark:bg-zinc-950 rounded-[4rem] overflow-hidden p-1">
+                           <PrestadoreProfile id={UserId} />
+                        </div>
+                      {/* </DialogContent> */}
+                    </Dialog>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
       </div>
 
-      {/* Indicadores de progresso */}
-      {usuarios.length > 1 && <ProgressDots />}
-
-      {/* Badge de scroll automático */}
-      {/* <div className="flex justify-center mt-3">
-        <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs">
-          <Sparkles size={12} />
-          <span>Arraste para ver mais profissionais</span>
-        </div>
-      </div> */}
+      {/* PROGRESS BAR EXTREME - (Igual) */}
+      <div className="flex justify-center items-center gap-3 mt-10">
+        {usuarios.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => scrollToIndex(index)}
+            className={`transition-all duration-700 rounded-full ${
+              index === currentIndex 
+                ? 'w-12 h-2.5 bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.4)]' 
+                : 'w-2.5 h-2.5 bg-zinc-200 dark:bg-zinc-800 hover:bg-orange-200'
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,137 +1,148 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@radix-ui/react-label";
+import { Label } from "@/components/ui/label"; // Verifique se o caminho está correto
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion} from "framer-motion";
 import z from "zod";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { signIn } from "@/api/sign-in";
 import { toast } from "sonner";
-import { GetUserProfile } from "@/api/get-profile";
-import { Loader } from "lucide-react";
+import { Loader2, LockKeyhole, Phone,  ArrowRight, Handshake } from "lucide-react";
 
+const signInBodySchema = z.object({
+  phone: z.string().min(9, "Telefone inválido"),
+  password: z.string().min(6, "Senha muito curta"),
+});
+
+type SignInBodySchemaTypes = z.infer<typeof signInBodySchema>;
 
 export function SignIn() {
-  const signInBodySchema = z.object({
-     phone:z.string(),
-     password:z.string()
-  })
+  const navigate = useNavigate();
+  const { register, handleSubmit, formState: { isSubmitting } } = useForm<SignInBodySchemaTypes>();
 
-  type SignInBodySchemaTypes = z.infer< typeof signInBodySchema>
-
-  const {register, reset, handleSubmit} = useForm<SignInBodySchemaTypes>()
-  const navigate = useNavigate()
-
-  const {mutateAsync:authenticate,isPending,data} = useMutation({
-    mutationFn:signIn,
-    onError(_,) {
-              toast.error("oops, credencials inválidas")
+  const { mutateAsync: authenticate } = useMutation({
+    mutationFn: signIn,
+    onSuccess(data) {
+      toast.success("Bem-vindo de volta!");
+      
+      // Lógica de redirecionamento baseada no ROLE vindo da resposta da mutação
+      if (data?.role === "ADMIN") {
+        navigate("/início");
+      } else if (data?.role?.startsWith("PRESTADOR")) {
+        navigate("/servicos");
+      } else {
+        navigate("/");
+      }
     },
-    onSuccess(){
-       navigate("/loading")
+    onError() {
+      toast.error("Credenciais inválidas. Verifique seu telefone e senha.");
     }
-  })
+  });
 
-    const {data:profile}=useQuery({
-    queryKey:['profile'],
-    queryFn:GetUserProfile
-  })
-
-
-  if(data?.role==="ADMIN"){
-      navigate("/início")
-    }
-        if(data?.role==="CLIENTE_COLECTIVO" || data?.role=='CLIENTE_INDIVIDUAL'){
-      navigate("/")
-    }
-
-         if(data?.role==="PRESTADOR_COLECTIVO" || data?.role=='PRESTADOR_INDIVIDUAL'){
-      navigate("/servicos")
-    }
-
-   
-async function handleSignIn(data: SignInBodySchemaTypes) {
-  const { phone, password } = data
-
-  try {
-    await authenticate({ phone, password }) // aguarda o login terminar
-
-    if(data){
-       const updatedProfile = profile // busca o perfil manualmente após login
-
-    if (updatedProfile?.role === "ADMIN") {
-      navigate('/Início')
-    } else if (
-      updatedProfile?.role === 'CLIENTE_INDIVIDUAL' ||
-      updatedProfile?.role === 'CLIENTE_COLECTIVO'
-    ) {
-      navigate('/')
-    } else if(updatedProfile?.role === 'PRESTADOR_INDIVIDUAL' || updatedProfile?.role==='PRESTADOR_COLECTIVO') { 
-      navigate('/servicos')
-    }
-    }
-
-
-
-    reset()
-  } catch (error) {
-    toast.error("Oops, credenciais inválidas")
+  async function handleSignIn(data: SignInBodySchemaTypes) {
+    await authenticate(data);
   }
-}
-
-   
-
-   const variants = {
-    enter: { x: 50, opacity: 0, scale: 0.95 },
-    center: { x: 0, opacity: 1, scale: 1 },
-    exit: { x: -50, opacity: 0, scale: 0.95 },
-  };
 
   return (
     <>
-      <Helmet title="Login" />
-      <div className="p-8">
-        <div className="w-[350px] flex flex-col justify-center gap-6">
-          <div className="flex flex-col gap-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Acessar Painel</h1>
-            <p className="text-sm text-muted-foreground">
-             Conecte-se a Liberal : Conectá-se a Liberal onde prestadores e clientes se encontram para crescer juntos .
-            </p>
+      <Helmet title="Login | Liberal" />
+      
+      {/* Container Principal com Background Suave */}
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#09090b] p-4 relative -top-20">
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          {/* LOGO E TÍTULO */}
+          <div className="flex flex-col items-center mb-1 text-center space-y-4">
+            <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 rotate-3">
+              <Handshake className="text-white" size={28} fill="currentColor" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-3xl font-black tracking-tight">Acessar Painel</h1>
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-[280px]">
+                Onde prestadores e clientes se encontram para crescer juntos.
+              </p>
+            </div>
           </div>
-          <form className="space-y-4" onSubmit={handleSubmit(handleSignIn)} >
-               <motion.div
-                              key="step1"
-                              variants={variants}
-                              initial="enter"
-                              animate="center"
-                              exit="exit"
-                              transition={{ duration: 0.5, ease: "easeInOut" }}
-                              className="space-y-4"
-                            >
-            <div>
-              <Label htmlFor="">Palavra Passe</Label>
-              <Input {...register('password')} placeholder="Palavra-Passe"></Input>
+
+          {/* CARD DE LOGIN */}
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-14 rounded-[2.5rem] shadow-xl shadow-black/5">
+            <form className="space-y-5" onSubmit={handleSubmit(handleSignIn)}>
+              
+              {/* CAMPO TELEFONE */}
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-zinc-500 ml-1">
+                  Telefone
+                </Label>
+                <div className="relative group">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-orange-500 transition-colors" />
+                  <Input 
+                    id="phone"
+                    {...register('phone')} 
+                    placeholder="9xx xxx xxx"
+                    className="pl-10 h-12 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 rounded-xl focus-visible:ring-orange-500"
+                  />
+                </div>
+              </div>
+
+              {/* CAMPO SENHA */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center ml-1">
+                  <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                    Palavra-Passe
+                  </Label>
+                  <Link to="/forgot-password"  className="text-[10px] text-orange-500 hover:underline">
+                    Esqueceu a senha?
+                  </Link>
+                </div>
+                <div className="relative group">
+                  <LockKeyhole className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-orange-500 transition-colors" />
+                  <Input 
+                    id="password"
+                    type="password"
+                    {...register('password')} 
+                    placeholder="••••••••"
+                    className="pl-10 h-12 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 rounded-xl focus-visible:ring-orange-500"
+                  />
+                </div>
+              </div>
+
+              {/* BOTÃO ENTRAR */}
+              <Button 
+                disabled={isSubmitting}
+                className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 transition-all active:scale-[0.98]"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Entrar na Plataforma <ArrowRight size={18} />
+                  </span>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800 text-center">
+              <p className="text-sm text-zinc-500">
+                Ainda não tem uma conta?{" "}
+                <Link to="/sign-up" className="text-orange-500 font-bold hover:underline">
+                  Criar conta grátis
+                </Link>
+              </p>
             </div>
-              <div>
-              <Label htmlFor="">Phone</Label>
-              <Input {...register('phone')} placeholder="+244 952 xxx xxx"></Input>
-            </div>
-               {/* <Link to='/loading'> */}
-                <Button className="flex flex-1 w-full mt-4" variant='default'>Acessar
-                   {isPending && <>
-                     <Loader className="animate-spin"></Loader>
-                   </>}
-                </Button>
-               {/* </Link> */}
-                          </motion.div>
-                   
-          </form>
-          <span className="text-muted-foreground text-xs">Se já tiver uma conta deve <Link className="border-b border-solid text-blue-400" to='/sign-up'>registrar-se</Link> primeiro para poder navegar normalmente e obter oportunidades.</span>
-        </div>
+          </div>
+          
+          {/* FOOTER DISCRETO */}
+          <p className="mt-8 text-center text-[10px] text-zinc-400 uppercase tracking-[0.2em]">
+            © 2025 Liberal Angola • Tecnologia & Serviços
+          </p>
+        </motion.div>
       </div>
     </>
   );
 }
-

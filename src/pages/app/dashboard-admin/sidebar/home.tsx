@@ -1,13 +1,12 @@
-import {
+import { 
   BookMarked,
   Camera,
   ChevronRight,
   Loader2,
   LogOut,
-  Menu,
   MessageCircle,
-  Plus,
   Search,
+  Sparkles,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -20,122 +19,96 @@ import servico4 from "@/assets/IMG-20250928-WA0058.jpg";
 import servico5 from "@/assets/IMG-20250928-WA0059.jpg";
 import servico6 from "@/assets/IMG-20250928-WA0069.jpg";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Link,useNavigate,useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { SearchServices } from "./Search";
-// import { MaisProfissao } from "./Categorias/MaisProfissao";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { GetUserProfile } from "@/api/get-profile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UpdatePhoto } from "@/api/update-profile-photo";
 import { socket } from "@/lib/socket";
-
-// import { NotificationDropdown } from "./Notification/notification-dropdown";
 import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
 import { DestaquesAuto } from "./destacados";
 import { api } from "@/lib/axios";
 import { ModeToggle } from "@/components/theme/theme-toggle";
 import { Logout } from "@/api/log-out";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { GetCategory } from "@/api/get-categories";
 import { getInialts } from "@/lib/utils";
 import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
 import { GetProfissaoByCategory } from "@/api/fetchProfissionByCategory";
 import { GetProfission } from "@/api/get-profissions";
 import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export function Home() {
+  const categorias = [
+    { image: servico3, title: 'Madeira & Oficios', to: '/madeira' },
+    { image: servico1, title: 'Electricidade & Manuntenção', to: '/electricidade' },
+    { image: servico2, title: 'Educação', to: '/ensino' },
+    { image: servico4, title: 'Beleza & Moda', to: '/moda' },
+    { image: servico5, title: 'Serviços Domésticos', to: '/domestica' },
+    { image: servico6, title: 'Tecnologias & Design', to: '/tecnologia' },
+    { image: servico4, title: 'Mais Profissionais', to: '/mais' }
+  ];
 
- const categorias = [
-    { 
-       image :servico3,
-       title:'Madeira & Oficios',
-       to:'/madeira'
-    },
-      { 
-       image :servico1,
-       title:'Electricidade & Manuntenção',
-       to:'/electricidade'
-      },
-          { 
-       image :servico2,
-       title:'Educação',
-       to:'/ensino'
-      },
-           { 
-       image :servico4,
-       title:'Beleza & Moda',
-       to:'/moda'
-      },
-{ 
-       image :servico5,
-       title:'Serviços Domésticos',
-       to:'/domestica'
-      },
-     { 
-       image :servico6, 
-       title:'Tecnologias & Design',
-       to:'/tecnologia'
-      },
-             { 
-       image :servico4,
-       title:'Mais Profissionais',
-       to:'/mais'
-      }
- ]
+  interface SearchProfissionTypes { categoryId: string }
 
-
-
-interface SearchProfissionTypes  {
-  categoryId:string
-}
-
-   const [searchParams, setSearchParams] = useSearchParams();
-   const categoryId = searchParams.get("category")
-
- function handleSearchProfission({categoryId}:SearchProfissionTypes){
-  console.log("peguei", categoryId)
-     setSearchParams((state) => {
-    categoryId ? state.set("category", categoryId) : state.delete("category");
-    return state;
-  });
- }
- const {data:categories,refetch:refetchCategories,isLoading:isLoadingategories} = useQuery({
-  queryKey:['category',categoryId],
-  queryFn:()=>GetCategory({query:''})
- })
-
- useEffect(()=>{
-  refetchCategories()
- },[categoryId,refetchCategories])
-
-  // Filtra o array pelo valor digitado
-  // const profissoesFiltradas = profissoesAngola.filter((p) =>
-  //   p.nome.toLowerCase().includes(filtro.toLowerCase())
-  // );
-  const [query, setQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoryId = searchParams.get("category");
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const navigate = useNavigate();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-
+  // Queries
+  const { data: categories, refetch: refetchCategories } = useQuery({
+    queryKey: ['category', categoryId],
+    queryFn: () => GetCategory({ query: '' })
+  });
 
   const { data: destacados, isLoading: iSLoadingDestaques } = useQuery({
-  queryKey: ["destaques"],
-  refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
-  refetchOnReconnect: true,       // Rebusca se a internet voltar
-  refetchOnMount: true,           // Rebusca sempre que o componente monta
-  staleTime: 0,    
+    queryKey: ["destaques"],
     queryFn: PrestadoresDestaques,
+    refetchOnMount: true,
+    staleTime: 0,
   });
+
+  const { data: profile, refetch } = useQuery({
+    queryKey: ["profile"],
+    queryFn: GetUserProfile,
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+  const { data: profByCategoy } = useQuery({
+    queryKey: ['byCategory', categoryId],
+    queryFn: () => GetProfissaoByCategory({ categoryId: Number(categoryId) }),
+    enabled: !!categoryId
+  });
+
+  const { data: profissao } = useQuery({
+    queryKey: ['profissao'],
+    queryFn: GetProfission
+  });
+
+  // Mutations
+  const { mutateAsync: Sair } = useMutation({ mutationFn: Logout });
+  const { mutateAsync: changeProfilePhoto } = useMutation({ mutationFn: UpdatePhoto });
+
+  // Handlers
+  function handleSearchProfission({ categoryId }: SearchProfissionTypes) {
+    setSearchParams((state) => {
+      categoryId ? state.set("category", categoryId) : state.delete("category");
+      return state;
+    });
+  }
+
+  const handleSignOut = async () => { await Sair(); };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -144,507 +117,261 @@ interface SearchProfissionTypes  {
       setPreview(URL.createObjectURL(file));
     }
   };
-  const {data:profByCategoy} =  useQuery({
-    queryKey:['byCategory',categoryId],
-    queryFn:()=>GetProfissaoByCategory({categoryId:Number(categoryId)})
-  })
-
-
-    const {data:profissao} = useQuery({
-      queryKey:['profissao'],
-      queryFn:GetProfission
-    })
-
-
-
-  const { data: profile, isLoading: isLoadingUserProfile, refetch } = useQuery({
-  queryKey: ["profile"],
-  refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
-  refetchOnReconnect: true,       // Rebusca se a internet voltar
-  refetchOnMount: true,           // Rebusca sempre que o componente monta
-  staleTime: 0,    
-  queryFn: GetUserProfile,
-  });
-
-    const {mutateAsync:Sair} = useMutation({
-      mutationFn:Logout
-    })
-    async function handleSignOut(){
-      await Sair()
-      
-    }
-
-  const { mutateAsync: changeProfilePhoto } = useMutation({
-    mutationFn: UpdatePhoto,
-  });
 
   const handleSave = () => {
-    if (!selectedFile) return;
-    changeProfilePhoto({
-      image_path: selectedFile,
-    });
-    console.log("Nova imagem:", selectedFile);
+    if (selectedFile) changeProfilePhoto({ image_path: selectedFile });
   };
 
- // 1. Limpa o baseURL para não ter barra no final
-const baseUrl = api.defaults.baseURL?.replace(/\/$/, "");
-
-// 2. Garante que o path não tenha barra no início
-const cleanPath = profile?.image_path?.replace(/^\//, "");
-
-const imageSrc =
-  preview ||
-  (profile?.image_path
-    ? encodeURI(`${baseUrl}/uploads/${cleanPath}`)
+  const imageSrc = preview || (profile?.image_path
+    ? `${api.defaults.baseURL}/uploads/${profile.image_path}`
     : "https://i.pravatar.cc/150?u=placeholder");
 
+  // Effects
+  useEffect(() => {
+    refetchCategories();
+  }, [categoryId, refetchCategories]);
 
   useEffect(() => {
     const seen = localStorage.getItem("app_onboarding_seen_v1");
-    if (!seen) {
-      navigate("/sign-up");
-    }
+    if (!seen) navigate("/sign-up");
   }, [navigate]);
-
-  const [_, setNotif] = useState<any[]>([]);
- 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (!profile?.id) return;
     socket.emit("register", profile.id);
-    console.log("🔗 Registrado no socket como:", profile.id);
-  }, [profile]);
-
-  useEffect(() => {
     audioRef.current = new Audio("/bell-98033.mp3");
-    audioRef.current.volume = 0.7;
-
-    socket.on("user", (data) => {
-      console.log("🔔 Nova notificação recebida:", data);
+    socket.on("user", () => {
       refetch();
-      setNotif((prev) => {
-        if (prev.length < data.length && audioRef.current) {
-          audioRef.current.play().catch(() => {});
-        }
-        return data;
-      });
+      audioRef.current?.play().catch(() => {});
     });
-    return () => {
-      socket.off("user");
-    };
-  }, [refetch]);
-    if(destacados?.usuarios.length===0  || !destacados || !profile){
-        <div className="w-full  overflow scroll-y-auto h-full flex flex-col items-center justify-center gap-4">
-      <motion.div
-        className="relative flex items-center justify-center"
-        animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
-      >
-        <div className="absolute w-16 h-16 rounded-full border-t-4 border-b-4 border-transparent border-t-orange-500 border-b-pink-500" />
-        <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
-      </motion.div>
+    return () => { socket.off("user"); };
+  }, [profile, refetch]);
 
-      <motion.p
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="text-sm font-medium text-muted-foreground"
-      >
-         <Loader2 className="animate-spin"></Loader2>
-      </motion.p>
-    </div>
-  }
+  // Roles Check
+  useEffect(() => {
+    if (profile?.role === 'PRESTADOR_COLECTIVO' || profile?.role === 'PRESTADOR_INDIVIDUAL') navigate("/servicos");
+    if (profile?.role === 'ADMIN') navigate("/início");
+  }, [profile, navigate]);
 
-   if(profile?.role =='PRESTADOR_COLECTIVO' || profile?.role=='PRESTADOR_INDIVIDUAL'){
-     navigate("/servicos")
-  }
-
-     if(profile?.role=='ADMIN'){
-     navigate("/início")
-  }
-  console.log("imagem-api:", imageSrc)
-
-
-  if(!categories || !profByCategoy || !profissao){
-    return
-  }
-
- 
-
-  
-  return (
-    <div className="flex flex-col h-screen w-full right-1 fixed overflow-hidden bg-background text-foreground">
-      <motion.div
-        className="flex flex-col relative -top-5 flex-1 px-4 py-4 gap-4 items-center justify-center pb-[1rem]"
-        initial={{ x: "-100%", opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        >
-        {/* HEADER */}
-        <header className="w-full flex justify-center   flex-col items-center gap-44">
-          <div className="flex items-center gap-11 justify-between">
-            <div className="flex items-center gap-2 mr-3">
-              <div className="relative inline-block">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    {isLoadingUserProfile ? (
-                      <Skeleton className="h-16 w-16 rounded-full" />
-                    ) : (
-                      <Avatar 
-                      key={imageSrc} 
-                      className="w-9 h-9 cursor-pointer ring-2 ring-orange-400">
-                        <AvatarImage src={imageSrc} />
-                        <AvatarFallback>
-                          {profile?.nome?.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
-                  </DialogTrigger>
-
-                  <DialogContent className="max-w-md">
-                   
-                    <DialogHeader>
-                      <DialogTitle>Editar Foto de Perfil</DialogTitle>
-                    </DialogHeader>
-
-                    <div className="flex flex-col items-center gap-5 py-4">
-                      <div className="relative">
-                        <img
-                          key={imageSrc}
-                          src={imageSrc}
-                          alt="Preview"
-                          className="w-40 h-40 rounded-full object-cover ring-4 ring-orange-400 shadow-lg"
-                        />
-                        <label
-                          htmlFor="file-upload"
-                          className="absolute bottom-2 right-2 bg-orange-500 hover:bg-orange-600 p-2 rounded-full cursor-pointer shadow-md transition"
-                        >
-                          <Camera className="w-4 h-4 text-white" />
-                        </label>
-                        <input
-                          id="file-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleFileChange}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-500">
-                        Clique no ícone da câmera para escolher uma nova foto.
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-3">
-                         <DialogFooter>
-                      <Button onClick={handleSave}>Salvar foto</Button>
-                    </DialogFooter>
-                    <Link to='/sign-in'>
-           <Button onClick={handleSignOut} className="text-red-500 flex-1 w-full" variant='outline'>
-             <LogOut></LogOut>
-             <span>Sair</span>
-          </Button></Link>
-
-                    </div>
-                 
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <div className="flex flex-col">
-                {isLoadingUserProfile ? (
-                  <div className="flex flex-col gap-2">
-                    <Skeleton className="w-24 h-4" />
-                    <Skeleton className="w-32 h-3" />
-                  </div>
-                ) : (
-                  <div className="flex flex-col">
-                    <span className="text-nowrap text-muted-foreground text-xs truncate max-w-28">{profile?.nome}</span>
-                    <span className="text-muted-foreground text-xs text-nowrap">
-                    +244{profile?.celular}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-              <Menu className="hidden lg:block" />
-            <div className="flex gap-2">
-            <Dialog>
-      <DialogTrigger asChild>
-        <Button className="rounded-full h-10 w-10 flex items-center justify-center bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:opacity-90">
-          <Plus />
-        </Button>
-      </DialogTrigger>
-           <ModeToggle></ModeToggle>
-
-      <DialogContent className="flex flex-col overlay-none border-0  items-center gap-4 h-full sm:h-auto sm:max-w-lg rounded-xl p-6 bg-background shadow-lg">
-        {/* Input única */}
-        <div className="relative flex items-center mt-5 w-full max-w-md mx-auto">
-          <Search className="absolute left-3 text-gray-400 dark:text-gray-500 pointer-events-none" size={18} />
-          <Input
-            type="text"
-            placeholder="O que você precisa?"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-muted text-sm shadow-sm focus-visible:ring-2 focus-visible:ring-orange-400 transition-all"
-            />
-        </div>
-        {query && (
-          <div className="flex flex-col gap-2 mt-2 text-sm">
-            <p className="text-muted-foreground">Sugestões:</p>
-            {profissao.profissao.length > 0 ? (
-              profissao.profissao.map((p) => (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                       <Button variant="outline" className=" flex flex-1 w-screen justify-between">
-                    <span className="text-orange-600">{p.titulo}</span>
-                    <ChevronRight className="text-orange-600" />
-                  </Button>
-                    </DialogTrigger>
-                     <FastFazerPedido selecionado={p.titulo}/>
-                  </Dialog>
-              ))
-            ) : (
-              <p className="text-gray-400">Nenhuma profissão encontrada.</p>
-            )}
-          </div>
-        )}
-
-     <ScrollArea className="max-h-90 w-screen p-4">
-  {categories?.length <= 0 && (
-    <span className="text-muted-foreground text-sm">Nenhuma Categoria</span>
-  )}
-  {isLoadingategories && (
-    <div>
-       <Skeleton className="w-24  h-10"></Skeleton>
-       <Skeleton className="w-24  h-10"></Skeleton>
-       <Skeleton className="w-24  h-10"></Skeleton>
-       <Skeleton className="w-24  h-10"></Skeleton>
-    </div>
-  )}
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-1 border-0 ">
-    {categories?.map((c) => (
-      <Dialog key={c.id}>
-        <div
-          onClick={() => handleSearchProfission({ categoryId: String(c.id) })}
-          className="
-            group cursor-pointer rounded-xl overflow-hidden bg-card border-0
-            hover:shadow-lg transition-all duration-300 
-            hover:-translate-y-1 
-          "
-        >
-          <div className="flex flex-col items-center p-4 gap-3">
-
-            {/* Título */}
-            <h2 className="text-lg font-semibold text-muted-foreground group-hover:text-primary transition">
-              {c.titulo}
-            </h2>
-
-            {/* IMAGEM */}
-         <DialogTrigger asChild>
-  {c.image_path ? (
-    <div
-      tabIndex={0}
-      role="button"
-      className="w-full cursor-pointer"
-    >
-      <img
-        src={`${api.defaults.baseURL}/uploads/${c.image_path}`}
-        alt=""
-        className="
-          h-48 w-full rounded-lg object-cover 
-          group-hover:brightness-105 group-hover:scale-[1.02]
-          transition-all duration-300 shadow
-        "
-      />
-    </div>
-  ) : (
-    <div
-      tabIndex={0}
-      role="button"
-      className="h-32 w-full rounded-lg bg-muted flex items-center 
-                 justify-center text-3xl font-bold cursor-pointer"
-    >
-      {getInialts(c.titulo)}
-    </div>
-  )}
-</DialogTrigger>
-
-          </div>
-        </div>
-
-        {/* DIÁLOGO PRINCIPAL */}
-        <DialogContent className="max-h-[90vh] overflow-auto rounded-xl shadow-xl">
-          <DialogHeader className="space-y-2">
-            <DialogTitle className="text-xl font-bold">Profissões</DialogTitle>
-            <DialogDescription className="text-sm">
-              Profissões organizadas por categoria.
-            </DialogDescription>
-
-            <span className="text-muted-foreground font-medium border-b pb-1">
-              {c.titulo}
-            </span>
-          </DialogHeader>
-
-          {/* Caso sem profissões */}
-          {profByCategoy.length <= 0 && (
-            <div className="p-3 rounded-md bg-muted/30 text-muted-foreground text-sm">
-              Nenhuma profissão encontrada nesta categoria
-            </div>
-          )}
-
-          {/* Lista de Profissões */}
-          <div className="mt-1 flex flex-col gap-3">
-            {profByCategoy?.map((i) => (
-              <Dialog key={i.id}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="
-                      w-full flex justify-between items-center py-4 rounded-lg
-                      border-primary/20 hover:border-primary 
-                      hover:bg-primary/10 transition-all
-                    "
-                  >
-                    <span className="text-primary font-semibold">
-                      {i.titulo}
-                    </span>
-                    <ChevronRight className="text-primary" />
-                  </Button>
-                </DialogTrigger>
-
-                <DialogContent className="rounded-xl shadow-lg">
-                  <FastFazerPedido selecionado={i.titulo} />
-                </DialogContent>
-              </Dialog>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
-    ))}
-  </div>
-</ScrollArea>
-      </DialogContent>
-    </Dialog>
-            {isLoadingUserProfile || !profile ? (
-              <Skeleton className="h-10 w-10 rounded-full" />
-            ) : (
-              <NotificationDropdownCostumer {...profile} />
-            )}
-
-            </div>
-          </div>
-        </header>
-           <div className="flex items-center gap-1">
-            <Link to='/vitrine'>
-              <Button variant='ghost' className="flex border-b">
-                <BookMarked size={12} className="text-xs text-orange-300"></BookMarked>
-                <span className="text-xs">Vitrine</span>
-              </Button>
-            </Link>
-             <Link to='/comment'>
-                <Button variant='ghost' className="flex border-b">
-                <MessageCircle size={12} className="text-xs text-blue-300"></MessageCircle>
-                <span className="text-xs">Comentários</span>
-              </Button>
-             </Link>
-           </div>
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <form className="relative -mt-2 w-full max-w-md mx-auto">
-              <Input
-                placeholder="O que você precisa?"
-                className="pl-11 pr-4 py-2.5 rounded-full bg-white dark:bg-muted text-sm focus-visible:ring-2 focus-visible:ring-orange-400 shadow-sm transition-all"
-              />
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                size={20}
-              />
-            </form>
-          </DialogTrigger>
-          <SearchServices />
-        </Dialog>
-    <AnimatePresence mode="wait">
-      {iSLoadingDestaques ? (
-        <motion.div
-        key="loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1 }}
-          className="w-full grid grid-cols-2 sm:grid-cols-3 gap-4 -mt-1"
-          >
-          {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-40 w-full rounded-xl" />
-          ))}
+  // Loading State
+  if (!profile || !categories || !profissao) {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center gap-4 bg-background">
+        <motion.div className="relative flex items-center justify-center" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}>
+          <div className="absolute w-16 h-16 rounded-full border-t-4 border-b-4 border-t-orange-500 border-b-pink-500" />
+          <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
         </motion.div>
-      ) : (
-        
-        <DestaquesAuto usuarios={destacados?.usuarios} />
-        
-      )}
-      <ScrollArea className="max-h-60 border  border-none w-screen p-2">
-            {categories?.length<=0 &&(
-               <>
-                <span className="text-muted-foreground">Nenhuma Categoria</span>
-               </>
-            )}
-    
-           <Dialog>
-             {/* <div onClick={()=>handleSearchProfission({categoryId:String(c.id)})}  >
-                     <h2 className="text-xl lg:text-xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                       {c.titulo}
-                        </h2>
-                <DialogTrigger asChild>
-              {c.image_path ?(
-                           <img src={`${api.defaults.baseURL}/uploads/${c.image_path}`} alt="" className="h-32 w-full gap-2 object-cover rounded-lg transform group-hover:scale-105 transition-transform duration-300 ease-in-out"
- />
-              ):(
-                <div>{getInialts(c.titulo)}</div>
-                )}
-                </DialogTrigger>
-          </div> */}
-             {!query && (
-    <div className="grid grid-cols-2 gap-4 mt-5">
-  {categorias.map((o) => (
-    <Link to={o.to} key={o.title}>
-      <div className="relative group cursor-pointer overflow-hidden rounded-lg shadow-md">
-        {/* Imagem de fundo */}
-        <img
-          src={o.image}
-          alt={o.title}
-          className="h-32 w-full object-cover rounded-lg transform group-hover:scale-105 transition-transform duration-300 ease-in-out"
-          />
-
-        {/* Overlay suave para destacar o texto */}
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300 rounded-lg" />
-
-        {/* Título */}
-        <span className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black/60 px-2 py-1 rounded-md">
-          {o.title}
-        </span>
       </div>
-    </Link>
-  ))}
-</div>
+    );
+  }
 
-        )}
-                <DialogContent className="h-full">
-                       {/* {profByCategoy.length<=0 &&(
-                          <div>
-                          <span className="text-muted-foreground">Nenhuma profissão encontrada nesta categoria</span>
-                          </div>
-                          )} */}
-                
-                       
-       
-                      
-                    
-                </DialogContent>
+  return (
+    <div className="h-screen w-full overflow-hidden bg-background flex flex-col antialiased">
+      {/* HEADER FIXO */}
+      <header className="flex-none sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center gap-2 sm:gap-4">
+          
+          {/* PERFIL */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <Dialog>
+              <DialogTrigger asChild>
+                <motion.button whileTap={{ scale: 0.95 }} className="relative group focus:outline-none">
+                  <Avatar className="h-10 w-10 sm:h-12 sm:w-12 ring-2 ring-orange-500/10 group-hover:ring-orange-500 transition-all">
+                    <AvatarImage src={imageSrc} className="object-cover" />
+                    <AvatarFallback className="font-bold">{profile?.nome?.slice(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
+                </motion.button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md rounded-[2.5rem]">
+                <DialogHeader><DialogTitle className="text-center">Minha Conta</DialogTitle></DialogHeader>
+                <div className="flex flex-col items-center gap-4 py-4">
+                  <div className="relative group">
+                    <img src={imageSrc} className="w-28 h-28 rounded-full object-cover ring-4 ring-orange-400" />
+                    <label htmlFor="file-up" className="absolute bottom-0 right-0 bg-orange-500 p-2 rounded-full cursor-pointer text-white shadow-lg">
+                      <Camera size={18} />
+                    </label>
+                    <input id="file-up" type="file" className="hidden" onChange={handleFileChange} />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-bold text-lg">{profile?.nome}</h3>
+                    <p className="text-sm text-muted-foreground">+244 {profile?.celular}</p>
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Button onClick={handleSave} className="bg-orange-500 hover:bg-orange-600 rounded-xl font-bold">Salvar</Button>
+                  <Button onClick={handleSignOut} variant="outline" className="text-red-500 rounded-xl"><LogOut className="mr-2" size={16}/> Sair</Button>
+                </div>
+              </DialogContent>
             </Dialog>
-     
-      </ScrollArea>
-    </AnimatePresence>
-      </motion.div>
+            <div className="hidden lg:flex flex-col truncate max-w-[100px]">
+              <span className="text-sm font-bold truncate leading-none">{profile?.nome?.split(' ')[0]}</span>
+              <span className="text-[10px] text-orange-500 font-bold uppercase mt-1">Ouro</span>
+            </div>
+          </div>
+
+          {/* PESQUISA */}
+          <div className="flex-1 flex justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="relative group w-full max-w-md">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-orange-500 transition-colors" />
+                  <Input readOnly placeholder="O que você precisa hoje?" className="h-10 sm:h-11 pl-10 w-full rounded-2xl bg-muted/50 border-transparent cursor-pointer" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[90vw] sm:w-[450px] mt-2 rounded-[2rem] p-4 shadow-2xl">
+                <p className="text-xs font-bold text-muted-foreground uppercase px-1 mb-4">Explorar Categorias</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {categories?.map((c) => (
+                    <div key={c.id} onClick={() => handleSearchProfission({ categoryId: String(c.id) })} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-muted hover:bg-white transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted">
+                          {c.image_path ? <img src={`${api.defaults.baseURL}/uploads/${c.image_path}`} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-bold text-orange-500 uppercase">{getInialts(c.titulo)}</div>}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-sm truncate">{c.titulo}</h4>
+                          <Dialog>
+                            <DialogTrigger className="text-[10px] text-orange-500 font-bold uppercase hover:underline">Ver Profissões</DialogTrigger>
+                            <DialogContent className="rounded-[2rem]">
+                              <DialogHeader><DialogTitle>{c.titulo}</DialogTitle></DialogHeader>
+                              <div className="flex flex-col gap-2">
+                                {profByCategoy?.map(i => (
+                                  <Dialog key={i.id}>
+                                    <DialogTrigger asChild>
+                                      <Button variant="ghost" className="justify-between h-12 rounded-xl bg-muted/30">{i.titulo} <ChevronRight size={16}/></Button>
+                                    </DialogTrigger>
+                                    <DialogContent><FastFazerPedido selecionado={i.titulo}/></DialogContent>
+                                  </Dialog>
+                                ))}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* AÇÕES */}
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            <ModeToggle />
+            {profile && <NotificationDropdownCostumer {...profile} />}
+          </div>
+        </div>
+      </header>
+
+      {/* CONTEÚDO COM SCROLL NATIVO (IMPEDE O BLOQUEIO DO SLIDE) */}
+      <main className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
+        <div className="max-w-7xl mx-auto px-4 py-6 space-y-8 pb-24">
+          
+          {/* BOTÕES DE NAVEGAÇÃO HORIZONTAL */}
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+            <Link to="/vitrine">
+              <motion.div whileHover={{ y: -2 }} className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-900 border rounded-full shadow-sm">
+                <div className="p-2 bg-orange-500 rounded-full text-white"><BookMarked size={16}/></div>
+                <div className="flex flex-col"><span className="text-xs font-bold leading-none">Vitrine</span><span className="text-[9px] text-muted-foreground">Explorar</span></div>
+              </motion.div>
+            </Link>
+            <Link to="/comment">
+              <motion.div whileHover={{ y: -2 }} className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-900 border rounded-full shadow-sm">
+                <div className="p-2 bg-blue-500 rounded-full text-white"><MessageCircle size={16}/></div>
+                <div className="flex flex-col"><span className="text-xs font-bold leading-none">Feedbacks</span><span className="text-[9px] text-muted-foreground">Comunidade</span></div>
+              </motion.div>
+            </Link>
+          </div>
+
+          {/* SEÇÃO DE DESTAQUES (SLIDE AGORA FUNCIONA) */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-black tracking-tighter flex items-center gap-2 px-1">
+              <Sparkles className="text-orange-500" size={20} /> Melhores da Semana
+            </h2>
+            <AnimatePresence mode="wait">
+              {iSLoadingDestaques ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-xl" />)}
+                </div>
+              ) : (
+                <DestaquesAuto usuarios={destacados?.usuarios} />
+              )}
+            </AnimatePresence>
+          </section>
+
+          {/* GRID DE CATEGORIAS */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-black tracking-tighter px-1">Todas Categorias</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {categorias.map((o) => (
+                <Link to={o.to} key={o.title} className="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-muted shadow-sm hover:shadow-xl transition-all">
+                  <img src={o.image} alt={o.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                  <span className="absolute bottom-4 left-4 text-white text-xs font-black bg-black/60 px-3 py-1.5 rounded-lg uppercase">
+                    {o.title}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </div>
+        {/* SEÇÃO DE DOWNLOAD (FOOTER) */}
+<footer className="mt-12 pb-10 px-1">
+  <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-orange-500 to-pink-600 p-8 text-white shadow-2xl">
+    {/* Decoração de fundo */}
+    <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
+    <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-40 w-40 rounded-full bg-black/10 blur-3xl" />
+
+    <div className="relative z-10 flex flex-col items-center text-center gap-6">
+      <div className="space-y-2">
+        <h3 className="text-2xl font-black tracking-tighter">Leve o talento no bolso</h3>
+        <p className="text-sm text-orange-50/80 font-medium">
+          Baixe o nosso app oficial para uma experiência completa.
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        {/* Play Store */}
+        <motion.a
+          whileTap={{ scale: 0.95 }}
+          href="#"
+          className="flex items-center gap-3 bg-black text-white px-6 py-3 rounded-2xl hover:bg-zinc-900 transition-colors border border-white/10"
+        >
+          <svg viewBox="0 0 24 24" className="h-7 w-7 fill-current" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.61 3,21.09 3,20.5M16.81,15.12L18.66,16.19C19.28,16.55 19.28,17.45 18.66,17.81L5.25,25.56L14.75,16.06L16.81,15.12M20.16,10.81C20.73,11.11 21,11.51 21,12C21,12.49 20.73,12.89 20.16,13.19L18.16,14.34L15.81,12L18.16,9.66L20.16,10.81M5.25,1.56L18.66,9.31C19.28,9.67 19.28,10.57 18.66,10.93L16.81,12L14.75,7.94L5.25,1.56Z" />
+          </svg>
+          <div className="text-left">
+            <p className="text-[10px] uppercase font-bold leading-none opacity-70">Disponível no</p>
+            <p className="text-lg font-bold leading-tight">Google Play</p>
+          </div>
+        </motion.a>
+
+        {/* App Store */}
+        <motion.a
+          whileTap={{ scale: 0.95 }}
+          href="#"
+          className="flex items-center gap-3 bg-black text-white px-6 py-3 rounded-2xl hover:bg-zinc-900 transition-colors border border-white/10"
+        >
+          <svg viewBox="0 0 24 24" className="h-7 w-7 fill-current" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.71,19.5C17.88,20.74 17,21.95 15.66,21.97C14.32,22 13.89,21.18 12.37,21.18C10.84,21.18 10.37,21.95 9.1,22C7.79,22.05 6.8,20.68 5.96,19.47C4.25,17 2.94,12.45 4.7,9.39C5.57,7.87 7.13,6.91 8.82,6.88C10.1,6.86 11.32,7.75 12.11,7.75C12.89,7.75 14.37,6.68 15.92,6.84C16.57,6.87 18.39,7.1 19.56,8.82C19.47,8.88 17.39,10.1 17.41,12.63C17.44,15.65 20.06,16.66 20.09,16.67C20.06,16.74 19.67,18.11 18.71,19.5M13,3.5C13.73,2.67 14.94,2.04 15.94,2C16.07,3.17 15.6,4.35 14.9,5.19C14.21,6.04 13.07,6.7 11.95,6.61C11.8,5.46 12.36,4.26 13,3.5Z" />
+          </svg>
+          <div className="text-left">
+            <p className="text-[10px] uppercase font-bold leading-none opacity-70">Baixar na</p>
+            <p className="text-lg font-bold leading-tight">App Store</p>
+          </div>
+        </motion.a>
+      </div>
+    </div>
+  </div>
+
+  <div className="mt-8 text-center text-muted-foreground">
+    <p className="text-xs font-bold tracking-widest uppercase opacity-50">
+      © 2025 SeuApp • Luanda, Angola
+    </p>
+  </div>
+</footer>
+      </main>
+      
     </div>
   );
 }

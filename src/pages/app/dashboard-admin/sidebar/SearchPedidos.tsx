@@ -1,370 +1,242 @@
-import { Briefcase, ChevronDown, File, MapPin, MessageCircle, Phone, Pin, Search, Trash2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { Briefcase, ChevronDown, File, MapPin, MessageCircle, Phone, Pin, Search, Trash2, AlertCircle, Clock } from "lucide-react";
+import { motion} from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CostumerOrders, Interessado} from "@/api/costumer-orders";
+import { CostumerOrders, Interessado } from "@/api/costumer-orders";
 import { formatNotificationDate } from "@/lib/utils";
 import { api } from "@/lib/axios";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { StarButton } from "./stars-button";
 import { PedidoCard } from "./pedidos-confirmar";
-import { socket } from "@/lib/socket";
 import { Favoritar } from "@/api/favoritar";
 import { Deletar } from "@/api/deletar-order";
 import { queryClient } from "@/lib/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { Commentar } from "@/api/commentar-prestadores";
-
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
 export function SearchPedidos() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _] = useSearchParams();
   const queryFromParams = searchParams.get("query") || "";
   const [searchTerm, setSearchTerm] = useState(queryFromParams);
-  const userId = searchParams.get("userId")
+  // const userId = searchParams.get("userId");
 
-  const {mutateAsync:comentar, isPending} = useMutation({
-    mutationFn:Commentar
-  })
+  const [parent] = useAutoAnimate();
 
+  // const { mutateAsync: comentar, isPending } = useMutation({ mutationFn: Commentar });
+  const { mutateAsync: favoritar } = useMutation({ mutationFn: Favoritar });
   
-  const avaliarPrestadoresBodySchema = z.object({
-    content:z.string()
-  })
-  function handleSetCommentSearchParams ({userId}:{userId:string}){
-      setSearchParams(state=>{
-         state.append("userId" ,userId)
-         return state
-      })
-  }
-
-  type AvaliarPrestadoresSchemaTypes = z.infer< typeof avaliarPrestadoresBodySchema>
-
-  const {handleSubmit, register,reset} = useForm<AvaliarPrestadoresSchemaTypes>()
-
-  async function handlecomentar(data:AvaliarPrestadoresSchemaTypes)
-  {
-     const { content} = data
-     await comentar({
-      content,
-      userId:Number(userId)
-     })
-    reset()
-  }
-
- 
-
-    const {mutateAsync:favoritar} = useMutation({
-    mutationFn : Favoritar,
-  })
-const { mutate: EliminarPedido } = useMutation({
+  const { mutate: EliminarPedido } = useMutation({
     mutationFn: Deletar,
-    onSuccess: (_data, variables) => {
-      // Remove o pedido localmente sem refazer o fetch
+    onSuccess: (_, variables) => {
       queryClient.setQueryData(["orders", searchTerm], (oldData: any) => {
         if (!oldData) return oldData;
         return oldData.filter((pedido: any) => pedido.id !== variables.pedidoId);
       });
     },
   });
-  const { data: orders, isLoading, refetch,isRefetching } = useQuery({
-  queryKey: ["orders", searchTerm],
-  refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
-  refetchOnReconnect: true,       // Rebusca se a internet voltar
-  refetchOnMount: true,           // Rebusca sempre que o componente monta
-  staleTime: 0,    
+
+  const { data: orders, isLoading, refetch, isRefetching } = useQuery({
+    queryKey: ["orders", searchTerm],
     queryFn: () => CostumerOrders({ query: searchTerm }),
   });
 
-
-   useEffect(() => {
-      socket.on("order", (data) => {
-        console.log("🔔 Nova notificação recebida:", data);
-        refetch();
-      });
-      return () => {
-        socket.off("order");
-      };
-    }, [refetch]);
-
-  
-
-
-
-  const [parent] = useAutoAnimate<HTMLDivElement>();
-
-  
-
-  // Atualiza a URL com debounce
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setSearchParams((prev) => {
-        const newParams = new URLSearchParams(prev);
-        if (searchTerm) {
-          newParams.set("query", searchTerm);
-        } else {
-          newParams.delete("query");
-        }
-        return newParams;
-      });
-      refetch(); // atualiza a lista sempre que searchTerm muda
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [searchTerm, setSearchParams, refetch]);
-
-  // Socket para atualização em tempo real
-  // useEffect(() => {
-  //   socket.on("user", () => {
-  //     refetch();
-  //   });
-  //   return () => socket.off("user");
-  // }, [refetch]);
+  // Estilização de Urgência
+  const getUrgencyStyles = (brevidade: string) => {
+    switch (brevidade) {
+      case 'URGENTE': return "bg-red-500/10 text-red-500 border-red-500/20";
+      case 'MEDIO': return "bg-orange-500/10 text-orange-500 border-orange-500/20";
+      default: return "bg-green-500/10 text-green-500 border-green-500/20";
+    }
+  };
 
   return (
-    <motion.div
-      className="flex h-screen justify-center items-start mt-2"
-      initial={{ x: "-100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+    <motion.div 
+      className="flex h-screen justify-center items-start p-4 lg:pt-20 md:p-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
     >
-      <Card className="w-[22rem] max-w-lg relative right-[2.5rem] overflow-hidden border-none">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold">Pedidos</CardTitle>
-          <CardDescription className="text-xs mb-2">
-            Aqui você encontra os últimos pedidos feitos.
-          </CardDescription>
-          <div className="relative flex gap-1">
-            <Button variant="outline">
-              <Search />
-            </Button>
+      <Card className="w-full max-w-lg border-none bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] rounded-[2.5rem] overflow-hidden">
+        <CardHeader className="pb-4">
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <CardTitle className="text-3xl font-black tracking-tight">Meus Pedidos</CardTitle>
+              <CardDescription className="font-medium">Gerencie suas solicitações ativas</CardDescription>
+            </div>
+            <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500">
+              <Clock size={24} />
+            </div>
+          </div>
+          
+          <div className="relative group mt-4">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-orange-500 transition-colors" size={18} />
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Pesquisar..."
-              className="mt-0.5"
+              placeholder="Buscar por título ou descrição..."
+              className="h-12 pl-12 rounded-2xl bg-slate-100/50 dark:bg-slate-900/50 border-none focus-visible:ring-2 focus-visible:ring-orange-500/50 transition-all"
             />
           </div>
         </CardHeader>
 
-       
-        <CardContent ref={parent} className="p-0 max-h-[400px] overflow-auto">
-           {!orders  || orders.length===0 &&  (
-          <div className="flex items-center justify-center">
-              <div className="flex flex-col items-center">
-                   <File className="text-muted-foreground" size={105}></File>
-                   <span className="text-muted-foreground">Nenhum pedido feito por enquanto</span>
-              </div>
-          </div>
-        )}
-
-          <Table>
-            <TableBody>
-              {isLoading
-                ? [...Array(5)].map((_, idx) => (
-                    <TableRow key={idx} className="h-14">
-                      <TableCell className="flex items-center gap-3 py-2 px-2">
-                        <Skeleton className="w-10 h-10 rounded-full" />
-                        <div className="flex flex-col gap-2 w-[16rem]">
-                          <Skeleton className="h-5 w-1/2 rounded" />
-                          <Skeleton className="h-4 w-3/4 rounded" />
-                        </div>
-                      </TableCell>
-                      <TableCell className="flex items-center gap-2 px-2">
-                        <Skeleton className="h-4 w-10 rounded" />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                : orders?.map((card) => (
-                    <TableRow key={card.id} className="h-14 relative">
-                      <TableCell className="flex items-center gap-3 py-2 px-2">
-                        <Avatar className="w-10 h-10 ring-2 ring-orange-300 shadow-sm">
-                          {card.image_path ? (
-                            <AvatarImage src={`${api.defaults.baseURL}/uploads/${card.image_path}`} />
-                          ) : (
-                            <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-                              {card.title.slice(0, 2).toUpperCase()}
-                            </AvatarFallback>
-                          )}
+        <CardContent className="p-0">
+          <ScrollArea className="h-[calc(100vh-320px)] px-6 pb-6">
+            <div ref={parent} className="space-y-4">
+              {isLoading ? (
+                <PedidoSkeleton />
+              ) : orders?.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 opacity-40 text-center">
+                  <File size={80} strokeWidth={1} />
+                  <p className="mt-4 font-bold uppercase tracking-widest text-xs">Nenhum pedido ativo</p>
+                </div>
+              ) : (
+                orders?.map((pedido) => (
+                  <motion.div 
+                    key={pedido.id}
+                    layout
+                    className="group relative p-4 rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300"
+                  >
+                    <div className="flex gap-4">
+                      {/* Avatar do Serviço */}
+                      <div className="relative flex-shrink-0">
+                        <Avatar className="w-14 h-14 rounded-2xl shadow-inner ring-2 ring-white dark:ring-slate-800">
+                          <AvatarImage src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} className="object-cover" />
+                          <AvatarFallback className="bg-orange-50 text-orange-500 font-bold">{pedido.title.substring(0,2).toUpperCase()}</AvatarFallback>
                         </Avatar>
-
-                        <div className="flex flex-col leading-tight w-full">
-                          <div className="flex justify-between items-start">
-                            <div className="flex flex-col">
-                              <span className="text-xl font-medium">{card.title}</span>
-                              <span className="text-[0.65rem] truncate max-w-60 text-muted-foreground">{card.content}</span>
-                            </div>
-
-                            {card._count.interessados > 0 && (
-                              <span className="bg-red-600 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-md">
-                                {card._count.interessados}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="mt-1 text-[0.65rem] text-muted-foreground flex justify-between items-center">
-                            <span>
-                              {card.brevidade==='BAIXO' &&(
-                               <>
-                                    Urgência: <span className="text-green-500 font-bold">Pouca</span>
-                               </>
-                              )}
-
-                                {card.brevidade==='URGENTE' &&(
-                               <>
-                                    Urgência: <span className="text-red-500 font-bold">Muita</span>
-                               </>
-                              )}
-                                   {card.brevidade==='MEDIO'&&(
-                               <>
-                                    Urgência: <span className="text-orange-500 font-bold">Normal</span>
-                               </>
-                              )}
-                            </span>
-                            <span className="text-[0.65rem] text-muted-foreground">
-                              {formatNotificationDate(card.created_at)}
-                            </span>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="flex items-center gap-[3rem] px-2">
-                        <div className="flex items-center gap-1 text-orange-400">
-                       <Button onClick={()=>EliminarPedido({pedidoId:card.id})} variant='outline'>
-                           <Trash2 size={16} className="text-red-400 cursor-pointer" />
-                       </Button>
-                          <MapPin size={16} />
-                          <span className="font-bold text-xs max-w-[110px] truncate" title={card.location}>
-                            {card.location}
+                        {pedido._count.interessados > 0 && (
+                          <span className="absolute -top-2 -right-2 h-6 w-6 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center ring-4 ring-white dark:ring-slate-950 animate-bounce">
+                            {pedido._count.interessados}
                           </span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-bold text-lg text-slate-900 dark:text-slate-100 truncate">{pedido.title}</h4>
+                          <button 
+                            onClick={() => EliminarPedido({ pedidoId: pedido.id })}
+                            className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
-                        <DropdownMenu>
-                          {card.interessados? (
-                            <DropdownMenuTrigger>
-                              <Button variant="outline">
-                                <span className="text-muted-foreground flex text-xs items-center">
-                                  Prestadores
-                                  <ChevronDown />
-                                </span>
+                        
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1 leading-relaxed">
+                          {pedido.content}
+                        </p>
+
+                        <div className="mt-4 flex flex-wrap items-center gap-3">
+                          <Badge variant="outline" className={`rounded-lg px-2 py-0.5 font-bold text-[10px] ${getUrgencyStyles(pedido.brevidade)}`}>
+                            {pedido.brevidade}
+                          </Badge>
+                          
+                          <div className="flex items-center gap-1.5 text-slate-400 text-xs font-medium">
+                            <MapPin size={12} className="text-orange-500" />
+                            <span className="truncate max-w-[120px]">{pedido.location}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-slate-400 text-xs">
+                            <Clock size={12} />
+                            <span>{formatNotificationDate(pedido.created_at)}</span>
+                          </div>
+                        </div>
+
+                        {/* Dropdown de Prestadores Refatorado */}
+                        <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="w-full justify-between h-10 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-orange-500 hover:text-white transition-all group/btn">
+                                <div className="flex items-center gap-2">
+                                  <Briefcase size={14} className="group-hover/btn:text-white text-orange-500 transition-colors" />
+                                  <span className="text-xs font-bold">Interessados</span>
+                                </div>
+                                <ChevronDown size={14} className="opacity-50" />
                               </Button>
                             </DropdownMenuTrigger>
-                          ):(
-                            <div>sem prestadores</div>
-                          )}
-
-                         {card.interessados.length>0 &&(
-                             <DropdownMenuContent className="w-80 p-3">
-                      {card.interessados.map((i: Interessado, idx: number) => (
-  <div
-key={`${card.id}-${i.prestadorId}`}
-  className={`
-    flex items-start gap-3 p-3 rounded-xl transition-all
-    hover:bg-muted/50 hover:shadow-sm
-    ${idx !== card.interessados.length - 1 ? "border-b border-muted/30" : ""}
-    `}
-    >
-    
-    {/* Avatar */}
-    <Avatar className="w-11 h-11 ring-2 ring-orange-300/60 shadow-sm flex-shrink-0">
-      {i.prestador.image_path ? (
-        <AvatarImage
-          src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`}
-        />
-      ) : (
-        <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-sm">
-          {i.prestador.nome.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      )}
-    </Avatar>
-
-    {/* Conteúdo principal */}
-    <div className="flex-1 min-w-0">
-      <div className="flex justify-between items-start gap-3">
-        
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <span className="text-sm font-semibold text-foreground truncate">
-            {i.prestador.nome}
-          </span>
-          <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
-            <Briefcase size={13} className="text-orange-500" /> {i.prestador.profissao}
-          </span>
-          <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
-            <MapPin size={13} className="text-orange-400" /> {i.prestador.municipio},{" "}
-            {i.prestador.provincia}
-          </span>
-        </div>
-        <div className="flex gap-1.5 flex-shrink-0">
-       
-            
-          <PedidoCard
-            refetch={refetch}
-            isRefetching={isRefetching}
-            prestadorId={i.prestadorId}
-            id={card.id}
-            status={i.status}
-          />
-
-          
-        </div>
-      </div>
-      <div className="mt-2">
-        <div className="flex items-center gap-[4rem] text-xs text-muted-foreground">
-          <div className="flex">
-             <Phone size={13} className="text-blue-500" />
-            <span className="font-medium">+244{i.prestador.celular}</span>
-          </div>
-          <div className="flex gap-2 ">
-            <Pin onClick={() => favoritar({ prestadorId: i.prestadorId })} className="w-4 h-4 text-muted-foreground"  />
-                <Dialog>
-              <DialogTrigger onClick={()=>handleSetCommentSearchParams({userId:i.prestadorId.toString()})}  asChild>
-                   <MessageCircle className="w-4 h-4 text-blue-400" />
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader className="flex items-start">
-                  <DialogTitle>Avaliação</DialogTitle>
-                  <DialogDescription>Pode avaliar prestadores com um comentário e estrela</DialogDescription>
-                </DialogHeader>
-
-
-                 <form onSubmit={handleSubmit(handlecomentar)} className="flex gap-3">
-                  <Input {...register('content')}></Input>
-                  <Button disabled={isPending} type="submit">Comentar</Button>
-                  </form>
-              </DialogContent>
-                  <StarButton prestadorId={i.prestador.id} />
-           </Dialog>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-))}
-
+                            
+                            <DropdownMenuContent align="end" className="w-[320px] p-2 rounded-[2rem] border-none shadow-2xl bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl">
+                              <ScrollArea className="max-h-[350px]">
+                                {pedido.interessados?.length > 0 ? (
+                                  pedido.interessados.map((i: Interessado) => (
+                                    <div key={i.prestadorId} className="p-3 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-2xl transition-all group/item">
+                                      <div className="flex items-center gap-3">
+                                        <Avatar className="h-10 w-10 rounded-xl ring-2 ring-orange-500/10">
+                                          <AvatarImage src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`} className="object-cover" />
+                                          <AvatarFallback className="text-[10px] font-bold">{i.prestador.nome.substring(0,2)}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm font-bold truncate">{i.prestador.nome}</p>
+                                          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-wider">{i.prestador.profissao}</p>
+                                        </div>
+                                        <PedidoCard refetch={refetch} isRefetching={isRefetching} prestadorId={i.prestadorId} id={pedido.id} status={i.status} />
+                                      </div>
+                                      
+                                      <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                        <div className="flex items-center gap-3">
+                                          <button onClick={() => favoritar({ prestadorId: i.prestadorId })} className="text-slate-400 hover:text-orange-500 transition-colors">
+                                            <Pin size={14} />
+                                          </button>
+                                          <Dialog>
+                                            <DialogTrigger asChild>
+                                              <button className="text-slate-400 hover:text-blue-500 transition-colors">
+                                                <MessageCircle size={14} />
+                                              </button>
+                                            </DialogTrigger>
+                                            <DialogContent className="rounded-[2.5rem]">
+                                              <DialogHeader>
+                                                <DialogTitle>Avaliar {i.prestador.nome}</DialogTitle>
+                                                <DialogDescription>Deixe um feedback sobre o atendimento.</DialogDescription>
+                                              </DialogHeader>
+                                              {/* Form logic aqui... */}
+                                            </DialogContent>
+                                          </Dialog>
+                                        </div>
+                                        <a href={`tel:+244${i.prestador.celular}`} className="flex items-center gap-1 text-[10px] font-bold text-blue-500">
+                                          <Phone size={12} /> +244 {i.prestador.celular}
+                                        </a>
+                                      </div>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="py-8 text-center text-muted-foreground">
+                                    <AlertCircle size={32} className="mx-auto mb-2 opacity-20" />
+                                    <p className="text-xs font-bold">Ninguém interessado ainda</p>
+                                  </div>
+                                )}
+                              </ScrollArea>
                             </DropdownMenuContent>
-                         )}
-                         {card.interessados.length<=0 && (
-                          <DropdownMenuContent className="flex flex-col items-center">
-                              <File className="flex text-muted-foreground"></File>
-                              <span className="text-muted-foreground text-xs">Sem Prestadores Interessados</span>
-                          </DropdownMenuContent>
-                         )}
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-            </TableBody>
-          </Table>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </div>
+          </ScrollArea>
         </CardContent>
       </Card>
     </motion.div>
   );
+}
+
+function PedidoSkeleton() {
+  return [...Array(3)].map((_, i) => (
+    <div key={i} className="p-4 rounded-3xl border border-slate-100 dark:border-slate-800 space-y-3">
+      <div className="flex gap-4">
+        <Skeleton className="h-14 w-14 rounded-2xl" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-5 w-1/3" />
+          <Skeleton className="h-4 w-full" />
+        </div>
+      </div>
+      <Skeleton className="h-10 w-full rounded-xl" />
+    </div>
+  ));
 }

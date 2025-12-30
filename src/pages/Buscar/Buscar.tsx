@@ -1,22 +1,11 @@
 import { useEffect, useState } from "react";
-import { Briefcase, Phone, Search, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { Briefcase,  Search, X, HeartOff, Star, MapPin, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FetchFavoritos } from "@/api/favoritos";
 import { RemoveFavoritos } from "@/api/remover-favoritos";
@@ -24,190 +13,160 @@ import { CallButton } from "./callButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { api } from "@/lib/axios";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function BuscarPrestadores() {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  // search atual vindo da URL
   const search = searchParams.get("search") || "";
-
-  // estado local do input (iniciado com query param)
   const [searchValue, setSearchValue] = useState<string>(search);
 
-  // debounce para atualizar URL enquanto o usuário digita
   useEffect(() => {
     const handler = setTimeout(() => {
-      const trimmed = searchValue.trim();
-      if (trimmed) {
-        setSearchParams({ search: trimmed });
-      } else {
-        // limpa o param quando input vazio
-        setSearchParams({});
-      }
+      setSearchParams(searchValue.trim() ? { search: searchValue.trim() } : {});
     }, 350);
-
     return () => clearTimeout(handler);
   }, [searchValue, setSearchParams]);
 
-  // garante que se a URL mudar externamente, o input seja atualizado
-  useEffect(() => {
-    setSearchValue(search);
-  }, [search]);
-
-  // fetch reativo ao parâmetro 'search'
   const { data: favoritos, isLoading } = useQuery({
     queryKey: ["favoritos", search],
-      refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
-  refetchOnReconnect: true,       // Rebusca se a internet voltar
-  refetchOnMount: true,           // Rebusca sempre que o componente monta
-  staleTime: 0,    
     queryFn: () => FetchFavoritos({ search }),
-    // keepPreviousData: true,
   });
-  
-  // remoção
-  const { mutateAsync: DeletarFromFavorites, isPending } = useMutation({
+
+  const { mutateAsync: DeletarFromFavorites } = useMutation({
     mutationFn: RemoveFavoritos,
     onSuccess: (_, variables) => {
-      // atualiza cache: remove o prestador da lista atual
       queryClient.setQueryData(["favoritos", search], (old: any) => {
-        if (!old) return [];
-        return old.filter((f: any) => f.prestador.id !== Number(variables.prestadorId));
+        return old?.filter((f: any) => f.prestador.id !== Number(variables.prestadorId));
       });
-      toast.success("Prestador removido dos favoritos.");
-    },
-    onError: () => {
-      toast.error("Erro ao remover. Tente novamente.");
+      toast.success("Removido dos favoritos");
     },
   });
-  
-  async function handleDeleteFromFavorites(prestadorId: string) {
-    await DeletarFromFavorites({ prestadorId });
-  }
-  
-  // skeleton enquanto carrega
-  if (isLoading) {
-    return (
-      <motion.div
-        className="flex h-screen justify-center fixed left-1 items-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.25 }}
-      >
-        <Card className="w-full max-w-lg border-none bg-10 p-6 space-y-4">
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-          <div className="space-y-3 mt-6">
-            {[1, 2, 3,4,5,8,9,19].map((i) => (
-              <div key={i} className="flex items-center gap-3">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-                <Skeleton className="h-8 w-16 rounded-md" />
-              </div>
-            ))}
-          </div>
-        </Card>
-      </motion.div>
-    );
-  }
-  
+
+  if (isLoading) return <FavoriteSkeleton />;
 
   return (
-    <motion.div
-      className="flex h-screen justify-center fixed left-[0.1rem] items-start mt-2"
-      initial={{ x: "-100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-    >
-      <Card className="w-[22rem] max-w-lg overflow-hidden border-none bg-10">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold">Prestadores Favoritos</CardTitle>
-          <CardDescription className="text-xs mb-2">
-            Aqui você encontra os prestadores favoritos.
-          </CardDescription>
-
-          <div className="relative">
-            <Input
-              placeholder="O que você precisa?"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="bg-zinc-200 dark:bg-black pl-10 w-full max-w-[320px]"
-            />
-            <Search className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400" size={20} />
-            {/* limpar input (opcional) */}
-            {searchValue && (
-              <button
-                onClick={() => setSearchValue("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                aria-label="Limpar pesquisa"
-                type="button"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-0 max-h-[400px] overflow-auto">
-          {/* se não existir nenhum favorito (após a busca), mostra mensagem dentro do card */}
-          {!favoritos || favoritos.length === 0 ? (
-            <div className="p-6 text-center text-muted-foreground">
-              <p className="text-sm font-medium">Nenhum usuário encontrado.</p>
-              <p className="text-xs mt-1">Tente outro termo de busca ou limpe o filtro.</p>
+    <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 bg-slate-50 dark:bg-[#080808]">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-4xl"
+      >
+        <header className="mb-8 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-1">
+              <h1 className="text-4xl font-black tracking-tight dark:text-white">Meus Favoritos</h1>
             </div>
-          ) : (
-            <Table>
-              <TableBody>
-                {favoritos.map((card) => (
-                  <TableRow key={card.id} className="h-14">
-                    <TableCell className="flex items-center gap-3 py-2 px-2">
-                      <Avatar className="w-10 h-10 ring-2 ring-orange-300 shadow-sm">
-                        {card.prestador.image_path ? (
-                          <AvatarImage src={`${api.defaults.baseURL}/uploads/${card.prestador.image_path}`} />
-                        ) : (
-                          <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-xs">
-                            {card.prestador.nome.slice(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
 
-                      <div className="flex flex-col leading-tight">
-                        <span className="text-lg font-medium">{card.prestador.nome}</span>
-                        <span className="text-sm text-muted-foreground flex items-center gap-2">
-                          <Briefcase size={13} /> {card.prestador.profissao}
-                        </span>
-                        <span className="text-sm text-muted-foreground flex items-center gap-2">
-                          <Phone size={13} /> {card.prestador.celular}
-                        </span>
+            <div className="relative group w-full md:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-orange-500 transition-colors" size={18} />
+              <Input
+                placeholder="Filtrar por nome ou profissão..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="h-12 pl-12 pr-10 rounded-2xl border-none bg-white dark:bg-zinc-900 shadow-sm focus-visible:ring-2 focus-visible:ring-orange-500/50 transition-all"
+              />
+              {searchValue && (
+                <button onClick={() => setSearchValue("")} className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <X size={16} className="text-muted-foreground hover:text-red-500" />
+                </button>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <ScrollArea className="h-[calc(100vh-250px)] pr-4 -mr-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+            <AnimatePresence mode="popLayout">
+              {favoritos?.map((card: any, index: number) => (
+                <motion.div
+                  key={card.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Card className="group border-none bg-white dark:bg-zinc-900/50 hover:bg-orange-500/[0.02] dark:hover:bg-orange-500/[0.02] rounded-[2rem] transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 border border-transparent hover:border-orange-500/20 overflow-hidden">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="relative">
+                          <Avatar className="w-16 h-16 rounded-2xl shadow-lg ring-4 ring-white dark:ring-zinc-800">
+                            <AvatarImage src={`${api.defaults.baseURL}/uploads/${card.prestador.image_path}`} className="object-cover" />
+                            <AvatarFallback className="bg-orange-100 text-orange-600 font-bold"><User size={24} /></AvatarFallback>
+                          </Avatar>
+                          <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-4 border-white dark:border-zinc-900" />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-bold text-lg truncate group-hover:text-orange-500 transition-colors">{card.prestador.nome}</h3>
+                            <div className="flex items-center gap-1 text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded-full">
+                              <Star size={10} className="fill-current" />
+                              <span className="text-[10px] font-black">4.9</span>
+                            </div>
+                          </div>
+
+                          <div className="mt-2 space-y-1">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Briefcase size={14} className="text-orange-500" />
+                              <span className="text-xs font-bold uppercase tracking-tight">{card.prestador.profissao}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <MapPin size={14} />
+                              <span className="text-xs">{card.prestador.municipio || "Angola"}</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </TableCell>
 
-                    <TableCell className="flex items-center gap-2 px-2">
-                      <CallButton phoneNumber={card.prestador.celular} />
-                      <Button
-                        variant="outline"
-                        disabled={isPending}
-                        onClick={() => handleDeleteFromFavorites(String(card.prestador.id))}
-                      >
-                        {isPending ? "Removendo..." : "Remover"}
-                      </Button>
-                      <X
-                        size={16}
-                        className="text-red-400 cursor-pointer"
-                        onClick={() => handleDeleteFromFavorites(String(card.prestador.id))}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      <div className="mt-6 flex items-center justify-between gap-3">
+                        <div className="flex gap-2">
+                          <CallButton phoneNumber={card.prestador.celular} />
+                          <Button variant="secondary" className="rounded-xl h-10 w-10 p-0 hover:bg-red-50 hover:text-red-500 transition-colors" onClick={() => DeletarFromFavorites({ prestadorId: String(card.prestador.id) })}>
+                            <HeartOff size={18} />
+                          </Button>
+                        </div>
+                        <Button className="rounded-xl bg-zinc-900 dark:bg-white dark:text-black hover:bg-orange-500 dark:hover:bg-orange-500 hover:text-white transition-all font-bold text-xs h-10 px-6">
+                          Ver Perfil
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {favoritos?.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+              <div className="w-20 h-20 bg-slate-100 dark:bg-zinc-900 rounded-full flex items-center justify-center text-muted-foreground">
+                <Search size={32} />
+              </div>
+              <div className="space-y-1">
+                <p className="font-bold text-lg">Nenhum resultado para "{searchValue}"</p>
+                <p className="text-sm text-muted-foreground">Tente buscar por outra profissão ou nome.</p>
+              </div>
+            </div>
           )}
-        </CardContent>
-      </Card>
-    </motion.div>
+        </ScrollArea>
+      </motion.div>
+    </div>
+  );
+}
+
+function FavoriteSkeleton() {
+  return (
+    <div className="max-w-4xl mx-auto p-8 space-y-8">
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-4 w-48" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-48 w-full rounded-[2rem]" />
+        ))}
+      </div>
+    </div>
   );
 }
