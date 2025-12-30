@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
+
 import { pt } from "date-fns/locale";
 import { GetUserProfile } from "@/api/get-profile";
 import { api } from "@/lib/axios";
