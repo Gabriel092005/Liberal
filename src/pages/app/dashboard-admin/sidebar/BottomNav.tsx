@@ -187,9 +187,8 @@ export function BottomNav() {
                               </div>
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="p-0 border-none bg-transparent shadow-none">
                             <FastFazerPedido selecionado={i.titulo}/>
-                          </DialogContent>
+                       
                         </Dialog>
                       ))}
                     </div>
@@ -216,9 +215,9 @@ export function BottomNav() {
                 <span>Solicitar Serviço</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-[2rem]">
+           
                <FastFazerPedido />
-            </DialogContent>
+           
           </Dialog>
         </div>
       </nav>

@@ -1,7 +1,7 @@
 import servico5 from '@/assets/IMG-20250928-WA0059.jpg'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogTrigger} from '@/components/ui/dialog'
 import { ChevronRight, Home, ShieldCheck, Flower2, Sparkles } from 'lucide-react'
 import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
@@ -28,9 +28,8 @@ function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="rounded-[2.5rem] p-0 overflow-hidden border-none max-w-md w-[95vw] shadow-2xl">
         <FastFazerPedido selecionado={selecionado} />
-      </DialogContent>
+  
     </Dialog>
   )
 }

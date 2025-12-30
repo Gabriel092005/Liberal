@@ -1,6 +1,7 @@
 import { 
   BookMarked,
   Camera,
+
   ChevronRight,
   Loader2,
   LogOut,
@@ -45,6 +46,11 @@ import { GetProfission } from "@/api/get-profissions";
 import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChatIntegrado} from "./Mensagens";
+
+
+
+
 
 export function Home() {
   const categorias = [
@@ -316,7 +322,11 @@ export function Home() {
                 <div className="flex flex-col"><span className="text-xs font-bold leading-none">Feedbacks</span><span className="text-[9px] text-muted-foreground">Comunidade</span></div>
               </motion.div>
             </Link>
+
+
+          <ChatIntegrado></ChatIntegrado>
           </div>
+
 
           {/* SEÇÃO DE DESTAQUES (SLIDE AGORA FUNCIONA) */}
         
