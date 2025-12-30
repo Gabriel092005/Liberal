@@ -1,9 +1,8 @@
-import servicoBeleza from '@/assets/IMG-20250928-WA0058.jpg' // 🔹 coloque a imagem certa aqui
+import servicoBeleza from '@/assets/IMG-20250928-WA0058.jpg'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { ChevronRight } from 'lucide-react'
-
+import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
+import { ChevronRight,  } from 'lucide-react'
 import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
 type ServicoButtonProps = {
@@ -15,15 +14,22 @@ type ServicoButtonProps = {
 function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
   return (
     <Dialog>
-      <DialogTrigger onClick={() => onSelect(nome)}>
-        <Button variant="outline" className="w-80 flex justify-between">
-          <span className="text-orange-600">{nome}</span>
-          <ChevronRight className="text-orange-600" />
+      <DialogTrigger asChild>
+        <Button 
+          onClick={() => onSelect(nome)}
+          variant="outline" 
+          className="w-full max-w-sm flex justify-between items-center group hover:border-orange-500 hover:bg-orange-50/50 dark:hover:bg-orange-500/10 transition-all duration-300 rounded-xl h-12 px-6 border-zinc-200 dark:border-zinc-800"
+        >
+          <span className="text-zinc-700 dark:text-zinc-200 group-hover:text-orange-600 font-medium transition-colors">
+            {nome}
+          </span>
+          <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
         </Button>
       </DialogTrigger>
-
-
+      
+      <DialogContent className="rounded-[2rem] p-0 overflow-hidden border-none max-w-md w-[95vw]">
         <FastFazerPedido selecionado={selecionado} />
+      </DialogContent>
     </Dialog>
   )
 }
@@ -31,51 +37,63 @@ function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
 export function BelezaModa() {
   const [servicoSelecionado, setServicoSelecionado] = useState<string>('')
 
+  const servicos = [
+    "Cabeleireiro",
+    "Manicure & Pedicure",
+    "Maquiadora",
+    "Costureira & Estilista",
+    "Esteticista"
+  ]
+
   return (
-    <div className="relative -mx-10 w-[40rem] h-56 md:h-72 lg:h-96">
-      {/* Imagem de capa */}
-      <img
-        className="w-full h-full object-cover"
-        src={servicoBeleza}
-        alt="Beleza & Moda"
-      />
-
-      {/* Overlay escuro */}
-      <div className="absolute inset-0 bg-black/40"></div>
-
-      {/* Texto centralizado */}
-      <div className="absolute inset-0 flex items-center right-56 justify-center">
-        <h2 className="text-white text-xl font-bold">Beleza & Moda</h2>
+    <div className="w-full max-w-5xl mx-auto overflow-hidden rounded-[2.5rem] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col md:flex-row">
+      
+      {/* Lado Esquerdo: Imagem de Capa com Texto */}
+      <div className="relative w-full md:w-1/2 h-64 md:h-auto min-h-[300px]">
+        <img
+          className="absolute inset-0 w-full h-full object-cover"
+          src={servicoBeleza}
+          alt="Beleza & Moda"
+        />
+        {/* Overlay Gradiente Profissional */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-gradient-to-r"></div>
+        
+        {/* Texto Posicionado */}
+        <div className="absolute bottom-8 left-8 right-8 md:top-1/2 md:-translate-y-1/2">
+ 
+          <h2 className="text-white text-3xl md:text-4xl font-extrabold tracking-tight">
+            Beleza & <br className="hidden md:block" /> Moda
+          </h2>
+          <p className="text-zinc-300 text-sm mt-2 max-w-[250px]">
+            Encontre os melhores profissionais para realçar sua essência.
+          </p>
+        </div>
       </div>
 
-      {/* Lista de serviços */}
-      <div className="flex flex-col relative right-32 gap-3 mt-3 justify-center items-center">
-        <ServicoButton
-          nome="Cabeleireiro"
-          selecionado={servicoSelecionado}
-          onSelect={setServicoSelecionado}
-        />
-        <ServicoButton
-          nome="Manicure & Pedicure"
-          selecionado={servicoSelecionado}
-          onSelect={setServicoSelecionado}
-        />
-        <ServicoButton
-          nome="Maquiadora"
-          selecionado={servicoSelecionado}
-          onSelect={setServicoSelecionado}
-        />
-        <ServicoButton
-          nome="Costureira & Estilista"
-          selecionado={servicoSelecionado}
-          onSelect={setServicoSelecionado}
-        />
-
-            <ServicoButton
-          nome="Esteticista"
-          selecionado={servicoSelecionado}
-          onSelect={setServicoSelecionado}
-        />
+      {/* Lado Direito: Lista de Serviços */}
+      <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-zinc-50/50 dark:bg-zinc-900/30">
+        <div className="space-y-3">
+          <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-6">
+            Selecione um serviço
+          </p>
+          
+          <div className="flex flex-col gap-3">
+            {servicos.map((servico) => (
+              <ServicoButton
+                key={servico}
+                nome={servico}
+                selecionado={servicoSelecionado}
+                onSelect={setServicoSelecionado}
+              />
+            ))}
+          </div>
+        </div>
+        
+        <footer className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
+          <p className="text-[10px] text-zinc-500 text-center">
+            Atendimento domiciliar ou em salão parceiro.
+          </p>
+        </footer>
       </div>
     </div>
   )

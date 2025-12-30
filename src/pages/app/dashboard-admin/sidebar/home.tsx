@@ -44,6 +44,7 @@ import { GetProfissaoByCategory } from "@/api/fetchProfissionByCategory";
 import { GetProfission } from "@/api/get-profissions";
 import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function Home() {
   const categorias = [
@@ -216,42 +217,76 @@ export function Home() {
               <DropdownMenuTrigger asChild>
                 <div className="relative group w-full max-w-md">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-orange-500 transition-colors" />
-                  <Input readOnly placeholder="O que você precisa hoje?" className="h-10 sm:h-11 pl-10 w-full rounded-2xl bg-muted/50 border-transparent cursor-pointer" />
+                  <Input readOnly placeholder="Buscar mais profissões..." className="h-10 sm:h-11 pl-10 w-full rounded-2xl bg-muted/50 border-transparent cursor-pointer" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[90vw] sm:w-[450px] mt-2 rounded-[2rem] p-4 shadow-2xl">
-                <p className="text-xs font-bold text-muted-foreground uppercase px-1 mb-4">Explorar Categorias</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {categories?.map((c) => (
-                    <div key={c.id} onClick={() => handleSearchProfission({ categoryId: String(c.id) })} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-muted hover:bg-white transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted">
-                          {c.image_path ? <img src={`${api.defaults.baseURL}/uploads/${c.image_path}`} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-bold text-orange-500 uppercase">{getInialts(c.titulo)}</div>}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-sm truncate">{c.titulo}</h4>
-                          <Dialog>
-                            <DialogTrigger className="text-[10px] text-orange-500 font-bold uppercase hover:underline">Ver Profissões</DialogTrigger>
-                            <DialogContent className="rounded-[2rem]">
-                              <DialogHeader><DialogTitle>{c.titulo}</DialogTitle></DialogHeader>
-                              <div className="flex flex-col gap-2">
-                                {profByCategoy?.map(i => (
-                                  <Dialog key={i.id}>
-                                    <DialogTrigger asChild>
-                                      <Button variant="ghost" className="justify-between h-12 rounded-xl bg-muted/30">{i.titulo} <ChevronRight size={16}/></Button>
-                                    </DialogTrigger>
-                                    <DialogContent><FastFazerPedido selecionado={i.titulo}/></DialogContent>
-                                  </Dialog>
-                                ))}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+             <DropdownMenuContent className="w-[90vw] sm:w-[450px] mt-2 rounded-[2rem] p-0 shadow-2xl overflow-hidden border-zinc-200 dark:border-zinc-800">
+  {/* Definimos uma altura máxima (ex: 70vh ou 500px) para o scroll ativar */}
+  <ScrollArea className="h-[70vh] sm:h-[550px] w-full p-4">
+    
+    <p className="text-xs font-bold text-muted-foreground uppercase px-1 mb-4 sticky top-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm z-10 py-1">
+      Explorar Categorias
+    </p>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
+      {categories?.map((c) => (
+        <div 
+          key={c.id} 
+          onClick={() => handleSearchProfission({ categoryId: String(c.id) })} 
+          className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-muted/50 hover:bg-white dark:hover:bg-zinc-800 transition-all border border-transparent hover:border-orange-500/20 shadow-sm"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted shrink-0">
+              {c.image_path ? (
+                <img 
+                  src={`${api.defaults.baseURL}/uploads/${c.image_path}`} 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center font-bold text-orange-500 uppercase">
+                  {getInialts(c.titulo)}
                 </div>
-              </DropdownMenuContent>
+              )}
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <h4 className="font-bold text-sm truncate">{c.titulo}</h4>
+              <Dialog>
+                <DialogTrigger 
+                  onClick={(e) => e.stopPropagation()} // Impede que o clique no botão ative o clique do card pai
+                  className="text-[10px] text-orange-500 font-bold uppercase hover:underline"
+                >
+                  Ver Profissões
+                </DialogTrigger>
+                <DialogContent className="rounded-[2rem] w-[95vw] sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>{c.titulo}</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="max-h-[60vh] pr-4">
+                    <div className="flex flex-col gap-2">
+                      {profByCategoy?.map(i => (
+                        <Dialog key={i.id}>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" className="justify-between h-12 rounded-xl bg-muted/30 hover:bg-orange-500/10 hover:text-orange-600 transition-colors">
+                              {i.titulo} <ChevronRight size={16}/>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="rounded-[2rem]">
+                            <FastFazerPedido selecionado={i.titulo}/>
+                          </DialogContent>
+                        </Dialog>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </ScrollArea>
+</DropdownMenuContent>
             </DropdownMenu>
           </div>
 
@@ -265,10 +300,10 @@ export function Home() {
 
       {/* CONTEÚDO COM SCROLL NATIVO (IMPEDE O BLOQUEIO DO SLIDE) */}
       <main className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
-        <div className="max-w-7xl mx-auto px-4 py-6 space-y-8 pb-24">
+        <div className="max-w-7xl mx-auto px-4  py-3 space-y-8 pb-24">
           
           {/* BOTÕES DE NAVEGAÇÃO HORIZONTAL */}
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+          <div className="flex gap-4 overflow-x-auto no-scrollbar -pb-1">
             <Link to="/vitrine">
               <motion.div whileHover={{ y: -2 }} className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-900 border rounded-full shadow-sm">
                 <div className="p-2 bg-orange-500 rounded-full text-white"><BookMarked size={16}/></div>
@@ -284,7 +319,24 @@ export function Home() {
           </div>
 
           {/* SEÇÃO DE DESTAQUES (SLIDE AGORA FUNCIONA) */}
+        
+
+          {/* GRID DE CATEGORIAS */}
           <section className="space-y-4">
+            {/* <h2 className="text-xl font-black tracking-tighter px-1">Todas Categorias</h2> */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {categorias.map((o) => (
+                <Link to={o.to} key={o.title} className="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-muted shadow-sm hover:shadow-xl transition-all">
+                  <img src={o.image} alt={o.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                  <span className="absolute bottom-4 left-4 text-white text-xs font-black bg-black/60 px-3 py-1.5 rounded-lg uppercase">
+                    {o.title}
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+              <section className="space-y-4">
             <h2 className="text-xl font-black tracking-tighter flex items-center gap-2 px-1">
               <Sparkles className="text-orange-500" size={20} /> Melhores da Semana
             </h2>
@@ -298,21 +350,6 @@ export function Home() {
               )}
             </AnimatePresence>
           </section>
-
-          {/* GRID DE CATEGORIAS */}
-          <section className="space-y-4">
-            <h2 className="text-xl font-black tracking-tighter px-1">Todas Categorias</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {categorias.map((o) => (
-                <Link to={o.to} key={o.title} className="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-muted shadow-sm hover:shadow-xl transition-all">
-                  <img src={o.image} alt={o.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
-                  <span className="absolute bottom-4 left-4 text-white text-xs font-black bg-black/60 px-3 py-1.5 rounded-lg uppercase">
-                    {o.title}
-                  </span>
-                </Link>
-              ))}
-            </div>
           </section>
         </div>
         {/* SEÇÃO DE DOWNLOAD (FOOTER) */}

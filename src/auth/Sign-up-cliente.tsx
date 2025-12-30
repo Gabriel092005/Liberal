@@ -83,7 +83,7 @@ export function SignUp() {
     <>
       <Helmet title="Criar Conta | Liberal" />
       
-      <div className="w-full max-w-[480px] space-y-2 relative -top-6">
+      <div className="w-full max-w-[480px] space-y-2 relative -top-24">
         {/* Header do Formulário */}
         <div className="text-center lg:text-left space-y-2">
           <motion.h1 
