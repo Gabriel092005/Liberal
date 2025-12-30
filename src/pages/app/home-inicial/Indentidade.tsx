@@ -12,14 +12,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Search, Settings, LifeBuoy, History } from 'lucide-react' // Novos ícones
+import { Search, History } from 'lucide-react' // Novos ícones
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { WhatsAppButton } from './whatsapp-button'
@@ -52,76 +51,42 @@ export function Indentitidade() {
             className="space-y-24 pb-20 pt-10"
           >
 
-            <header className="absolute top-0 z-[100] w-full border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-xl">
+   <header className="fixed top-0 z-[100] w-full border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white dark:bg-[#09090b] shadow-sm">
   <div className="container max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
     
     {/* LOGO */}
-   <Link to="/" className="flex items-center gap-1 group shrink-0">
-  {/* O ÍCONE (Sempre visível) */}
-  <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:rotate-6 transition-transform">
-    <Handshake className="text-white" size={20} />
-  </div>
+    <Link to="/" className="flex items-center gap-1 group shrink-0">
+      <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:rotate-6 transition-transform">
+        <Handshake className="text-white" size={20} />
+      </div>
 
-  {/* O TEXTO (Removido o 'hidden' e adicionada cor de fallback) */}
-  <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-300 text-zinc-900 dark:text-white">
-    Liberal
-  </span>
-</Link>
+      {/* TEXTO - Removido o gradient que buga no Safari e garantido cor sólida */}
+      <span className="font-bold text-xl tracking-tight text-zinc-900 dark:text-white">
+        Liberal
+      </span>
+    </Link>
 
-    {/* BARRA DE PESQUISA COM DROPDOWN */}
+    {/* BARRA DE PESQUISA */}
     <div className="flex-1 max-w-md mx-4">
       <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-              <div className="relative group cursor-pointer w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Pesquisar..."
-                  readOnly
-                  className="w-full h-10 pl-10 pr-4 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-transparent focus:border-orange-500 transition-all text-sm outline-none cursor-pointer text-zinc-900 dark:text-zinc-100"
-                />
-                {/* KBD visível apenas do tablet para cima (md) */}
-                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden md:flex h-5 select-none items-center gap-1 rounded border bg-white dark:bg-zinc-900 px-1.5 font-mono text-[10px] font-medium opacity-100">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
-              </div>
-            </DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
+          <div className="relative group cursor-pointer w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
+            <input
+              type="text"
+              placeholder="Pesquisar..."
+              readOnly
+              className="w-full h-10 pl-10 pr-4 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-transparent focus:border-orange-500 transition-all text-sm outline-none cursor-pointer text-zinc-900 dark:text-zinc-100"
+            />
+          </div>
+        </DropdownMenuTrigger>
 
-        {/* CONTEÚDO DO DROPDOWN (MENU DE BUSCA) */}
-        <DropdownMenuContent className="w-[calc(100vw-2rem)] md:w-[450px] mt-2 rounded-2xl p-2 shadow-2xl border-zinc-200/50 dark:border-zinc-800/50 backdrop-blur-xl">
+        <DropdownMenuContent className="w-[calc(100vw-2rem)] md:w-[450px] mt-2 rounded-2xl p-2 shadow-2xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
           <DropdownMenuLabel className="text-xs text-zinc-500 px-3 py-2">Buscas Recentes</DropdownMenuLabel>
           <DropdownMenuGroup>
             <DropdownMenuItem className="rounded-xl cursor-pointer gap-3 py-3">
               <History className="h-4 w-4 text-zinc-400" />
               <span>Eletricista em Luanda</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-xl cursor-pointer gap-3 py-3">
-              <History className="h-4 w-4 text-zinc-400" />
-              <span>Limpeza Profissional</span>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          
-          <DropdownMenuSeparator className="my-2" />
-          
-          <DropdownMenuLabel className="text-xs text-zinc-500 px-3 py-2">Categorias Sugeridas</DropdownMenuLabel>
-          <DropdownMenuGroup>
-            <DropdownMenuItem className="rounded-xl cursor-pointer gap-3 py-3">
-              <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
-                <Settings className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-medium">Manutenção</span>
-                <span className="text-[10px] text-zinc-500">Reparos, Pintura, Obras</span>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-xl cursor-pointer gap-3 py-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
-                <LifeBuoy className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-medium">Suporte Técnico</span>
-                <span className="text-[10px] text-zinc-500">Computadores, TI, Celulares</span>
-              </div>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -129,24 +94,20 @@ export function Indentitidade() {
     </div>
 
     {/* BOTÕES LADO DIREITO */}
-  {/* BOTÕES LADO DIREITO */}
-<div className="flex items-center gap-2 shrink-0">
-  <ModeToggle />
-  
-  <Link to='/sign-in'>
-    <Button 
-      className="rounded-full font-semibold shadow-md bg-orange-500 text-white hover:bg-orange-600 transition-all px-4" 
-      size="sm"
-    >
-      <LogIn className="h-4 w-4 sm:mr-2" /> 
-      {/* Removemos o 'hidden' para o texto aparecer no celular também, 
-          ou usamos 'block' se quiser garantir */}
-   
-    </Button>
-  </Link>
-</div>
+    <div className="flex items-center gap-2 shrink-0">
+      <ModeToggle />
+      <Link to='/sign-in' className="shrink-0">
+        <Button 
+          className="rounded-full font-semibold shadow-md bg-orange-500 text-white hover:bg-orange-600 transition-all px-4 flex items-center justify-center" 
+          size="sm"
+        >
+          <LogIn className="h-4 w-4 sm:mr-2" /> 
+          
+        </Button>
+      </Link>
+    </div>
   </div>
-</header>
+</header> 
             
             {/* HERO SECTION */}
             <section className="container lg:flex lg:items-center max-w-7xl mx-auto px-4 text-center space-y-8">
