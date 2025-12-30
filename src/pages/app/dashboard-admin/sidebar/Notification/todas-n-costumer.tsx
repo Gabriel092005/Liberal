@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Clock, AlertCircle, RefreshCw, Inbox, CheckCheck, Circle } from "lucide-react";
+import { Bell, Clock, AlertCircle, RefreshCw, Inbox, CheckCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
