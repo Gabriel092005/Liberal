@@ -11,43 +11,127 @@ import { CostumerOrders, Interessado } from "@/api/costumer-orders";
 import { formatNotificationDate } from "@/lib/utils";
 import { api } from "@/lib/axios";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { StarButton } from "./stars-button";
 import { PedidoCard } from "./pedidos-confirmar";
+import { socket } from "@/lib/socket";
 import { Favoritar } from "@/api/favoritar";
 import { Deletar } from "@/api/deletar-order";
 import { queryClient } from "@/lib/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { Commentar } from "@/api/commentar-prestadores";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 
 export function SearchPedidos() {
-  const [searchParams, _] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryFromParams = searchParams.get("query") || "";
   const [searchTerm, setSearchTerm] = useState(queryFromParams);
-  // const userId = searchParams.get("userId");
+  const userId = searchParams.get("userId")
 
-  const [parent] = useAutoAnimate();
+  const {mutateAsync:comentar} = useMutation({
+    mutationFn:Commentar
+  })
 
-  // const { mutateAsync: comentar, isPending } = useMutation({ mutationFn: Commentar });
-  const { mutateAsync: favoritar } = useMutation({ mutationFn: Favoritar });
   
-  const { mutate: EliminarPedido } = useMutation({
+  const avaliarPrestadoresBodySchema = z.object({
+    content:z.string()
+  })
+  function handleSetCommentSearchParams ({userId}:{userId:string}){
+      setSearchParams(state=>{
+         state.append("userId" ,userId)
+         return state
+      })
+  }
+
+  type AvaliarPrestadoresSchemaTypes = z.infer< typeof avaliarPrestadoresBodySchema>
+
+  const {handleSubmit, register,reset} = useForm<AvaliarPrestadoresSchemaTypes>()
+
+  async function handlecomentar(data:AvaliarPrestadoresSchemaTypes)
+  {
+     const { content} = data
+     await comentar({
+      content,
+      userId:Number(userId)
+     })
+    reset()
+  }
+
+ 
+
+    const {mutateAsync:favoritar} = useMutation({
+    mutationFn : Favoritar,
+  })
+const { mutate: EliminarPedido } = useMutation({
     mutationFn: Deletar,
-    onSuccess: (_, variables) => {
+    onSuccess: (_data, variables) => {
+      // Remove o pedido localmente sem refazer o fetch
       queryClient.setQueryData(["orders", searchTerm], (oldData: any) => {
         if (!oldData) return oldData;
         return oldData.filter((pedido: any) => pedido.id !== variables.pedidoId);
       });
     },
   });
-
-  const { data: orders, isLoading, refetch, isRefetching } = useQuery({
-    queryKey: ["orders", searchTerm],
+  const { data: orders, isLoading, refetch,isRefetching } = useQuery({
+  queryKey: ["orders", searchTerm],
+  refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
+  refetchOnReconnect: true,       // Rebusca se a internet voltar
+  refetchOnMount: true,           // Rebusca sempre que o componente monta
+  staleTime: 0,    
     queryFn: () => CostumerOrders({ query: searchTerm }),
   });
 
-  // Estilização de Urgência
+
+   useEffect(() => {
+      socket.on("order", (data) => {
+        console.log("🔔 Nova notificação recebida:", data);
+        refetch();
+      });
+      return () => {
+        socket.off("order");
+      };
+    }, [refetch]);
+
+  
+
+
+
+  const [parent] = useAutoAnimate<HTMLDivElement>();
+
+  
+
+  // Atualiza a URL com debounce
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        if (searchTerm) {
+          newParams.set("query", searchTerm);
+        } else {
+          newParams.delete("query");
+        }
+        return newParams;
+      });
+      refetch(); // atualiza a lista sempre que searchTerm muda
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [searchTerm, setSearchParams, refetch]);
+
+  // Socket para atualização em tempo real
+  // useEffect(() => {
+  //   socket.on("user", () => {
+  //     refetch();
+  //   });
+  //   return () => socket.off("user");
+  // }, [refetch]);
+
+
   const getUrgencyStyles = (brevidade: string) => {
     switch (brevidade) {
       case 'URGENTE': return "bg-red-500/10 text-red-500 border-red-500/20";
@@ -56,8 +140,9 @@ export function SearchPedidos() {
     }
   };
 
+
   return (
-    <motion.div 
+        <motion.div 
       className="flex h-screen justify-center items-start p-4 lg:pt-20 md:p-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -154,7 +239,7 @@ export function SearchPedidos() {
                               <Button variant="ghost" className="w-full justify-between h-10 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-orange-500 hover:text-white transition-all group/btn">
                                 <div className="flex items-center gap-2">
                                   <Briefcase size={14} className="group-hover/btn:text-white text-orange-500 transition-colors" />
-                                  <span className="text-xs font-bold">Interessados</span>
+                                  <span className="text-xs font-bold"> Interessados</span>
                                 </div>
                                 <ChevronDown size={14} className="opacity-50" />
                               </Button>
@@ -177,23 +262,32 @@ export function SearchPedidos() {
                                         <PedidoCard refetch={refetch} isRefetching={isRefetching} prestadorId={i.prestadorId} id={pedido.id} status={i.status} />
                                       </div>
                                       
-                                      <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                      <div onClick={()=>handleSetCommentSearchParams({userId:String(i.prestadorId)})} className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
                                         <div className="flex items-center gap-3">
-                                          <button onClick={() => favoritar({ prestadorId: i.prestadorId })} className="text-slate-400 hover:text-orange-500 transition-colors">
+                                          <Button variant='outline' onClick={() => favoritar({ prestadorId: i.prestadorId })} className="text-slate-400 hover:text-orange-500 transition-colors">
                                             <Pin size={14} />
-                                          </button>
+                                          </Button>
+                                         
+                                        <Button variant='outline'>
+                                            <StarButton prestadorId={i.prestadorId}></StarButton>
+                                          </Button>                                        
                                           <Dialog>
                                             <DialogTrigger asChild>
-                                              <button className="text-slate-400 hover:text-blue-500 transition-colors">
+                                              <Button variant='outline' className="text-slate-400 hover:text-blue-500 transition-colors">
                                                 <MessageCircle size={14} />
-                                              </button>
+                                              </Button>
                                             </DialogTrigger>
                                             <DialogContent className="rounded-[2.5rem]">
                                               <DialogHeader>
                                                 <DialogTitle>Avaliar {i.prestador.nome}</DialogTitle>
                                                 <DialogDescription>Deixe um feedback sobre o atendimento.</DialogDescription>
                                               </DialogHeader>
-                                              {/* Form logic aqui... */}
+                                              <form onSubmit={handleSubmit(handlecomentar)} action="">
+                                                  <div className="flex items-center gap-3">
+                                                   <Textarea {...register('content')}></Textarea>
+                                                   <Button type="submit">Comentar</Button>
+                                                  </div>
+                                              </form>
                                             </DialogContent>
                                           </Dialog>
                                         </div>
@@ -239,4 +333,5 @@ function PedidoSkeleton() {
       <Skeleton className="h-10 w-full rounded-xl" />
     </div>
   ));
+
 }
