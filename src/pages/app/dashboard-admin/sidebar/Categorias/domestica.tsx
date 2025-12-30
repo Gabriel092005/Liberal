@@ -5,6 +5,8 @@ import { Dialog, DialogTrigger} from '@/components/ui/dialog'
 import { ChevronRight, Home, ShieldCheck, Flower2, Sparkles } from 'lucide-react'
 import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
+
+
 // --- Subcomponente de Botão de Serviço ---
 type ServicoButtonProps = {
   nome: string
