@@ -56,32 +56,36 @@ export function Indentitidade() {
   <div className="container max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
     
     {/* LOGO */}
-    <Link to="/" className="flex items-center gap-2 group shrink-0">
-      <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:rotate-6 transition-transform">
-        <Handshake className="text-white" size={20} fill="currentColor" />
-      </div>
-      <span className="font-bold text-xl tracking-tight hidden md:block bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500">
-        Liberal
-      </span>
-    </Link>
+   <Link to="/" className="flex items-center gap-1 group shrink-0">
+  {/* O ÍCONE (Sempre visível) */}
+  <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:rotate-6 transition-transform">
+    <Handshake className="text-white" size={20} />
+  </div>
+
+  {/* O TEXTO (Removido o 'hidden' e adicionada cor de fallback) */}
+  <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-300 text-zinc-900 dark:text-white">
+    Liberal
+  </span>
+</Link>
 
     {/* BARRA DE PESQUISA COM DROPDOWN */}
     <div className="flex-1 max-w-md mx-4">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="relative group cursor-pointer">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
-            <input
-              type="text"
-              placeholder="Pesquisar serviços..."
-              readOnly // Usamos readOnly para o input agir apenas como gatilho do dropdown
-              className="w-full h-10 pl-10 pr-4 rounded-full bg-zinc-100/50 dark:bg-zinc-800/50 border border-transparent focus:border-orange-500/50 transition-all text-sm outline-none cursor-pointer"
-            />
-            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex h-5 select-none items-center gap-1 rounded border bg-white dark:bg-zinc-900 px-1.5 font-mono text-[10px] font-medium opacity-100">
-              <span className="text-xs">⌘</span>K
-            </kbd>
-          </div>
-        </DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
+              <div className="relative group cursor-pointer w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
+                <input
+                  type="text"
+                  placeholder="Pesquisar..."
+                  readOnly
+                  className="w-full h-10 pl-10 pr-4 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-transparent focus:border-orange-500 transition-all text-sm outline-none cursor-pointer text-zinc-900 dark:text-zinc-100"
+                />
+                {/* KBD visível apenas do tablet para cima (md) */}
+                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden md:flex h-5 select-none items-center gap-1 rounded border bg-white dark:bg-zinc-900 px-1.5 font-mono text-[10px] font-medium opacity-100">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </div>
+            </DropdownMenuTrigger>
 
         {/* CONTEÚDO DO DROPDOWN (MENU DE BUSCA) */}
         <DropdownMenuContent className="w-[calc(100vw-2rem)] md:w-[450px] mt-2 rounded-2xl p-2 shadow-2xl border-zinc-200/50 dark:border-zinc-800/50 backdrop-blur-xl">
@@ -125,14 +129,22 @@ export function Indentitidade() {
     </div>
 
     {/* BOTÕES LADO DIREITO */}
-    <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-      <ModeToggle />
-      <Link to='/sign-in'>
-        <Button className="rounded-full font-semibold shadow-md hover:shadow-orange-500/10 transition-all" size="sm">
-          <LogIn className="mr-2 h-4 w-4" /> <span className="hidden sm:inline">Entrar</span>
-        </Button>
-      </Link>
-    </div>
+  {/* BOTÕES LADO DIREITO */}
+<div className="flex items-center gap-2 shrink-0">
+  <ModeToggle />
+  
+  <Link to='/sign-in'>
+    <Button 
+      className="rounded-full font-semibold shadow-md bg-orange-500 text-white hover:bg-orange-600 transition-all px-4" 
+      size="sm"
+    >
+      <LogIn className="h-4 w-4 sm:mr-2" /> 
+      {/* Removemos o 'hidden' para o texto aparecer no celular também, 
+          ou usamos 'block' se quiser garantir */}
+   
+    </Button>
+  </Link>
+</div>
   </div>
 </header>
             
