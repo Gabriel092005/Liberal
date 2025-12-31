@@ -7,8 +7,12 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Navigation } from "../app/Prestadores-dash/Navigation";
 
+
+
 export  function AppLayoutPestadores(){
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+
+  
 
         const { data: profile } = useQuery({
         queryKey: ["profile"],
