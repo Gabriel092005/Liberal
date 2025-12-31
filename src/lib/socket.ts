@@ -1,8 +1,8 @@
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
-const URL = 'https://liberalconnect.org/api/'; // URL do seu backend
-
-export const socket = io(URL, {
-  transports: ['websocket'],
-  withCredentials: true,
+export const socket = io("https://liberalconnect.org", {
+  path: "/api/socket.io/", // <--- OBRIGATÓRIO ser igual ao backend
+  transports: ["websocket"], 
+  reconnectionAttempts: 5,
+  withCredentials:true
 });

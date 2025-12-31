@@ -27,7 +27,9 @@ export interface SearchNewOrdersRequest {
 }
 
 export async function SearchNearOrders({latitude,longitude,radiusKm}:SearchNewOrdersRequest) {
-     const response = await api.get<SearchNewOrdersResponse[]>("/orders/",{
+    
+   console.log(latitude,longitude)
+  const response = await api.get<SearchNewOrdersResponse[]>("/orders/",{
         params:{
             latitude,
             longitude,

@@ -1,11 +1,11 @@
-import { Outlet, useNavigate } from "react-router-dom";
-import { BottomNavPrestadores } from "../app/Prestadores-dash/BottomNavPrestadores";
-import { useQuery } from "@tanstack/react-query";
 import { GetUserProfile } from "@/api/get-profile";
-import { useEffect } from "react";
 import { api } from "@/lib/axios";
+import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
+import { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Navigation } from "../app/Prestadores-dash/Navigation";
 
 export  function AppLayoutPestadores(){
   const navigate = useNavigate();
@@ -62,11 +62,24 @@ export  function AppLayoutPestadores(){
   
   return(
     <div className="flex min-h-screen fixed     antialiased ">
-         <div className="flex ml-[40px]    flex-1 flex-col ">
-        <BottomNavPrestadores/>
+         <div className="flex ml-[40px]  pt-10  flex-1 flex-col ">
+        {/* <BottomNavPrestadores/>S */}
+        <Navigation></Navigation>
         <Outlet/>
       </div>
     </div>
+
   )
 
 }
+
+
+
+
+
+
+
+
+
+
+

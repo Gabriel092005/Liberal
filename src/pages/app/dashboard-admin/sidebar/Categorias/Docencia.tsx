@@ -1,8 +1,8 @@
 import servico5 from '@/assets/IMG-20250928-WA0059.jpg'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
-import { ChevronRight, GraduationCap, BookOpen } from 'lucide-react'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { BookOpen, ChevronRight, GraduationCap } from 'lucide-react'
+import { useState } from 'react'
 import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
 
 type ServicoButtonProps = {
@@ -28,9 +28,8 @@ function ServicoButton({ nome, selecionado, onSelect }: ServicoButtonProps) {
       </DialogTrigger>
       
       {/* Importante: Adicionado DialogContent para o modal abrir corretamente */}
-      <DialogContent className="rounded-[2rem] p-0 overflow-hidden border-none max-w-md w-[95vw]">
         <FastFazerPedido selecionado={selecionado} />
-      </DialogContent>
+     
     </Dialog>
   )
 }

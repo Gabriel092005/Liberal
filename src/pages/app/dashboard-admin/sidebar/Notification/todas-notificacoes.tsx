@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { Bell,  Clock, AlertCircle, RefreshCw, List } from "lucide-react"
+import { Bell,  RefreshCw, Inbox, Check } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -11,31 +11,18 @@ import { GetUserProfile } from "@/api/get-profile"
 import { api } from "@/lib/axios"
 
 export function NotificacoesMobile() {
-  const { data: user, isLoading, isError, refetch } = useQuery({
+  const { data: user, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["user-profile"],
     queryFn: GetUserProfile
   })
 
+  // Skeleton otimizado para preencher a tela mobile
   if (isLoading) {
     return (
-      <div className="p-4 flex flex-col gap-3">
-        {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-20 w-full rounded-xl" />
+      <div className="p-4 space-y-4 w-full max-w-md mx-auto">
+        {[...Array(6)].map((_, i) => (
+          <Skeleton key={i} className="h-24 w-full rounded-[1.5rem]" />
         ))}
-      </div>
-    )
-  }
-
-  if (isError ) {
-    return (
-      <div className="flex flex-col items-center justify-center p-6 text-center">
-        <AlertCircle className="text-red-500 w-8 h-8 mb-2" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Não foi possível carregar as notificações.
-        </p>
-        <Button onClick={() => refetch()} className="mt-3">
-          Tentar novamente
-        </Button>
       </div>
     )
   }
@@ -44,82 +31,117 @@ export function NotificacoesMobile() {
 
   return (
     <motion.div
-      className="w-full  max-w-md mx-auto bg-white dark:bg-neutral-900 relative right-[1rem] shadow-md rounded-2xl p-3 flex flex-col h-[90vh]"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      // h-[100dvh] usa a unidade dinâmica para evitar bugs de scroll no Safari/Chrome mobile
+      // pb-[safe-area-inset-bottom] protege contra a barra de gestos do iOS
+      className="w-full max-w-md mx-auto bg-white dark:bg-zinc-950 flex flex-col h-[100dvh] sm:h-[85vh] sm:rounded-[2.5rem] sm:shadow-2xl overflow-hidden border-x border-zinc-100 dark:border-zinc-900"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
     >
-      {/* Header */}
-      <header className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Bell className="text-orange-500 w-6 h-6" />
-          <h2 className="font-bold text-lg text-gray-800 dark:text-gray-100">
-            Notificações
+      {/* Header com padding-top para Safe Area (Notch) */}
+      <header className="pt-[calc(env(safe-area-inset-top)+1rem)] px-6 pb-4 flex items-center justify-between sticky top-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-lg z-10">
+        <div className="space-y-0.5">
+          <h2 className="font-black text-2xl tracking-tight text-zinc-900 dark:text-zinc-50">
+            Inbox
           </h2>
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+            <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-zinc-500">
+              {notificacoes.filter((n: any) => !n.AlreadySeen).length} Pendentes
+            </p>
+          </div>
         </div>
-        {notificacoes.length > 0 && (
-            <RefreshCw   onClick={() => refetch()} className="text-muted-foreground"></RefreshCw>
-        )}
+        
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          onClick={() => refetch()}
+          className={`rounded-full h-10 w-10 shrink-0 ${isFetching ? 'animate-spin' : 'active:scale-90 transition-transform'}`}
+        >
+          <RefreshCw className="w-5 h-5 text-zinc-500" />
+        </Button>
       </header>
 
-      {/* Lista de notificações */}
-      <ScrollArea className="flex-1 pr-2">
-        <AnimatePresence mode="popLayout">
+      {/* Área de Notificações */}
+      <ScrollArea className="flex-1 px-4">
+        <AnimatePresence mode="popLayout" initial={false}>
           {notificacoes.length === 0 ? (
             <motion.div
               key="empty"
-              className="flex flex-col items-center justify-center mt-10 text-center text-gray-500 dark:text-gray-400"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center h-[60vh] text-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
             >
-              <List className="w-20 h-20 text-muted-foreground mb-2" />
-              <p>Você não possui novas notificações 🎉</p>
+              <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-900 rounded-3xl flex items-center justify-center mb-4 rotate-12">
+                <Inbox className="w-10 h-10 text-zinc-400" />
+              </div>
+              <h3 className="text-zinc-900 dark:text-zinc-100 font-bold">Inbox Vazio</h3>
+              <p className="text-sm text-zinc-500 max-w-[200px] mt-1">
+                Você está em dia com todas as suas atividades.
+              </p>
             </motion.div>
           ) : (
-            notificacoes.map((n:any) => (
-              <motion.div
-                key={n.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                layout
-              >
-                <Card
-                  className={`flex gap-3  items-start p-3 mb-3 rounded-xl border ${
-                    n.AlreadySeen
-                      ? "border-neutral-200 dark:border-neutral-700 bg-transparent"
-                      : "border-orange-500/40 bg-orange-50 dark:bg-orange-950/30"
-                  }`}
+            <div className="space-y-3 pb-[env(safe-area-inset-bottom)] mt-2">
+              {notificacoes.map((n: any, i: number) => (
+                <motion.div
+                  key={n.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2, delay: i * 0.03 }}
                 >
-                  {n.image ? (
-                    <img
-                      src={`${api.defaults.baseURL}/uploads/${n.image}`}
-                      alt="Imagem da notificação"
-                      className="w-10 h-10 rounded-full object-cover border"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
-                      <Bell className="w-5 h-5 text-orange-500" />
-                    </div>
-                  )}
+                  <Card
+                    className={`group relative border-none transition-all duration-200 active:scale-[0.98] rounded-[1.8rem] ${
+                      n.AlreadySeen
+                        ? "bg-zinc-50 dark:bg-zinc-900/40"
+                        : "bg-white dark:bg-zinc-900 shadow-xl shadow-zinc-200/50 dark:shadow-none ring-1 ring-zinc-100 dark:ring-zinc-800"
+                    }`}
+                  >
+                    <div className="p-4 flex gap-4 items-center">
+                      {/* Avatar com Shape de App (iOS style) */}
+                      <div className="relative shrink-0">
+                        {n.image ? (
+                          <img
+                            src={`${api.defaults.baseURL}/uploads/${n.image}`}
+                            alt=""
+                            className="w-12 h-12 rounded-[1.1rem] object-cover"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-[1.1rem] bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center">
+                            <Bell className="w-6 h-6 text-orange-500" />
+                          </div>
+                        )}
+                        {!n.AlreadySeen && (
+                          <div className="absolute -top-1 -right-1 h-4 w-4 bg-orange-500 border-2 border-white dark:border-zinc-900 rounded-full" />
+                        )}
+                      </div>
 
-                  <div className="flex flex-col flex-1">
-                    <p className="text-sm text-gray-800 dark:text-gray-100 leading-snug">
-                      {n.content}
-                    </p>
-                    <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1 gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>
-                        {formatDistanceToNow(new Date(n.created_at), {
-                          addSuffix: true,
-                          locale: pt
-                        })}
-                      </span>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <p className={`text-[13px] leading-tight line-clamp-2 ${
+                          n.AlreadySeen ? "text-zinc-500" : "text-zinc-900 dark:text-zinc-100 font-semibold"
+                        }`}>
+                          {n.content}
+                        </p>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-medium text-zinc-400">
+                            {formatDistanceToNow(new Date(n.created_at), {
+                              addSuffix: false,
+                              locale: pt
+                            })}
+                          </span>
+                          {n.AlreadySeen && (
+                            <div className="flex items-center gap-0.5 text-zinc-300">
+                               <Check className="w-3 h-3" />
+                               <span className="text-[9px] font-bold uppercase tracking-tighter">Lida</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           )}
         </AnimatePresence>
       </ScrollArea>

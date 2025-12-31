@@ -11,12 +11,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { provinceMunicipalityMap } from "@/data/province"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Settings, User, MapPin, Loader2 } from "lucide-react"
+import { Loader2, MapPin, Settings, User } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
 
 const updateProfileSchema = z.object({
   nome: z.string().min(3, "Nome muito curto").nullable(),
