@@ -41,12 +41,12 @@ export function SearchPedidos() {
   const avaliarPrestadoresBodySchema = z.object({
     content:z.string()
   })
-  function handleSetCommentSearchParams ({userId}:{userId:string}){
-      setSearchParams(state=>{
-         state.append("userId" ,userId)
-         return state
-      })
-  }
+  // function handleSetCommentSearchParams ({userId}:{userId:string}){
+  //     setSearchParams(state=>{
+  //        state.append("userId" ,userId)
+  //        return state
+  //     })
+  // }
 
   type AvaliarPrestadoresSchemaTypes = z.infer< typeof avaliarPrestadoresBodySchema>
 
