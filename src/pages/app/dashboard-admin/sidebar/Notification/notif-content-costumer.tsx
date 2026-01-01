@@ -1,12 +1,11 @@
 // notif-costumer.tsx
-import { Bell, FileText, Clock } from "lucide-react";
 import { Notificacao } from "@/api/get-profile";
-import { formatNotificationDate } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { api } from "@/lib/axios";
-import { Link } from "react-router-dom";
+import { formatNotificationDate } from "@/lib/utils";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { motion } from "framer-motion";
+import { Bell, Clock, FileText } from "lucide-react";
 
 export function NotificationMenuCostumer({ notif }: { notif: Notificacao[] }) {
   const [parent] = useAutoAnimate();
