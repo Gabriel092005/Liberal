@@ -264,6 +264,7 @@ export function Home() {
                 >
                   Ver Profissões
                 </DialogTrigger>
+                <DialogContent className="rounded-[2rem] w-[95vw] sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle>{c.titulo}</DialogTitle>
                   </DialogHeader>
@@ -283,6 +284,7 @@ export function Home() {
                       ))}
                     </div>
                   </ScrollArea>
+                </DialogContent>
               </Dialog>
             </div>
           </div>

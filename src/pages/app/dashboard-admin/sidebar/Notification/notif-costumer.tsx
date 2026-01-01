@@ -46,6 +46,7 @@ export function NotificationMenuCostumer({ notif }: NotifTypes) {
                 ) : (
                   <AvatarFallback className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
                     <Bell className="h-5 w-5 text-orange-500" />
+
                   </AvatarFallback>
                 )}
               </Avatar>

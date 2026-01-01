@@ -132,7 +132,8 @@ export function HomeContent() {
             </Sheet>
             
             <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-full p-1 border border-zinc-200 dark:border-zinc-700">
-          {profile && <NotificationDropdown {...profile}/>}            </div>
+          {profile && <NotificationDropdown {...profile}/>}   
+                   </div>
           </div>
         </div>
       </header>

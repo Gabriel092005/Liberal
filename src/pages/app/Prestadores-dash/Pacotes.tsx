@@ -81,7 +81,7 @@ export function Package() {
 
       {/* GRID DE CARDS (Substitui a Tabela) */}
       {/* 3. SCROLL AREA: Onde o "deslize" acontece */}
-        <ScrollArea className="flex-1 h-full max-h-80 w-full">
+        <ScrollArea className="flex-1 h-full max-h-96 w-full">
           <main className="p-6 flex flex-col gap-4 pb-32">
             {planos?.map((plano: any, i: number) => (
               <motion.div

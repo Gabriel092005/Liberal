@@ -12,15 +12,17 @@ export const api = axios.create({
   // if)
 api.interceptors.request.use(config => {
   const token = document.cookie
-    .split('; ')
+    .split(';')
     .find(row => row.startsWith('token='))
     ?.split('=')[1];
 
-  if (token) {
+    if (token) {
+      localStorage.setItem('@Liberal:token', token);
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
 
 // Função utilitária para delay
 // function delay(ms: number) {
