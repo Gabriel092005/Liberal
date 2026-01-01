@@ -21,6 +21,7 @@ export async function signIn({password,phone}:SignInRequest) {
      const  token  = response.data.token
      document.cookie=`token=${token}; Secure; SameSite=Lax; Path=/`;  
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
     const fcmToken = await registerPushNotifications();
 
     if (fcmToken) {
@@ -29,7 +30,7 @@ export async function signIn({password,phone}:SignInRequest) {
       console.log("Token vinculado ao usuário com sucesso!");
     }
 
-    if (token) {
+    if (fcmToken) {
       localStorage.setItem('@Liberal:token', token);
       await registerPushNotifications();
   }
