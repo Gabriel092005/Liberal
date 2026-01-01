@@ -87,7 +87,7 @@ useEffect(() => {
 
      if(profile?.role =='ADMIN'){
      navigate("/início")
-  }
+  }    
 
 
 

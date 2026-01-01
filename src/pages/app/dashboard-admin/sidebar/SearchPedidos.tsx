@@ -1,31 +1,31 @@
-import { Briefcase, ChevronDown, File, MapPin, MessageCircle, Phone, Pin, Search, Trash2, AlertCircle, Clock } from "lucide-react";
-import { motion} from "framer-motion";
-import { Input } from "@/components/ui/input";
+import { Commentar } from "@/api/commentar-prestadores";
+import { CostumerOrders, Interessado } from "@/api/costumer-orders";
+import { Deletar } from "@/api/deletar-order";
+import { Favoritar } from "@/api/favoritar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { CostumerOrders, Interessado } from "@/api/costumer-orders";
-import { formatNotificationDate } from "@/lib/utils";
-import { api } from "@/lib/axios";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { StarButton } from "./stars-button";
-import { PedidoCard } from "./pedidos-confirmar";
-import { socket } from "@/lib/socket";
-import { Favoritar } from "@/api/favoritar";
-import { Deletar } from "@/api/deletar-order";
-import { queryClient } from "@/lib/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { Commentar } from "@/api/commentar-prestadores";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { api } from "@/lib/axios";
+import { queryClient } from "@/lib/react-query";
+import { socket } from "@/lib/socket";
+import { formatNotificationDate } from "@/lib/utils";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { AlertCircle, Briefcase, ChevronDown, Clock, File, MapPin, MessageCircle, Phone, Pin, Search, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
+import z from "zod";
+import { PedidoCard } from "./pedidos-confirmar";
+import { StarButton } from "./stars-button";
 
 export function SearchPedidos() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -249,53 +249,102 @@ const { mutate: EliminarPedido } = useMutation({
                               <ScrollArea className="max-h-[350px]">
                                 {pedido.interessados?.length > 0 ? (
                                   pedido.interessados.map((i: Interessado) => (
-                                    <div key={i.prestadorId} className="p-3 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-2xl transition-all group/item">
-                                      <div className="flex items-center gap-3">
-                                        <Avatar className="h-10 w-10 rounded-xl ring-2 ring-orange-500/10">
-                                          <AvatarImage src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`} className="object-cover" />
-                                          <AvatarFallback className="text-[10px] font-bold">{i.prestador.nome.substring(0,2)}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1 min-w-0">
-                                          <p className="text-sm font-bold truncate">{i.prestador.nome}</p>
-                                          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-wider">{i.prestador.profissao}</p>
-                                        </div>
-                                        <PedidoCard refetch={refetch} isRefetching={isRefetching} prestadorId={i.prestadorId} id={pedido.id} status={i.status} />
-                                      </div>
-                                      
-                                      <div onClick={()=>handleSetCommentSearchParams({userId:String(i.prestadorId)})} className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                                        <div className="flex items-center gap-3">
-                                          <Button variant='outline' onClick={() => favoritar({ prestadorId: i.prestadorId })} className="text-slate-400 hover:text-orange-500 transition-colors">
-                                            <Pin size={14} />
-                                          </Button>
-                                         
-                                        <Button variant='outline'>
-                                            <StarButton prestadorId={i.prestadorId}></StarButton>
-                                          </Button>                                        
-                                          <Dialog>
-                                            <DialogTrigger asChild>
-                                              <Button variant='outline' className="text-slate-400 hover:text-blue-500 transition-colors">
-                                                <MessageCircle size={14} />
-                                              </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="rounded-[2.5rem]">
-                                              <DialogHeader>
-                                                <DialogTitle>Avaliar {i.prestador.nome}</DialogTitle>
-                                                <DialogDescription>Deixe um feedback sobre o atendimento.</DialogDescription>
-                                              </DialogHeader>
-                                              <form onSubmit={handleSubmit(handlecomentar)} action="">
-                                                  <div className="flex items-center gap-3">
-                                                   <Textarea {...register('content')}></Textarea>
-                                                   <Button type="submit">Comentar</Button>
-                                                  </div>
-                                              </form>
-                                            </DialogContent>
-                                          </Dialog>
-                                        </div>
-                                        <a href={`tel:+244${i.prestador.celular}`} className="flex items-center gap-1 text-[10px] font-bold text-blue-500">
-                                          <Phone size={12} /> +244 {i.prestador.celular}
-                                        </a>
-                                      </div>
-                                    </div>
+               <div key={i.prestadorId} className="group/item relative p-4 rounded-[2rem] bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-900 hover:shadow-2xl hover:shadow-orange-500/5 transition-all duration-500">
+  <div className="flex items-center gap-4">
+    {/* Avatar Section com Shape Moderno */}
+    <div className="relative">
+      <Avatar className="h-12 w-12 rounded-2xl ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 ring-transparent group-hover/item:ring-orange-500/20 transition-all duration-500">
+        <AvatarImage 
+          src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`} 
+          className="object-cover" 
+        />
+        <AvatarFallback className="bg-orange-100 text-orange-600 text-xs font-bold">
+          {i.prestador.nome.substring(0, 2).toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
+      {/* Indicador de Status Online (Opcional) */}
+      <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 bg-green-500 border-2 border-white dark:border-zinc-950 rounded-full" />
+    </div>
+
+    {/* Nome e Info */}
+    <div className="flex-1 min-w-0">
+      <p className="text-base font-black tracking-tight text-zinc-800 dark:text-zinc-100 truncate">
+        {i.prestador.nome}
+      </p>
+      <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[9px] font-black uppercase tracking-widest mt-0.5">
+        {i.prestador.profissao}
+      </div>
+    </div>
+
+    {/* Componente de Status/Ação principal */}
+    <PedidoCard 
+      refetch={refetch} 
+      isRefetching={isRefetching} 
+      prestadorId={i.prestadorId} 
+      id={pedido.id} 
+      status={i.status} 
+    />
+  </div>
+
+  {/* Footer de Ações - Aparece suavemente no Hover */}
+  <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/50 flex items-center justify-between opacity-0 group-hover/item:opacity-100 transform translate-y-2 group-hover/item:translate-y-0 transition-all duration-300">
+    <div className="flex items-center gap-2">
+      {/* Botões Estilizados como Glass */}
+      <Button 
+        variant="ghost" 
+        onClick={() => favoritar({ prestadorId: i.prestadorId })}
+        className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-orange-500/10 hover:text-orange-600 transition-colors"
+      >
+        <Pin size={15} />
+      </Button>
+
+      <Button 
+        variant="ghost"
+        className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-yellow-500/10 hover:text-yellow-600 transition-colors"
+      >
+        <StarButton prestadorId={i.prestadorId} />
+      </Button>
+
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button 
+            variant="ghost"
+            className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-blue-500/10 hover:text-blue-600 transition-colors"
+          >
+            <MessageCircle size={15} />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px] rounded-[2.5rem] p-6 backdrop-blur-2xl bg-white/90 dark:bg-zinc-950/90 border-zinc-200/50">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black tracking-tighter uppercase">Avaliar Atendimento</DialogTitle>
+            <DialogDescription className="text-zinc-500 font-medium">
+              Sua opinião ajuda a comunidade a escolher os melhores profissionais.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(handlecomentar)} className="space-y-4 mt-4">
+            <Textarea 
+              {...register('content')} 
+              placeholder="Como foi sua experiência?"
+              className="min-h-[120px] rounded-3xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus:ring-orange-500/20"
+            />
+            <Button type="submit" className="w-full h-12 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase tracking-widest transition-all active:scale-95">
+              Enviar Avaliação
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+
+    {/* Link de Telefone Minimalista */}
+    <a 
+      href={`tel:+244${i.prestador.celular}`} 
+      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-zinc-950/10"
+    >
+      <Phone size={12} className="fill-current" />
+      <span className="text-[10px] font-black uppercase tracking-tighter">+244 {i.prestador.celular}</span>
+    </a>
+  </div>
+</div>
                                   ))
                                 ) : (
                                   <div className="py-8 text-center text-muted-foreground">
