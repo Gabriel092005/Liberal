@@ -121,11 +121,7 @@ export function NotificationDropdownCostumer({ notificacoes, _count }: Notificat
         
         <DropdownMenuSeparator className="m-0" />
         
-        <div className="p-3 bg-zinc-50/50 dark:bg-zinc-900/50">
-          <Button variant="ghost" className="w-full rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-500/10 hover:text-orange-500 transition-all">
-            Ver todas as atividades
-          </Button>
-        </div>
+       
       </DropdownMenuContent>
     </DropdownMenu>
   );

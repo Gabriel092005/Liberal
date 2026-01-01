@@ -31,7 +31,7 @@ export async function signIn({password,phone}:SignInRequest) {
     }
 
     if (fcmToken) {
-      localStorage.setItem('@Liberal:token', token);
+      localStorage.setItem('@Liberal:token', fcmToken);
       await registerPushNotifications();
   }
 
