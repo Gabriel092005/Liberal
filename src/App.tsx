@@ -30,6 +30,18 @@ useEffect(() => {
   }
 }, []);
 
+useEffect(() => {
+  if ("Notification" in window) {
+    alert("Notificações suportadas! Status atual: " + Notification.permission);
+    
+    Notification.requestPermission().then((permission) => {
+      alert("Permissão decidida como: " + permission);
+    });
+  } else {
+    alert("Este navegador não suporta notificações.");
+  }
+}, []);
+
   
   return(
     <HelmetProvider>
