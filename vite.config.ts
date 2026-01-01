@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 
+
 export default defineConfig({
   plugins: [
     react(),
@@ -66,4 +67,21 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"), // 👈 Adiciona esta linha
     },
   },
+
+
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://liberalconnect.org',
+        changeOrigin: true,
+        // rewrite: (path) => path.replace(/^\/api/, ''), // Use se o backend não tiver /api no início
+      },
+      // Proxy para o Socket.io não falhar
+      '/socket.io': {
+        target: 'wss://liberalconnect.org',
+        ws: true,
+      },
+    },
+  },
+
 });
