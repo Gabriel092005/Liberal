@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { GetProfission } from "@/api/get-profissions";
+import { signUp } from "@/api/sign-up";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -11,26 +11,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Link, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 import { provinceMunicipalityMap } from "@/data/province";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { signUp } from "@/api/sign-up";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { GetProfission } from "@/api/get-profissions";
-import { 
-  User, 
-  Phone, 
-  Briefcase, 
-  Fingerprint, 
-  LockKeyhole,  
-  Camera, 
-  ArrowRight, 
+import { AnimatePresence, motion } from "framer-motion";
+import {
   ArrowLeft,
+  ArrowRight,
+  Briefcase,
+  Camera,
   CheckCircle2,
-  ShieldCheck
+  ShieldCheck,
+  User
 } from "lucide-react";
+import { useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { Controller, useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const formVariants = {
   enter: (direction: number) => ({
