@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios"
 interface NewOrderRequest{
-    title:string
+    title:string|undefined
     content:string
     brevidade:string
     location:string|null,

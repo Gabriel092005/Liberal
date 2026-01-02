@@ -1,26 +1,18 @@
-import { 
-  BookMarked,
-  Camera,
-
-  ChevronRight,
-  Loader2,
-  LogOut,
-  MessageCircle,
-  Search,
-  Sparkles,
-} from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
+import { GetCategory } from "@/api/get-categories";
+import { GetUserProfile } from "@/api/get-profile";
+import { GetProfission } from "@/api/get-profissions";
+import { Logout } from "@/api/log-out";
+import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
+import { UpdatePhoto } from "@/api/update-profile-photo";
 import servico1 from "@/assets/IMG-20250928-WA0054.jpg";
-import servico2 from "@/assets/IMG-20250928-WA0057.jpg";
 import servico3 from "@/assets/IMG-20250928-WA0056.jpg";
+import servico2 from "@/assets/IMG-20250928-WA0057.jpg";
 import servico4 from "@/assets/IMG-20250928-WA0058.jpg";
 import servico5 from "@/assets/IMG-20250928-WA0059.jpg";
 import servico6 from "@/assets/IMG-20250928-WA0069.jpg";
+import { ModeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -28,25 +20,30 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { GetUserProfile } from "@/api/get-profile";
-import { Skeleton } from "@/components/ui/skeleton";
-import { UpdatePhoto } from "@/api/update-profile-photo";
-import { socket } from "@/lib/socket";
-import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
-import { DestaquesAuto } from "./destacados";
-import { api } from "@/lib/axios";
-import { ModeToggle } from "@/components/theme/theme-toggle";
-import { Logout } from "@/api/log-out";
-import { GetCategory } from "@/api/get-categories";
-import { getInialts } from "@/lib/utils";
-import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
-import { GetProfissaoByCategory } from "@/api/fetchProfissionByCategory";
-import { GetProfission } from "@/api/get-profissions";
-import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChatIntegrado} from "./Mensagens";
+import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/lib/axios";
+import { socket } from "@/lib/socket";
+import { getInialts } from "@/lib/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowRight,
+  BookMarked,
+  Camera,
+  Loader2,
+  LogOut,
+  MessageCircle,
+  Search,
+  Sparkles
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { DestaquesAuto } from "./destacados";
+import { ChatIntegrado } from "./Mensagens";
+import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
 
 
 
@@ -92,11 +89,11 @@ export function Home() {
     staleTime: 0,
   });
 
-  const { data: profByCategoy } = useQuery({
-    queryKey: ['byCategory', categoryId],
-    queryFn: () => GetProfissaoByCategory({ categoryId: Number(categoryId) }),
-    enabled: !!categoryId
-  });
+  // const { data: profByCategoy } = useQuery({
+  //   queryKey: ['byCategory', categoryId],
+  //   queryFn: () => GetProfissaoByCategory({ categoryId: Number(categoryId) }),
+  //   enabled: !!categoryId
+  // });
 
   const { data: profissao } = useQuery({
     queryKey: ['profissao'],
@@ -234,13 +231,19 @@ export function Home() {
       Explorar Categorias
     </p>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
+    <div className="grid  grid-cols-1 sm:grid-cols-2  pb-4">
       {categories?.map((c) => (
+                            <Link 
+    to={`/categorias/${c.id}/profissoes`} 
+    className="inline-flex items-center gap-1.5 mt-1"
+  >
         <div 
+          
           key={c.id} 
           onClick={() => handleSearchProfission({ categoryId: String(c.id) })} 
           className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-muted/50 hover:bg-white dark:hover:bg-zinc-800 transition-all border border-transparent hover:border-orange-500/20 shadow-sm"
         >
+ 
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted shrink-0">
               {c.image_path ? (
@@ -256,39 +259,23 @@ export function Home() {
             </div>
             
             <div className="flex-1 min-w-0">
-              <h4 className="font-bold text-sm truncate">{c.titulo}</h4>
-              <Dialog>
-                <DialogTrigger 
-                  onClick={(e) => e.stopPropagation()} // Impede que o clique no botão ative o clique do card pai
-                  className="text-[10px] text-orange-500 font-bold uppercase hover:underline"
-                >
-                  Ver Profissões
-                </DialogTrigger>
-                <DialogContent className="rounded-[2rem] w-[95vw] sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>{c.titulo}</DialogTitle>
-                  </DialogHeader>
-                  <ScrollArea className="max-h-[60vh] pr-4">
-                    <div className="flex flex-col gap-2">
-                      {profByCategoy?.map(i => (
-                        <Dialog key={i.id}>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" className="justify-between h-12 rounded-xl bg-muted/30 hover:bg-orange-500/10 hover:text-orange-600 transition-colors">
-                              {i.titulo} <ChevronRight size={16}/>
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="rounded-[2rem]">
-                            <FastFazerPedido selecionado={i.titulo}/>
-                          </DialogContent>
-                        </Dialog>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </DialogContent>
-              </Dialog>
+    
+            <div className="flex-1 min-w-0">
+  <h4 className="font-black text-sm truncate">{c.titulo}</h4>
+  
+  {/* O Link substitui o DialogTrigger inteiramente */}
+ 
+   <div className="flex items-center">
+      <span className="text-[10px] text-orange-600 font-black uppercase tracking-widest">
+      Ver Profissões
+    </span>
+    <ArrowRight size={12} className="text-orange-600" />
+   </div>
+</div>
             </div>
           </div>
         </div>
+  </Link>
       ))}
     </div>
   </ScrollArea>
@@ -309,7 +296,7 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-4  py-3 space-y-8 pb-24">
           
           {/* BOTÕES DE NAVEGAÇÃO HORIZONTAL */}
-          <div className="flex gap-4 overflow-x-auto no-scrollbar -pb-1">
+          <div className="flex items-center gap-4 overflow-x-auto no-scrollbar -pb-1">
             <Link to="/vitrine">
               <motion.div whileHover={{ y: -2 }} className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-900 border rounded-full shadow-sm">
                 <div className="p-2 bg-orange-500 rounded-full text-white"><BookMarked size={16}/></div>
@@ -322,7 +309,6 @@ export function Home() {
                 <div className="flex flex-col"><span className="text-xs font-bold leading-none">Feedbacks</span><span className="text-[9px] text-muted-foreground">Comunidade</span></div>
               </motion.div>
             </Link>
-
 
           <ChatIntegrado></ChatIntegrado>
           </div>

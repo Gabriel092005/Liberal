@@ -267,6 +267,8 @@ export function HomeContent() {
                           </Badge>
                         </div>
 
+                        
+
                         <BotaoNegociar 
                           celular={pedido.autor.celular} 
                           image_path={pedido.autor.image_path} 

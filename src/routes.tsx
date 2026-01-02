@@ -1,42 +1,43 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { AppLayoutClients} from './pages/_layouts/app-clientes';
-import { Home} from './pages/app/dashboard-admin/sidebar/home';
 import { SignIn } from './auth/Sign-In';
-import { AuthLayout } from './pages/_layouts/auth';
 import { SignUp } from './auth/Sign-up-cliente';
 import { SignUpEmpresa } from './auth/Sign-up-cliente-empresa';
+import { AppLayoutClients } from './pages/_layouts/app-clientes';
+import { AuthLayout } from './pages/_layouts/auth';
+import { Home } from './pages/app/dashboard-admin/sidebar/home';
 // import { BuscarPrestadores } from './pages/Buscar/Buscar';
 import { Profile } from './pages/profile';
 // import { BoasVindas } from './pages/app/dashboard-admin/boas-vindas';
+import { AppLayoutAdmin } from './pages/_layouts/app-admin';
+import { AppLayoutPestadores } from './pages/_layouts/app-prestadores';
+import { IdentidadeLayoutAdmin } from './pages/_layouts/indentida-visual';
+import { BelezaModa } from './pages/app/dashboard-admin/sidebar/Categorias/BelezaModa';
+import { Docencia } from './pages/app/dashboard-admin/sidebar/Categorias/Docencia';
+import { Domestica } from './pages/app/dashboard-admin/sidebar/Categorias/domestica';
+import { Electricidade } from './pages/app/dashboard-admin/sidebar/Categorias/Electricidade';
+import { MaisProfissao } from './pages/app/dashboard-admin/sidebar/Categorias/MaisProfissao';
+import { TecnologiaDesign } from './pages/app/dashboard-admin/sidebar/Categorias/TecnologiaDesign';
+import { CommentsList } from './pages/app/dashboard-admin/sidebar/comentarios';
 import { Config } from './pages/app/dashboard-admin/sidebar/config';
 import { MadeiraOficios } from './pages/app/dashboard-admin/sidebar/FileInput/madeira';
-import { Electricidade } from './pages/app/dashboard-admin/sidebar/Categorias/Electricidade';
-import { Domestica } from './pages/app/dashboard-admin/sidebar/Categorias/domestica';
-import { BelezaModa } from './pages/app/dashboard-admin/sidebar/Categorias/BelezaModa';
-import { MaisProfissao } from './pages/app/dashboard-admin/sidebar/Categorias/MaisProfissao';
-import { BuscarPrestadores } from './pages/Buscar/Buscar';
+import { NotificacoesMobileCostumer } from './pages/app/dashboard-admin/sidebar/Notification/todas-n-costumer';
+import { NotificacoesMobile } from './pages/app/dashboard-admin/sidebar/Notification/todas-notificacoes';
 import { SearchPedidos } from './pages/app/dashboard-admin/sidebar/SearchPedidos';
-import { TecnologiaDesign } from './pages/app/dashboard-admin/sidebar/Categorias/TecnologiaDesign';
-import { Docencia } from './pages/app/dashboard-admin/sidebar/Categorias/Docencia';
-import { IdentidadeLayoutAdmin } from './pages/_layouts/indentida-visual';
+import { VerMapas } from './pages/app/dashboard-admin/sidebar/Ver-Mapas';
 import { Indentitidade } from './pages/app/home-inicial/Indentidade';
-import { AppLayoutPestadores } from './pages/_layouts/app-prestadores';
-import { PrestadoresDash } from './pages/app/Prestadores-dash/Prestadores-home';
 import { Package } from './pages/app/Prestadores-dash/Pacotes';
 import { PrestadoresPedidos } from './pages/app/Prestadores-dash/Pedidos-Prestadores';
+import { PrestadoresDash } from './pages/app/Prestadores-dash/Prestadores-home';
 import { ProfilePage } from './pages/app/Prestadores-dash/PrestadoresProfile';
-import { VerMapas } from './pages/app/dashboard-admin/sidebar/Ver-Mapas';
-import { AppLayoutAdmin } from './pages/_layouts/app-admin';
-import { Dashboard } from './pages/dash-admin/dasboard';
+import { Vitrine } from './pages/app/Prestadores-dash/Vitrine';
+import { BuscarPrestadores } from './pages/Buscar/Buscar';
 import { CostumerTableFilters } from './pages/dash-admin/Clients/clients';
 import { PedidosFilters } from './pages/dash-admin/Clients/Pedidos';
-import { NotificacoesMobile } from './pages/app/dashboard-admin/sidebar/Notification/todas-notificacoes';
-import { LoadingPage } from './pages/Loading';
-import { PrestadoresTableFilters } from './pages/dash-admin/prestadores/prestadores';
+import { Dashboard } from './pages/dash-admin/dasboard';
 import { Notificacoes } from './pages/dash-admin/notificacoes';
-import { Vitrine } from './pages/app/Prestadores-dash/Vitrine';
-import { CommentsList } from './pages/app/dashboard-admin/sidebar/comentarios';
-import { NotificacoesMobileCostumer } from './pages/app/dashboard-admin/sidebar/Notification/todas-n-costumer';
+import { PrestadoresTableFilters } from './pages/dash-admin/prestadores/prestadores';
+import { LoadingPage } from './pages/Loading';
+import { PaginaProfissoes } from './profissionals-page';
 export const router = createBrowserRouter([
   {
 
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <Home/> },
       { path: '/favoritos', element: <BuscarPrestadores/> },  
+      { path: '/categorias/:id/profissoes', element: <PaginaProfissoes /> }, // ROTA DINÂMICA
       { path: '/pedidos', element: <SearchPedidos/> },
       { path: '/madeira', element: <MadeiraOficios/> },
       { path: '/vitrine', element: <Vitrine/> },
@@ -110,3 +112,5 @@ export const router = createBrowserRouter([
   },
 
 ]);
+
+  
