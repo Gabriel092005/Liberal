@@ -2,7 +2,8 @@
 import { ModeToggle } from '@/components/theme/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
-import { Apple, Award, Check, Globe, Handshake, LogIn, MessageCircle, Play, Star, User, Zap } from 'lucide-react'
+import logo from '@/assets/logo-01.png'
+import { Apple, Award, Check, Globe, LogIn, MessageCircle, Play, Star, User, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
   // 1. IMPORTANTE: Importar o ScrollArea do seu diretório de componentes
   import {
@@ -56,14 +57,7 @@ import { WhatsAppButton } from './whatsapp-button'
       
       {/* LOGO */}
       <Link to="/" className="flex items-center gap-1 group shrink-0">
-        <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:rotate-6 transition-transform">
-          <Handshake className="text-white" size={20} />
-        </div>
-
-        {/* TEXTO - Removido o gradient que buga no Safari e garantido cor sólida */}
-        <span className="font-bold text-xl tracking-tight text-zinc-900 dark:text-white">
-          Liberal
-        </span>
+        <img src={logo} alt=""className="h-9 w-10" />
       </Link>
 
       {/* BARRA DE PESQUISA */}
@@ -295,7 +289,10 @@ import { WhatsAppButton } from './whatsapp-button'
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
                     <div className="flex flex-col items-center gap-3">
                       <Zap className="text-orange-500" />
-                      <p className="text-sm text-zinc-500">Liberal Angola</p>
+                      <p className="text-sm text-zinc-500">
+                        Quem somos; Dicas de segurança; redes sociais;
+                        Termos de uso e privacidade.
+                      </p>
                     </div>
                     <div className="flex flex-col gap-2">
                       <h4 className="font-bold">Baixe agora</h4>

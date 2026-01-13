@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogHeader } from "@/components/ui/dialog";
-import { Home as HomeIcon, User, Plus, Briefcase, Heart, Handshake,Search, ChevronRight, Sparkles } from "lucide-react";
+import { Home as HomeIcon, User, Plus, Briefcase, Heart,Search, ChevronRight, Sparkles } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GetCategory } from "@/api/get-categories";
 import { useEffect } from "react";
 import { getInialts } from "@/lib/utils";
+import logo1 from '@/assets/logo-01.png'
 import { GetProfissaoByCategory } from "@/api/fetchProfissionByCategory";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -52,15 +53,12 @@ export function BottomNav() {
   return (
     <>
       {/* --- DESKTOP: NAVBAR SUPERIOR (Sempre no Topo) --- */}
-      <nav className="hidden lg:flex fixed top-0 inset-x-0 z-[100] items-center justify-center py-4 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl border-b border-white/20">
+      <nav className="hidden lg:flex fixed top-0 inset-x-0 z-[100]  items-center justify-center py-4 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl border-b border-white/20">
         <div className="max-w-7xl w-full px-8 flex items-center justify-between">
           
           {/* Logo Minimalista */}
           <div className="flex items-center gap-2">
-             <div className="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
-                <Handshake size={22} strokeWidth={3} />
-             </div>
-             <span className="font-black text-xl tracking-tighter uppercase">liberal</span>
+        <img src={logo1} className="h-10" alt="" />
           </div>
 
           {/* Links de Navegação */}
@@ -245,24 +243,24 @@ export function BottomNav() {
             </div>
 
             {/* Botão Central Mobile */}
-            <div className="absolute left-1/2 -translate-x-1/2 -top-10">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <motion.button
-                    whileHover={{ y: -5 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="rounded-[2.2rem] h-20 w-20 flex items-center justify-center 
-                      bg-gradient-to-tr from-orange-500 via-pink-500 to-rose-500 text-white 
-                      shadow-[0_15px_35px_rgba(249,115,22,0.4)] border-[8px] border-zinc-50 dark:border-zinc-950"
-                  >
-                    <Plus size={35} strokeWidth={3} />
-                  </motion.button>
-                </DialogTrigger>
-                <DialogContent className="rounded-[2.5rem]">
-                   <FastFazerPedido />
-                </DialogContent>
-              </Dialog>
-            </div>
+          <div className="absolute left-1/2 -translate-x-1/2 -top-7"> {/* Ajustei o -top de 10 para 7 para compensar o tamanho menor */}
+  <Dialog>
+    <DialogTrigger asChild>
+      <motion.button
+        whileHover={{ y: -4 }}
+        whileTap={{ scale: 0.9 }}
+        className="rounded-[1.6rem] h-14 w-14 flex items-center justify-center 
+          bg-gradient-to-tr from-orange-500 via-pink-500 to-rose-500 text-white 
+          shadow-[0_10px_25px_rgba(249,115,22,0.3)] border-[5px] border-zinc-50 dark:border-zinc-950"
+      >
+        <Plus size={24} strokeWidth={3} />
+      </motion.button>
+    </DialogTrigger>
+    <DialogContent className="rounded-[2.5rem]">
+       <FastFazerPedido />
+    </DialogContent>
+  </Dialog>
+</div>
 
             <div className="flex gap-8">
               {navLinks.slice(2, 4).map((link) => {

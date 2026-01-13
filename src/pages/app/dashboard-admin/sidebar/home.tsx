@@ -2,6 +2,8 @@ import { GetCategory } from "@/api/get-categories";
 import { GetUserProfile } from "@/api/get-profile";
 import { GetProfission } from "@/api/get-profissions";
 import { Logout } from "@/api/log-out";
+import logo from '@/assets/logo-01.png'
+
 import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
 import { UpdatePhoto } from "@/api/update-profile-photo";
 import servico1 from "@/assets/IMG-20250928-WA0054.jpg";
@@ -10,9 +12,9 @@ import servico2 from "@/assets/IMG-20250928-WA0057.jpg";
 import servico4 from "@/assets/IMG-20250928-WA0058.jpg";
 import servico5 from "@/assets/IMG-20250928-WA0059.jpg";
 import servico6 from "@/assets/IMG-20250928-WA0069.jpg";
-import { ModeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+
 import {
   Dialog,
   DialogContent,
@@ -173,124 +175,112 @@ export function Home() {
     <div className="h-screen w-full overflow-hidden bg-background flex flex-col antialiased">
       {/* HEADER FIXO */}
       <header className="flex-none sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center gap-2 sm:gap-4">
-          
-          {/* PERFIL */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <Dialog>
-              <DialogTrigger asChild>
-                <motion.button whileTap={{ scale: 0.95 }} className="relative group focus:outline-none">
-                  <Avatar className="h-10 w-10 sm:h-12 sm:w-12 ring-2 ring-orange-500/10 group-hover:ring-orange-500 transition-all">
-                    <AvatarImage src={imageSrc} className="object-cover" />
-                    <AvatarFallback className="font-bold">{profile?.nome?.slice(0, 2).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
-                </motion.button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md rounded-[2.5rem]">
-                <DialogHeader><DialogTitle className="text-center">Minha Conta</DialogTitle></DialogHeader>
-                <div className="flex flex-col items-center gap-4 py-4">
-                  <div className="relative group">
-                    <img src={imageSrc} className="w-28 h-28 rounded-full object-cover ring-4 ring-orange-400" />
-                    <label htmlFor="file-up" className="absolute bottom-0 right-0 bg-orange-500 p-2 rounded-full cursor-pointer text-white shadow-lg">
-                      <Camera size={18} />
-                    </label>
-                    <input id="file-up" type="file" className="hidden" onChange={handleFileChange} />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="font-bold text-lg">{profile?.nome}</h3>
-                    <p className="text-sm text-muted-foreground">+244 {profile?.celular}</p>
-                  </div>
-                </div>
-                <div className="grid gap-2">
-                  <Button onClick={handleSave} className="bg-orange-500 hover:bg-orange-600 rounded-xl font-bold">Salvar</Button>
-                  <Button onClick={handleSignOut} variant="outline" className="text-red-500 rounded-xl"><LogOut className="mr-2" size={16}/> Sair</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-            <div className="hidden lg:flex flex-col truncate max-w-[100px]">
-              <span className="text-sm font-bold truncate leading-none">{profile?.nome?.split(' ')[0]}</span>
-              <span className="text-[10px] text-orange-500 font-bold uppercase mt-1">Ouro</span>
+  <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center gap-3 sm:gap-4">
+    
+     
+    <Link to="/" className="flex-shrink-0 flex items-center gap-2 group mr-2">
+        <img src={logo} alt=""className="h-9 w-10" />
+      
+      <div className="hidden md:flex flex-col">
+        <span className="font-black text-lg leading-none tracking-tighter">
+          LIBERAL<span className="text-orange-500">.</span>
+        </span>
+        <span className="text-[10px] font-bold text-muted-foreground leading-none">ANGOLA</span>
+      </div>
+    </Link>
+
+    {/* PERFIL */}
+    <div className="flex items-center gap-3 flex-shrink-0 border-l pl-3 sm:pl-4 border-zinc-200 dark:border-zinc-800">
+      <Dialog>
+        <DialogTrigger asChild>
+          <motion.button whileTap={{ scale: 0.95 }} className="relative group focus:outline-none">
+            <Avatar className="h-10 w-10 sm:h-12 sm:w-12 ring-2 ring-orange-500/10 group-hover:ring-orange-500 transition-all">
+              <AvatarImage src={imageSrc} className="object-cover" />
+              <AvatarFallback className="font-bold">{profile?.nome?.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
+          </motion.button>
+        </DialogTrigger>
+        {/* ... conteúdo do Dialog (mantido igual) ... */}
+        <DialogContent className="max-w-md rounded-[2.5rem]">
+          <DialogHeader><DialogTitle className="text-center">Minha Conta</DialogTitle></DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="relative group">
+              <img src={imageSrc} className="w-28 h-28 rounded-full object-cover ring-4 ring-orange-400" />
+              <label htmlFor="file-up" className="absolute bottom-0 right-0 bg-orange-500 p-2 rounded-full cursor-pointer text-white shadow-lg">
+                <Camera size={18} />
+              </label>
+              <input id="file-up" type="file" className="hidden" onChange={handleFileChange} />
+            </div>
+            <div className="text-center">
+              <h3 className="font-bold text-lg">{profile?.nome}</h3>
+              <p className="text-sm text-muted-foreground">+244 {profile?.celular}</p>
             </div>
           </div>
-
-          {/* PESQUISA */}
-          <div className="flex-1 flex justify-center">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="relative group w-full max-w-md">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-orange-500 transition-colors" />
-                  <Input readOnly placeholder="Buscar mais profissões..." className="h-10 sm:h-11 pl-10 w-full rounded-2xl bg-muted/50 border-transparent cursor-pointer" />
-                </div>
-              </DropdownMenuTrigger>
-             <DropdownMenuContent className="w-[90vw] sm:w-[450px] mt-2 rounded-[2rem] p-0 shadow-2xl overflow-hidden border-zinc-200 dark:border-zinc-800">
-  {/* Definimos uma altura máxima (ex: 70vh ou 500px) para o scroll ativar */}
-  <ScrollArea className="h-[70vh] sm:h-[550px] w-full p-4">
-    
-    <p className="text-xs font-bold text-muted-foreground uppercase px-1 mb-4 sticky top-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm z-10 py-1">
-      Explorar Categorias
-    </p>
-
-    <div className="grid  grid-cols-1 sm:grid-cols-2  pb-4">
-      {categories?.map((c) => (
-                            <Link 
-    to={`/categorias/${c.id}/profissoes`} 
-    className="inline-flex items-center gap-1.5 mt-1"
-  >
-        <div 
-          
-          key={c.id} 
-          onClick={() => handleSearchProfission({ categoryId: String(c.id) })} 
-          className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-muted/50 hover:bg-white dark:hover:bg-zinc-800 transition-all border border-transparent hover:border-orange-500/20 shadow-sm"
-        >
- 
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted shrink-0">
-              {c.image_path ? (
-                <img 
-                  src={`${api.defaults.baseURL}/uploads/${c.image_path}`} 
-                  className="w-full h-full object-cover" 
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center font-bold text-orange-500 uppercase">
-                  {getInialts(c.titulo)}
-                </div>
-              )}
-            </div>
-            
-            <div className="flex-1 min-w-0">
-    
-            <div className="flex-1 min-w-0">
-  <h4 className="font-black text-sm truncate">{c.titulo}</h4>
-  
-  {/* O Link substitui o DialogTrigger inteiramente */}
- 
-   <div className="flex items-center">
-      <span className="text-[10px] text-orange-600 font-black uppercase tracking-widest">
-      Ver Profissões
-    </span>
-    <ArrowRight size={12} className="text-orange-600" />
-   </div>
-</div>
-            </div>
+          <div className="grid gap-2">
+            <Button onClick={handleSave} className="bg-orange-500 hover:bg-orange-600 rounded-xl font-bold">Salvar</Button>
+            <Button onClick={handleSignOut} variant="outline" className="text-red-500 rounded-xl"><LogOut className="mr-2" size={16}/> Sair</Button>
           </div>
-        </div>
-  </Link>
-      ))}
+        </DialogContent>
+      </Dialog>
+      
+      <div className="hidden lg:flex flex-col truncate max-w-[100px]">
+        <span className="text-sm font-bold truncate leading-none">{profile?.nome?.split(' ')[0]}</span>
+        <span className="text-[10px] text-orange-500 font-bold uppercase mt-1">Ouro</span>
+      </div>
     </div>
-  </ScrollArea>
-</DropdownMenuContent>
-            </DropdownMenu>
-          </div>
 
-          {/* AÇÕES */}
-          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-            <ModeToggle />
-            {profile && <NotificationDropdownCostumer {...profile} />}
+    {/* PESQUISA */}
+    <div className="flex-1 flex justify-center px-2">
+      <DropdownMenu>
+        {/* ... conteúdo da pesquisa (mantido igual) ... */}
+        <DropdownMenuTrigger asChild>
+          <div className="relative group w-full max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-orange-500 transition-colors" />
+            <Input readOnly placeholder="Buscar mais profissões..." className="h-10 sm:h-11 pl-10 w-full rounded-2xl bg-muted/50 border-transparent cursor-pointer" />
           </div>
-        </div>
-      </header>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-[90vw] sm:w-[450px] mt-2 rounded-[2rem] p-0 shadow-2xl overflow-hidden border-zinc-200 dark:border-zinc-800">
+          <ScrollArea className="h-[70vh] sm:h-[550px] w-full p-4">
+            <p className="text-xs font-bold text-muted-foreground uppercase px-1 mb-4 sticky top-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm z-10 py-1">
+              Explorar Categorias
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 pb-4">
+              {categories?.map((c) => (
+                <Link to={`/categorias/${c.id}/profissoes`} key={c.id} className="inline-flex items-center gap-1.5 mt-1">
+                  <div onClick={() => handleSearchProfission({ categoryId: String(c.id) })} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-muted/50 hover:bg-white dark:hover:bg-zinc-800 transition-all border border-transparent hover:border-orange-500/20 shadow-sm w-full">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted shrink-0">
+                        {c.image_path ? (
+                          <img src={`${api.defaults.baseURL}/uploads/${c.image_path}`} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-bold text-orange-500 uppercase">{getInialts(c.titulo)}</div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-black text-sm truncate">{c.titulo}</h4>
+                        <div className="flex items-center">
+                          <span className="text-[10px] text-orange-600 font-black uppercase tracking-widest">Ver Profissões</span>
+                          <ArrowRight size={12} className="text-orange-600" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </ScrollArea>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
 
+    {/* AÇÕES */}
+    <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+      {/* <ModeToggle /> */}
+      {profile && <NotificationDropdownCostumer {...profile} />}
+    </div>
+  </div>
+</header>
       {/* CONTEÚDO COM SCROLL NATIVO (IMPEDE O BLOQUEIO DO SLIDE) */}
       <main className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
         <div className="max-w-7xl mx-auto px-4  py-3 space-y-8 pb-24">
@@ -397,11 +387,11 @@ export function Home() {
     </div>
   </div>
 
-  <div className="mt-8 text-center text-muted-foreground">
+  {/* <div className="mt-8 text-center text-muted-foreground">
     <p className="text-xs font-bold tracking-widest uppercase opacity-50">
       © 2025 SeuApp • Luanda, Angola
     </p>
-  </div>
+  </div> */}
 </footer>
       </main>
       

@@ -126,7 +126,6 @@ export function HomeContent() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[85%] p-0 border-none bg-white dark:bg-zinc-950">
-                <div className="p-6 pt-12 font-black text-2xl uppercase tracking-tighter text-orange-500">Vitrine</div>
                 <Vitrine></Vitrine>
               </SheetContent>
             </Sheet>

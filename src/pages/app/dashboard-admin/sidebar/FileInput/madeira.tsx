@@ -48,7 +48,7 @@ export function MadeiraOficios() {
   ]
 
   return (
-    <div className="w-full max-w-5xl mx-auto overflow-hidden rounded-[2.5rem] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col md:flex-row my-8">
+    <div className="w-full max-w-5xl mx-auto overflow-hidden rounded-[2.5rem] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col md:flex-row ">
       
       {/* Lado Esquerdo: Identidade Visual de Ofícios */}
       <div className="relative w-full md:w-1/2 h-64 md:h-auto min-h-[350px]">

@@ -33,7 +33,7 @@ export function NotificacoesMobile() {
     <motion.div
       // h-[100dvh] usa a unidade dinâmica para evitar bugs de scroll no Safari/Chrome mobile
       // pb-[safe-area-inset-bottom] protege contra a barra de gestos do iOS
-      className="w-full max-w-md mx-auto bg-white dark:bg-zinc-950 flex flex-col h-[100dvh] sm:h-[85vh] sm:rounded-[2.5rem] sm:shadow-2xl overflow-hidden border-x border-zinc-100 dark:border-zinc-900"
+      className=" w-[24rem] relative -top-10 right-12 bg-white dark:bg-zinc-950 flex flex-col h-[100dvh] sm:h-[85vh] sm:rounded-[2.5rem] sm:shadow-2xl overflow-hidden border-x border-zinc-100 dark:border-zinc-900"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >

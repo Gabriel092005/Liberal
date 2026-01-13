@@ -41,12 +41,12 @@ export function SearchPedidos() {
   const avaliarPrestadoresBodySchema = z.object({
     content:z.string()
   })
-  // function handleSetCommentSearchParams ({userId}:{userId:string}){
-  //     setSearchParams(state=>{
-  //        state.append("userId" ,userId)
-  //        return state
-  //     })
-  // }
+  function handleSetCommentSearchParams ({userId}:{userId:string}){
+      setSearchParams(state=>{
+         state.set("userId" ,userId)
+         return state
+      })
+  }
 
   type AvaliarPrestadoresSchemaTypes = z.infer< typeof avaliarPrestadoresBodySchema>
 
@@ -54,7 +54,8 @@ export function SearchPedidos() {
 
   async function handlecomentar(data:AvaliarPrestadoresSchemaTypes)
   {
-     const { content} = data
+    console.log("data",data)
+    const { content} = data
      await comentar({
       content,
       userId:Number(userId)
@@ -245,11 +246,11 @@ const { mutate: EliminarPedido } = useMutation({
                               </Button>
                             </DropdownMenuTrigger>
                             
-                            <DropdownMenuContent align="end" className="w-[320px] p-2 rounded-[2rem] border-none shadow-2xl bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl">
+                            <DropdownMenuContent  align="end" className="w-[320px] p-2 rounded-[2rem] border-none shadow-2xl bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl">
                               <ScrollArea className="max-h-[350px]">
                                 {pedido.interessados?.length > 0 ? (
                                   pedido.interessados.map((i: Interessado) => (
-               <div key={i.prestadorId} className="group/item relative p-4 rounded-[2rem] bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-900 hover:shadow-2xl hover:shadow-orange-500/5 transition-all duration-500">
+               <div key={i.prestadorId} onClick={()=>handleSetCommentSearchParams({userId:String(i.prestadorId)})} className="group/item relative p-4 rounded-[2rem] bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-900 hover:shadow-2xl hover:shadow-orange-500/5 transition-all duration-500">
   <div className="flex items-center gap-4">
     {/* Avatar Section com Shape Moderno */}
     <div className="relative">
@@ -268,7 +269,7 @@ const { mutate: EliminarPedido } = useMutation({
 
     {/* Nome e Info */}
     <div className="flex-1 min-w-0">
-      <p className="text-base font-black tracking-tight text-zinc-800 dark:text-zinc-100 truncate">
+      <p className="text-base max-w-44 w-32 font-black tracking-tight text-zinc-800 dark:text-zinc-100 truncate">
         {i.prestador.nome}
       </p>
       <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[9px] font-black uppercase tracking-widest mt-0.5">
@@ -298,12 +299,13 @@ const { mutate: EliminarPedido } = useMutation({
         <Pin size={15} />
       </Button>
 
-      <Button 
-        variant="ghost"
-        className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-yellow-500/10 hover:text-yellow-600 transition-colors"
-      >
-        <StarButton prestadorId={i.prestadorId} />
-      </Button>
+     <Button 
+  variant="ghost"
+  // Remova o onClick daqui se for usar dentro do StarButton
+  className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-yellow-500/10 hover:text-yellow-600 transition-colors overflow-visible"
+>
+  <StarButton prestadorId={i.prestadorId} />
+</Button>
 
       <Dialog>
         <DialogTrigger asChild>
