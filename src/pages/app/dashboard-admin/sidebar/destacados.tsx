@@ -9,13 +9,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  ArrowRight
+  User,
+  ShieldCheck
 } from "lucide-react";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { api } from "@/lib/axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { PrestadoreProfile } from "./PrestadorProfile";
-import { useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface UsuarioDestaque {
   id: number;
@@ -32,6 +31,7 @@ interface UsuarioDestaque {
 interface FetchPrestadoresDestaquesResponse {
   usuarios: UsuarioDestaque[] | undefined
 }
+
 export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<number>(0);
@@ -41,20 +41,10 @@ export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
   const [autoScroll, setAutoScroll] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const UserId = searchParams.get("userId");
-  const CARD_WIDTH_TOTAL = 344;
+  const CARD_WIDTH_TOTAL = 344; // Card(320px) + Gap(24px)
 
-  function handleSearchProfile({userId}: {userId: string}){
-    setSearchParams((state) => {
-      userId ? state.set("userId", userId ) : state.delete("userId");
-      return state;
-    });
-  }
-
-  // Lógica de Scroll Automático REPARADA
+  // Lógica de Scroll Automático Suave
   useEffect(() => {
-    // Adicionamos isDragging aqui para não brigar com o mouse do usuário
     if (!autoScroll || !usuarios || usuarios.length === 0 || isDragging) return;
     
     const container = containerRef.current;
@@ -64,11 +54,8 @@ export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
     
     const scrollStep = () => {
       if (!container) return;
-
-      // Sincroniza o ref com a posição real caso o usuário tenha mexido
       scrollRef.current = container.scrollLeft;
-      
-      scrollRef.current += 0.6; // Sua velocidade original
+      scrollRef.current += 0.6; 
       
       if (scrollRef.current >= container.scrollWidth - container.clientWidth) {
         scrollRef.current = 0;
@@ -85,7 +72,7 @@ export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
 
     animationFrameId = requestAnimationFrame(scrollStep);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [usuarios, autoScroll, currentIndex, isDragging]); // isDragging é chave aqui
+  }, [usuarios, autoScroll, currentIndex, isDragging]);
 
   const scrollToIndex = useCallback((index: number) => {
     const container = containerRef.current;
@@ -116,49 +103,47 @@ export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
   if (!usuarios || usuarios.length === 0) return null;
 
   return (
-    <div className="relative w-full overflow-hidden  py-10">
-      {/* HEADER EXTREME - (Mantido exatamente igual) */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 px-6 gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 bg-orange-500/10 w-fit px-3 py-1 rounded-full border border-orange-500/20">
+    <section className="relative w-full overflow-hidden bg-transparent py-16">
+      {/* Header Alinhado ao Layout (Max-W-7xl) */}
+      <div className="max-w-7xl mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 bg-orange-500/10 w-fit px-4 py-1.5 rounded-full border border-orange-500/20">
             <Sparkles size={14} className="text-orange-600 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-700">Premium Choice</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-700">Seleção Premium</span>
           </div>
-          <h2 className="text-4xl font-black tracking-tight text-zinc-900 dark:text-white lg:text-5xl">
+          <h2 className="text-5xl md:text-6xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase">
             Elite <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-600">Talents</span>
           </h2>
-          <p className="text-zinc-500 font-medium max-w-md">Descubra os profissionais que estão elevando o nível do mercado angolano com excelência e qualidade.</p>
+          <p className="text-zinc-500 dark:text-zinc-400 font-medium max-w-lg text-lg">
+            Os profissionais mais requisitados e bem avaliados do mercado nacional.
+          </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <Button
             variant="outline"
             size="icon"
             onClick={() => scrollToIndex(currentIndex - 1)}
-            className="h-14 w-14 rounded-3xl border-zinc-200 dark:border-zinc-800 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all duration-500 shadow-xl active:scale-90"
+            className="h-16 w-16 rounded-[2rem] border-zinc-200 dark:border-zinc-800 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all duration-500 shadow-xl active:scale-90 bg-white dark:bg-zinc-950"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={28} />
           </Button>
           <Button
             variant="outline"
             size="icon"
             onClick={() => scrollToIndex(currentIndex + 1)}
-            className="h-14 w-14 rounded-3xl border-zinc-200 dark:border-zinc-800 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all duration-500 shadow-xl active:scale-90"
+            className="h-16 w-16 rounded-[2rem] border-zinc-200 dark:border-zinc-800 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all duration-500 shadow-xl active:scale-90 bg-white dark:bg-zinc-950"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={28} />
           </Button>
         </div>
       </div>
 
-      {/* CAROUSEL EXTREME - AJUSTE DE GESTO AQUI */}
-      <div className="relative overflow-visible flex-col">
+      {/* Container de Carrossel com Efeito "Bleed" (Vaza para as bordas) */}
+      <div className="relative w-full">
         <div
           ref={containerRef}
-          /** * ADICIONADO: touch-pan-x e no-scrollbar 
-           * Isso permite que o scroll horizontal funcione livre do ScrollArea pai
-           */
-          className="flex lg:flex-row gap-6 overflow-x-auto py-8 px-6 scrollbar-none   select-none touch-pan-x"
-          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+          className="flex gap-6 overflow-x-auto py-10 px-[max(1.5rem,calc((100vw-80rem)/2))] scrollbar-none select-none touch-pan-x cursor-grab active:cursor-grabbing"
           onMouseDown={(e) => handleDragStart(e.pageX)}
           onMouseMove={(e) => handleDragMove(e.pageX)}
           onMouseUp={() => setIsDragging(false)}
@@ -167,81 +152,77 @@ export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
           onTouchMove={(e) => handleDragMove(e.touches[0].pageX)}
           onTouchEnd={() => setIsDragging(false)}
         >
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {usuarios.map((usuario) => (
               <motion.div
                 key={usuario.id}
-                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={{ y: -15 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -10 }}
                 className="flex-shrink-0"
               >
-                {/* O restante do seu Card (CardContent, Avatar, etc) continua IGUAL */}
-                <Card className="w-80 h-[420px]  rounded-[3.5rem] border-none bg-white dark:bg-zinc-900 shadow-[0_30px_60px_rgba(0,0,0,0.12)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.5)] relative overflow-hidden group/card transition-all duration-500">
-                  <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-orange-500/10 to-transparent opacity-50 group-hover/card:opacity-100 transition-opacity" />
-                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/20 rounded-full blur-[60px]" />
+                <Card className="w-80 h-[460px] rounded-[3.5rem] border-none bg-white dark:bg-zinc-900 shadow-[0_30px_70px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.6)] relative overflow-hidden group/card transition-all duration-500">
+                  
+                  {/* Gradiente Decorativo de Fundo */}
+                  <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-orange-500/10 via-transparent to-transparent" />
+                  
                   <CardContent className="p-8 flex flex-col h-full relative z-10">
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-orange-500 rounded-[2rem] blur-xl opacity-20 group-hover/card:opacity-40 transition-opacity" />
-                        <Avatar className="h-24 w-24 rounded-[2rem] border-[6px] border-white dark:border-zinc-900 shadow-2xl relative">
+                    <div className="flex justify-between items-start mb-8">
+                      <div className="relative group/avatar">
+                        <div className="absolute inset-0 bg-orange-500 rounded-[2.2rem] blur-2xl opacity-0 group-hover/card:opacity-30 transition-opacity" />
+                        <Avatar className="h-24 w-24 rounded-[2.2rem] border-[6px] border-white dark:border-zinc-900 shadow-2xl relative transition-transform duration-500 group-hover/card:scale-105">
                           {usuario.image_path ? (
                             <AvatarImage src={`${api.defaults.baseURL}/uploads/${usuario.image_path}`} className="object-cover" />
                           ) : (
-                            <AvatarFallback className="bg-zinc-950 text-white text-3xl font-black">
+                            <AvatarFallback className="bg-zinc-950 text-white text-3xl font-black italic">
                               {usuario.nome?.slice(0, 1)}
                             </AvatarFallback>
                           )}
                         </Avatar>
                       </div>
-                      <div className="bg-zinc-950 dark:bg-orange-500 text-white px-4 py-2 rounded-2xl flex items-center gap-1.5 shadow-lg">
-                        <Star size={16} className="fill-current" />
-                        <span className="text-sm font-black tracking-tighter">{usuario.estrelas || "5.0"}</span>
+                      <div className="bg-orange-500 text-white px-4 py-2 rounded-2xl flex items-center gap-1.5 shadow-[0_10px_20px_-5px_rgba(249,115,22,0.5)]">
+                        <Star size={14} className="fill-current" />
+                        <span className="text-xs font-black">4.9</span>
                       </div>
                     </div>
 
-                    <div className="space-y-2 mb-6">
-                      <h3 className="text-2xl font-black text-zinc-900 dark:text-white leading-none truncate">
-                        {usuario.nome}
-                      </h3>
-                      <p className="inline-block bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[11px] font-black uppercase tracking-widest px-3 py-1 rounded-lg">
+                    <div className="space-y-3 mb-8">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight truncate uppercase tracking-tighter">
+                          {usuario.nome}
+                        </h3>
+                        <ShieldCheck size={20} className="text-blue-500 shrink-0" />
+                      </div>
+                      <span className="inline-block bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-700/50">
                         {usuario.profissao}
-                      </p>
+                      </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 mb-8">
-                      <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-3xl border border-zinc-100 dark:border-zinc-800">
-                        <MapPinIcon size={14} className="text-orange-500 mb-1" />
-                        <p className="text-[10px] font-bold text-zinc-400 uppercase">Local</p>
-                        <p className="text-[11px] font-black truncate">{usuario.municipio}</p>
+                    <div className="grid grid-cols-2 gap-3 mb-auto">
+                      <div className="bg-zinc-50 dark:bg-zinc-800/40 p-3 rounded-[1.5rem] border border-zinc-100 dark:border-zinc-800">
+                        <MapPinIcon size={14} className="text-orange-500 mb-1.5" />
+                        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Local</p>
+                        <p className="text-[11px] font-black truncate text-zinc-700 dark:text-zinc-300 uppercase">{usuario.municipio}</p>
                       </div>
-                      <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-3xl border border-zinc-100 dark:border-zinc-800">
-                        <Building2 size={14} className="text-orange-500 mb-1" />
-                        <p className="text-[10px] font-bold text-zinc-400 uppercase">Role</p>
-                        <p className="text-[11px] font-black truncate">
-                           {usuario.role === "PRESTADOR_COLECTIVO" ? "Empresa" : "Expert"}
+                      <div className="bg-zinc-50 dark:bg-zinc-800/40 p-3 rounded-[1.5rem] border border-zinc-100 dark:border-zinc-800">
+                        <Building2 size={14} className="text-orange-500 mb-1.5" />
+                        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Perfil</p>
+                        <p className="text-[11px] font-black truncate text-zinc-700 dark:text-zinc-300 uppercase">
+                          {usuario.role === "PRESTADOR_COLECTIVO" ? "Empresa" : "Expert"}
                         </p>
                       </div>
                     </div>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          onClick={() => handleSearchProfile({ userId: String(usuario.id) })}
-                          className="w-full mt-auto bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-[1.5rem] h-14 font-black text-xs tracking-[0.2em] group/btn overflow-hidden relative shadow-2xl active:scale-95 transition-all"
-                        >
-                          <span className="relative z-10 flex items-center gap-2">
-                             EXPLORAR PERFIL <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-                          </span>
-                          <motion.div className="absolute inset-0 bg-orange-500 -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-500" />
-                        </Button>
-                      </DialogTrigger>
-                      {/* <DialogContent className="max-w-4xl p-0 border-none bg-transparent shadow-none focus-visible:ring-0"> */}
-                        <div className="bg-white dark:bg-zinc-950 rounded-[4rem] overflow-hidden p-1">
-                           <PrestadoreProfile id={UserId} />
-                        </div>
-                      {/* </DialogContent> */}
-                    </Dialog>
+                    {/* Botão de Perfil Refinado */}
+                    <Link to={`/users/${usuario.id}/profile`} className="mt-6">
+                      <Button 
+                        className="w-full h-14 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black uppercase tracking-tighter text-[11px] shadow-2xl transition-all duration-300 hover:bg-orange-600 dark:hover:bg-orange-500 hover:text-white group/btn gap-3"
+                      >
+                        <User size={16} strokeWidth={3} />
+                        Visualizar Portfólio
+                        <ChevronRight size={16} className="ml-auto opacity-50 group-hover/btn:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -250,20 +231,20 @@ export function DestaquesAuto({ usuarios }: FetchPrestadoresDestaquesResponse) {
         </div>
       </div>
 
-      {/* PROGRESS BAR EXTREME - (Igual) */}
-      <div className="flex justify-center items-center gap-3 mt-10">
+      {/* Indicador de Progresso Minimalista */}
+      <div className="flex justify-center items-center gap-3 mt-6">
         {usuarios.map((_, index) => (
           <button
             key={index}
             onClick={() => scrollToIndex(index)}
-            className={`transition-all duration-700 rounded-full ${
+            className={`transition-all duration-500 rounded-full h-1.5 ${
               index === currentIndex 
-                ? 'w-12 h-2.5 bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.4)]' 
-                : 'w-2.5 h-2.5 bg-zinc-200 dark:bg-zinc-800 hover:bg-orange-200'
+                ? 'w-10 bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' 
+                : 'w-2 bg-zinc-200 dark:bg-zinc-800 hover:bg-orange-200'
             }`}
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

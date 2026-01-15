@@ -37,10 +37,10 @@ export interface Usuario {
 }
 
 export interface GetUserProfileResponse {
-  usuario: Usuario | null;
+  usuario: Usuario | undefined;
 }
 
-export async function GetUserProfileById({userId}:{userId:string|null}) {
+export async function GetUserProfileById({userId}:{userId:string|undefined}) {
     const response = await api.get<GetUserProfileResponse>(`/profileById/${userId}`);
     console.log('cheguei',response)
   return response.data.usuario;

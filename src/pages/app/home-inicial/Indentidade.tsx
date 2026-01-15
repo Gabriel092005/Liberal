@@ -2,7 +2,7 @@
 import { ModeToggle } from '@/components/theme/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
-import logo from '@/assets/logo-01.png'
+import logo from '@/assets/liberal.png'
 import { Apple, Award, Check, Globe, LogIn, MessageCircle, Play, Star, User, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
   // 1. IMPORTANTE: Importar o ScrollArea do seu diretório de componentes
@@ -23,6 +23,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { History, Search } from 'lucide-react'; // Novos ícones
 import { WhatsAppButton } from './whatsapp-button'
+import { Separator } from '@/components/ui/separator'
+import { HeroSection } from './SpellingEffetc'
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -57,9 +59,10 @@ import { WhatsAppButton } from './whatsapp-button'
       
       {/* LOGO */}
       <Link to="/" className="flex items-center gap-1 group shrink-0">
-        <img src={logo} alt=""className="h-9 w-10" />
+        <img src={logo} alt=""className="h-10" />
       </Link>
-
+      <Separator orientation='vertical'></Separator>
+ 
       {/* BARRA DE PESQUISA */}
       <div className="flex-1 max-w-md mx-4">
         <DropdownMenu>
@@ -96,6 +99,7 @@ import { WhatsAppButton } from './whatsapp-button'
             size="sm"
           >
             <LogIn className="h-4 w-4 sm:mr-2" /> 
+            Entrar
             
           </Button>
         </Link>
@@ -109,16 +113,7 @@ import { WhatsAppButton } from './whatsapp-button'
               
               {/* HERO SECTION */}
               <section className="container lg:flex lg:items-center max-w-7xl mx-auto px-4 text-center space-y-8">
-                <motion.div variants={itemVariants} className="space-y-4">
-                  <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.1]">
-                    Aumente sua <br />
-                    <span className="text-orange-500 italic">Visibilidade.</span>
-                  </h1>
-                  <p className="max-w-2xl mx-auto text-zinc-500 dark:text-zinc-400 text-lg md:text-xl">
-                    Escolha o plano que melhor se adapta ao seu momento e comece a receber pedidos hoje mesmo em Angola.
-                  </p>
-                  <Button>Quero saber mais</Button>
-                </motion.div>
+             <HeroSection></HeroSection>
 
                 <motion.div variants={itemVariants} className="relative py-10 flex justify-center">
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 md:w-96 h-64 md:h-96 bg-orange-500/20 blur-[100px] rounded-full -z-10" />

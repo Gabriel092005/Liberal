@@ -38,6 +38,7 @@ import { Notificacoes } from './pages/dash-admin/notificacoes';
 import { PrestadoresTableFilters } from './pages/dash-admin/prestadores/prestadores';
 import { LoadingPage } from './pages/Loading';
 import { PaginaProfissoes } from './profissionals-page';
+import { PrestadoreProfile } from './pages/app/dashboard-admin/sidebar/PrestadorProfile';
 export const router = createBrowserRouter([
   {
 
@@ -81,6 +82,8 @@ export const router = createBrowserRouter([
       // {path:'/', <PrestadoresLayout}
       {path: '/loading', element:<LoadingPage/> },
       { path: '/servicos', element: <PrestadoresDash/> },
+      { path: '/users/:id/profile', element: <PrestadoreProfile /> }, // ROTA DINÂMICA
+
       { path: '/notif-prestadores', element: <NotificacoesMobile/> },
       { path: '/config-prestadores', element: <Config/> },
       { path: '/prestadores-pedidos', element: <PrestadoresPedidos/> },

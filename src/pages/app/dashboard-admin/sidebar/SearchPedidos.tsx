@@ -246,107 +246,127 @@ const { mutate: EliminarPedido } = useMutation({
                               </Button>
                             </DropdownMenuTrigger>
                             
-                            <DropdownMenuContent  align="end" className="w-[320px] p-2 rounded-[2rem] border-none shadow-2xl bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl">
+                            <DropdownMenuContent  align="end" className="w-[320px] p-2 rounded-[2rem] border-none shadow-2xl bg-white/95 dark:bg-slate-950/95  backdrop-blur-xl">
                               <ScrollArea className="max-h-[350px]">
                                 {pedido.interessados?.length > 0 ? (
                                   pedido.interessados.map((i: Interessado) => (
-               <div key={i.prestadorId} onClick={()=>handleSetCommentSearchParams({userId:String(i.prestadorId)})} className="group/item relative p-4 rounded-[2rem] bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-900 hover:shadow-2xl hover:shadow-orange-500/5 transition-all duration-500">
-  <div className="flex items-center gap-4">
-    {/* Avatar Section com Shape Moderno */}
-    <div className="relative">
-      <Avatar className="h-12 w-12 rounded-2xl ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 ring-transparent group-hover/item:ring-orange-500/20 transition-all duration-500">
-        <AvatarImage 
-          src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`} 
-          className="object-cover" 
-        />
-        <AvatarFallback className="bg-orange-100 text-orange-600 text-xs font-bold">
-          {i.prestador.nome.substring(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      {/* Indicador de Status Online (Opcional) */}
-      <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 bg-green-500 border-2 border-white dark:border-zinc-950 rounded-full" />
-    </div>
+                                <div className="relative max-h-[70vh] overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-orange-500/40 scrollbar-track-transparent">
 
-    {/* Nome e Info */}
-    <div className="flex-1 min-w-0">
-      <p className="text-base max-w-44 w-32 font-black tracking-tight text-zinc-800 dark:text-zinc-100 truncate">
-        {i.prestador.nome}
-      </p>
-      <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[9px] font-black uppercase tracking-widest mt-0.5">
-        {i.prestador.profissao}
+  <div
+    key={i.prestadorId}
+    onClick={() =>
+      handleSetCommentSearchParams({
+        userId: String(i.prestadorId),
+      })
+    }
+    className="group/item relative p-4 rounded-[2rem] bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-900 hover:shadow-2xl hover:shadow-orange-500/5 transition-all duration-500"
+  >
+    <div className="flex items-center gap-4">
+      {/* Avatar */}
+      <div className="relative">
+        <Avatar className="h-12 w-12 rounded-2xl ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 ring-transparent group-hover/item:ring-orange-500/20 transition-all duration-500">
+          <AvatarImage
+            src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`}
+            className="object-cover"
+          />
+          <AvatarFallback className="bg-orange-100 text-orange-600 text-xs font-bold">
+            {i.prestador.nome.substring(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 bg-green-500 border-2 border-white dark:border-zinc-950 rounded-full" />
       </div>
+
+      {/* Nome */}
+      <div className="flex-1 min-w-0">
+        <p className="text-base max-w-44 w-32 font-black tracking-tight text-zinc-800 dark:text-zinc-100 truncate">
+          {i.prestador.nome}
+        </p>
+        <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[9px] font-black uppercase tracking-widest mt-0.5">
+          {i.prestador.profissao}
+        </div>
+      </div>
+
+      <PedidoCard
+        refetch={refetch}
+        isRefetching={isRefetching}
+        prestadorId={i.prestadorId}
+        id={pedido.id}
+        status={i.status}
+      />
     </div>
 
-    {/* Componente de Status/Ação principal */}
-    <PedidoCard 
-      refetch={refetch} 
-      isRefetching={isRefetching} 
-      prestadorId={i.prestadorId} 
-      id={pedido.id} 
-      status={i.status} 
-    />
-  </div>
+    {/* Footer */}
+    <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/50 flex items-center justify-between opacity-0 group-hover/item:opacity-100 transform translate-y-2 group-hover/item:translate-y-0 transition-all duration-300">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          onClick={() => favoritar({ prestadorId: i.prestadorId })}
+          className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-orange-500/10 hover:text-orange-600 transition-colors"
+        >
+          <Pin size={15} />
+        </Button>
 
-  {/* Footer de Ações - Aparece suavemente no Hover */}
-  <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/50 flex items-center justify-between opacity-0 group-hover/item:opacity-100 transform translate-y-2 group-hover/item:translate-y-0 transition-all duration-300">
-    <div className="flex items-center gap-2">
-      {/* Botões Estilizados como Glass */}
-      <Button 
-        variant="ghost" 
-        onClick={() => favoritar({ prestadorId: i.prestadorId })}
-        className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-orange-500/10 hover:text-orange-600 transition-colors"
-      >
-        <Pin size={15} />
-      </Button>
+        <Button
+          variant="ghost"
+          className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-yellow-500/10 hover:text-yellow-600 transition-colors overflow-visible"
+        >
+          <StarButton prestadorId={i.prestadorId} />
+        </Button>
 
-     <Button 
-  variant="ghost"
-  // Remova o onClick daqui se for usar dentro do StarButton
-  className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-yellow-500/10 hover:text-yellow-600 transition-colors overflow-visible"
->
-  <StarButton prestadorId={i.prestadorId} />
-</Button>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button 
-            variant="ghost"
-            className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-blue-500/10 hover:text-blue-600 transition-colors"
-          >
-            <MessageCircle size={15} />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] rounded-[2.5rem] p-6 backdrop-blur-2xl bg-white/90 dark:bg-zinc-950/90 border-zinc-200/50">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-black tracking-tighter uppercase">Avaliar Atendimento</DialogTitle>
-            <DialogDescription className="text-zinc-500 font-medium">
-              Sua opinião ajuda a comunidade a escolher os melhores profissionais.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(handlecomentar)} className="space-y-4 mt-4">
-            <Textarea 
-              {...register('content')} 
-              placeholder="Como foi sua experiência?"
-              className="min-h-[120px] rounded-3xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus:ring-orange-500/20"
-            />
-            <Button type="submit" className="w-full h-12 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase tracking-widest transition-all active:scale-95">
-              Enviar Avaliação
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-blue-500/10 hover:text-blue-600 transition-colors"
+            >
+              <MessageCircle size={15} />
             </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+          </DialogTrigger>
 
-    {/* Link de Telefone Minimalista */}
-    <a 
-      href={`tel:+244${i.prestador.celular}`} 
-      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-zinc-950/10"
-    >
-      <Phone size={12} className="fill-current" />
-      <span className="text-[10px] font-black uppercase tracking-tighter">+244 {i.prestador.celular}</span>
-    </a>
+          <DialogContent className="sm:max-w-[425px] rounded-[2.5rem] p-6 backdrop-blur-2xl bg-white/90 dark:bg-zinc-950/90 border-zinc-200/50">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black tracking-tighter uppercase">
+                Avaliar Atendimento
+              </DialogTitle>
+              <DialogDescription className="text-zinc-500 font-medium">
+                Sua opinião ajuda a comunidade a escolher os melhores profissionais.
+              </DialogDescription>
+            </DialogHeader>
+
+            <form
+              onSubmit={handleSubmit(handlecomentar)}
+              className="space-y-4 mt-4"
+            >
+              <Textarea
+                {...register("content")}
+                placeholder="Como foi sua experiência?"
+                className="min-h-[120px] rounded-3xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus:ring-orange-500/20"
+              />
+              <Button
+                type="submit"
+                className="w-full h-12 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase tracking-widest transition-all active:scale-95"
+              >
+                Enviar Avaliação
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <a
+        href={`tel:+244${i.prestador.celular}`}
+        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-zinc-950/10"
+      >
+        <Phone size={12} className="fill-current" />
+        <span className="text-[10px] font-black uppercase tracking-tighter">
+          +244 {i.prestador.celular}
+        </span>
+      </a>
+    </div>
   </div>
+
 </div>
+
                                   ))
                                 ) : (
                                   <div className="py-8 text-center text-muted-foreground">
