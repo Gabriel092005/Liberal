@@ -7,15 +7,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { Briefcase, CheckCircle2, Loader2, LogOut, MapPin, Pencil, Phone } from "lucide-react";
-import { useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlignLeft, Briefcase, CheckCircle2, ChevronRight, Loader2, LogOut, MapPin, Pencil, Phone, Send, Settings, Star, Type, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Config } from "./config-prestadores";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { PromoverServicos } from "@/api/vitrine";
+
 
 const editarBioBodySchema = z.object({
   description: z.string().min(1, "A bio não pode estar vazia"),
@@ -25,6 +30,59 @@ type EditarBodySchemaTypes = z.infer<typeof editarBioBodySchema>;
 
 export function ProfilePage() {
   const queryClient = useQueryClient();
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading] = useState(false);
+
+  const vitrineSchema = z.object({
+  titulo: z.string()
+    .min(5, "O título deve ter pelo menos 5 caracteres")
+    .max(50, "Título muito longo"),
+  descricao: z.string()
+    .min(20, "A descrição deve ser mais detalhada (min 20 caracteres)")
+    .max(500, "Limite de 500 caracteres atingido"),
+})
+
+type VitrineFormData = z.infer< typeof vitrineSchema> 
+const {
+    register,
+    handleSubmit,
+  } = useForm<VitrineFormData>({
+    resolver: zodResolver(vitrineSchema),
+    defaultValues: {
+      titulo: "",
+      descricao: "",
+    }
+  });
+
+  const {mutateAsync:vitrinar}= useMutation({
+    mutationFn:PromoverServicos
+  })
+
+
+// 4. Lógica de Envio para a API
+  async function handlePromoverPerfil(data:VitrineFormData) {
+    console.log(data)
+    try {
+        const {
+          descricao,
+          titulo
+        } = data
+
+        await vitrinar({
+          title:titulo,
+          description:descricao
+        })
+  
+      
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulação de delay
+
+      toast.success("Perfil publicado na vitrine com sucesso!");
+      reset(); // Limpa o formulário
+      setIsOpen(false); // Fecha o painel
+    } catch (error) {
+      toast.error("Erro ao publicar na vitrine.");
+    } 
+  };
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -169,27 +227,131 @@ export function ProfilePage() {
                 </div>
 
                 {/* BOTÕES DE AÇÃO ESTILO MOBILE */}
-                <div className="mt-8 flex flex-col gap-3">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="w-full h-14 rounded-2xl bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 font-black uppercase tracking-tighter hover:scale-[1.02] active:scale-95 transition-all shadow-xl">
-                        Configurações da Conta
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl w-[95vw] h-[85vh] overflow-y-auto rounded-[3rem] p-4 border-none">
-                      <Config />
-                    </DialogContent>
-                  </Dialog>
+          <div className="mt-8 flex flex-col gap-3 p-1">
+  {/* Botão de Destaque: Perfil na Vitrine */}
+<div className="w-full flex flex-col gap-2">
+      {/* Botão Gatilho */}
+      <Button 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`group relative w-full h-16 rounded-[1.5rem] transition-all duration-500 active:scale-[0.98] overflow-hidden border-none shadow-lg
+          ${isOpen 
+            ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900" 
+            : "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-orange-500/20"
+          }`}
+      >
+        <div className="relative flex items-center w-full px-2 gap-3">
+          <div className={`p-2 rounded-xl transition-colors ${isOpen ? 'bg-orange-500 text-white' : 'bg-white/20'}`}>
+            <Star className={isOpen ? "fill-current" : "fill-white"} size={20} />
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-black uppercase tracking-tighter text-sm">
+              {isOpen ? "Configurando Vitrine" : "Perfil na Vitrine"}
+            </span>
+            {!isOpen && <span className="text-[10px] opacity-80 font-medium tracking-tight">Expandir visibilidade do perfil</span>}
+          </div>
+          <motion.div
+            animate={{ rotate: isOpen ? 90 : 0 }}
+            className="ml-auto opacity-40"
+          >
+            <ChevronRight size={18} />
+          </motion.div>
+        </div>
+      </Button>
 
-                  <Button 
-                    onClick={() => { Sair(); window.location.href = '/sign-in'; }}
-                    variant="ghost" 
-                    className="h-12 w-full rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 font-black uppercase tracking-widest text-[10px] gap-2"
-                  >
-                    <LogOut size={16} />
-                    Sair da Conta
-                  </Button>
+      {/* "Dialog" Suave Expansível (Sem Overlay) */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, scale: 0.95 }}
+            animate={{ height: "auto", opacity: 1, scale: 1 }}
+            exit={{ height: 0, opacity: 0, scale: 0.95 }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
+            className="overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] shadow-2xl"
+          >
+            <form onSubmit={handleSubmit(handlePromoverPerfil)} className="p-5 space-y-5">
+              {/* Header Interno */}
+              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Novo Destaque</span>
+                <button onClick={() => setIsOpen(false)} className="text-zinc-400 hover:text-zinc-600">
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Formulário */}
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-zinc-500 ml-1 flex items-center gap-1">
+                    <Type size={12} /> TÍTULO DA VITRINE
+                  </label>
+                   <Input
+                                       placeholder="Ex: Especialista em UI Design" 
+                                       {...register('titulo')}
+                    className="rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none focus-visible:ring-1 focus-visible:ring-orange-500 h-11 text-sm font-medium"
+                   
+                      >
+                   </Input>
                 </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-zinc-500 ml-1 flex items-center gap-1">
+                    <AlignLeft size={12} /> DESCRIÇÃO DETALHADA
+                  </label>
+                  <Textarea 
+                  {...register('descricao')}
+                    placeholder="Conte um pouco sobre seus melhores serviços..." 
+                    className="rounded-2xl bg-zinc-50 dark:bg-zinc-800 border-none focus-visible:ring-1 focus-visible:ring-orange-500 min-h-[100px] text-sm resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Ação de Envio */}
+              <Button 
+                 type="submit"
+                disabled={loading}
+                className="w-full h-12 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold gap-2 transition-all"
+              >
+                {loading ? (
+                  <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
+                    <Star size={18} />
+                  </motion.div>
+                ) : (
+                  <>
+                    <Send size={16} />
+                    <span>Publicar na Vitrine</span>
+                  </>
+                )}
+              </Button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+
+  {/* Botão: Configurações */}
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button className="w-full h-14 rounded-[1.5rem] bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold uppercase tracking-tight hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200/50 dark:border-zinc-700/50 gap-3">
+        <Settings size={20} className="text-zinc-500" />
+        Configurações da Conta
+      </Button>
+    </DialogTrigger>
+    <DialogContent className="max-w-2xl w-[95vw] h-[85vh] overflow-hidden rounded-[3rem] p-0 border-none bg-zinc-50 dark:bg-zinc-950 shadow-2xl">
+      <div className="h-full overflow-y-auto p-6">
+        <Config />
+      </div>
+    </DialogContent>
+  </Dialog>
+
+  {/* Botão: Sair (Design mais limpo e discreto) */}
+  <Button 
+    onClick={() => { Sair(); window.location.href = '/sign-in'; }}
+    variant="ghost" 
+    className="h-12 w-full rounded-2xl text-red-500/70 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 font-bold uppercase tracking-[0.2em] text-[10px] gap-2 mt-2 transition-colors"
+  >
+    <LogOut size={14} strokeWidth={3} />
+    Encerrar Sessão
+  </Button>
+</div>
               </CardContent>
             </Card>
             

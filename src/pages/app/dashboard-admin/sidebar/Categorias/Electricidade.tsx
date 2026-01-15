@@ -92,7 +92,7 @@ export function Electricidade() {
         </header>
         
         {/* ScrollArea: Altura limitada no mobile, flexível no desktop */}
-        <ScrollArea className="h-[280px] md:h-auto w-full pr-4">
+        <ScrollArea className="h-[100px] md:h-auto w-full pr-4">
           <div className="flex flex-col gap-3 pb-2">
             {servicos.map((nome) => (
               <ServicoButton
@@ -105,11 +105,11 @@ export function Electricidade() {
           </div>
         </ScrollArea>
 
-        <div className="mt-auto pt-4 border-t border-zinc-200 dark:border-zinc-800">
+        {/* <div className="mt-auto pt-4 border-t border-zinc-200 dark:border-zinc-800">
           <p className="text-[10px] text-zinc-400 italic">
             * Clique no serviço para solicitar um orçamento gratuito.
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   )

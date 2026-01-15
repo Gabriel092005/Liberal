@@ -10,10 +10,9 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { api } from "@/lib/axios";
-import { getInialts } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookMarked, File, InfoIcon, MapPin, MoveDownLeft, MoveUpRight, RefreshCw, Search } from "lucide-react";
+import {File, InfoIcon, MapPin, Menu, MoveDownLeft, MoveUpRight, RefreshCw, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -22,6 +21,8 @@ import { BotaoNegociar } from "./botao-negociar";
 import { SkeletonsDemo } from "./NearClientsSearch";
 import { ServicesDialogDetails } from "./ServicesDialogDetails";
 import { Vitrine } from "./Vitrine";
+import logo from '@/assets/liberal.png'
+import { ModeToggle } from "@/components/theme/theme-toggle";
 
 
 function useDebounce<T>(value: T, delay = 400): T {
@@ -95,47 +96,61 @@ export function HomeContent() {
         <div className="flex flex-col    w-full bg-zinc-50 dark:bg-zinc-950 overflow-hidden">
       
       {/* 1. HEADER - FIXO NO TOPO */}
-      <header className="w-full shrink-0 md:hidden z-50 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 pt-[env(safe-area-inset-top)]">
-        <div className="h-16 px-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 ring-2 ring-orange-500/10 border-2 border-white dark:border-zinc-800 shadow-sm">
-              <AvatarImage src={`${api.defaults.baseURL}/uploads/${profile?.image_path}`} />
-              <AvatarFallback className="bg-orange-100 text-orange-600 font-bold text-xs">
-                 {profile && (
-                     <div>
-                         {getInialts(profile?.nome)}
-                     </div>
-                 )}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col leading-none min-w-0">
-              <span className="text-sm font-black text-zinc-900 dark:text-zinc-100 truncate max-w-[140px] uppercase tracking-tight">
-                {profile?.nome}
-              </span>
-              <span className="text-[10px] font-bold text-orange-500 mt-1 flex items-center gap-1">
-                {profile?.role}
-              </span>
-            </div>
-          </div>
+    <header className="w-full shrink-0 md:hidden z-50 sticky top-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 supports-[backdrop-filter]:bg-white/60">
+  {/* Padding para Safe Area do iOS/Android */}
+  <div className="h-[env(safe-area-inset-top)] w-full" />
+  
+  <div className="h-16 px-4 flex items-center justify-between">
+    {/* Logo com efeito de brilho */}
+    <div className="relative group">
+      <div className="absolute -inset-2 bg-orange-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+      <img 
+        src={logo} 
+        alt="Logo" 
+        className="h-10 w-auto relative z-10 hover:scale-105 transition-transform duration-300" 
+      />
+    </div>
 
-          <div className="flex items-center gap-1.5">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 active:scale-90 transition-transform">
-                  <BookMarked size={18} className="text-zinc-500 dark:text-zinc-400" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[85%] p-0 border-none bg-white dark:bg-zinc-950">
-                <Vitrine></Vitrine>
-              </SheetContent>
-            </Sheet>
-            
-            <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-full p-1 border border-zinc-200 dark:border-zinc-700">
-          {profile && <NotificationDropdown {...profile}/>}   
-                   </div>
+    {/* Lado Direito: Ações */}
+    <div className="flex items-center gap-2">
+      {/* Container de Notificação Estilizado */}
+      <div className="relative flex items-center justify-center bg-zinc-100/80 dark:bg-zinc-800/80 rounded-2xl p-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+        {profile && (
+          <div className="scale-90 origin-center">
+            <NotificationDropdown {...profile} />
           </div>
-        </div>
-      </header>
+        )}
+      </div>
+
+      {/* Menu Sanduíche com Sheet */}
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-2xl h-11 w-11 bg-orange-500 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-orange-600 dark:hover:bg-orange-500 hover:text-white active:scale-95 transition-all duration-300 shadow-lg shadow-orange-500/10"
+          >
+            <Menu className="h-5 w-5 stroke-[2.5px]" />
+          </Button>
+
+        </SheetTrigger>
+        
+        
+        {/* SheetContent com animação e bordas arredondadas */}
+        <SheetContent 
+          side="right" 
+          className="w-[85%] p-0 border-l border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 sm:max-w-none"
+        >
+          {/* O componente Vitrine deve lidar com o scroll interno */}
+          <div className="h-full pt-[env(safe-area-inset-top)]">
+            <Vitrine />
+          </div>
+        </SheetContent>
+      </Sheet>
+      <ModeToggle></ModeToggle>
+    </div>
+  </div>
+</header>
       </div>
         {/* Header fixo no topo do card */}
         <CardHeader className="px-2 pb-4 pt-2 shrink-0">
@@ -200,86 +215,117 @@ export function HomeContent() {
                 <p className="text-sm font-medium">Nenhum pedido encontrado.</p>
               </motion.div>
             ) : (
-              <div className="space-y-3">
-                {orders.map((card) => {
-                  const isInteresseComPedido = "pedido" in card;
-                  const pedido = isInteresseComPedido ? card.pedido : card;
+       <div className="space-y-4 p-1">
+  {orders.map((card) => {
+    const isInteresseComPedido = "pedido" in card;
+    const pedido = isInteresseComPedido ? card.pedido : card;
 
-                  return (
-                    <motion.div
-                      key={card.id}
-                      layout
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="group bg-white dark:bg-zinc-900 p-4 rounded-[1.5rem] border border-zinc-100 dark:border-zinc-800 active:scale-[0.98] transition-transform"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex gap-3 min-w-0">
-                          <Avatar className="w-10 h-10 rounded-xl ring-2 ring-orange-500/10 shrink-0">
-                            <AvatarImage src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} />
-                            <AvatarFallback className="bg-orange-100 text-orange-600 rounded-xl text-xs font-bold">
-                              {pedido?.title?.charAt(0) ?? "S"}
-                            </AvatarFallback>
-                          </Avatar>
-                          
-                          <div className="flex flex-col min-w-0">
-                            <h4 className="font-bold text-sm truncate uppercase tracking-tight">
-                              {pedido?.title}
-                            </h4>
-                            <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5 leading-relaxed">
-                              {pedido?.content}
-                            </p>
-                          </div>
-                        </div>
+    return (
+      <motion.div
+        key={card.id}
+        layout
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="group relative bg-white dark:bg-zinc-900/50 backdrop-blur-sm p-5 rounded-[2rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 hover:border-orange-500/20 active:scale-[0.99] transition-all duration-300"
+      >
+        {/* Lado Superior: Info Principal */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex gap-4 min-w-0">
+            {/* Avatar com Shape Moderno */}
+            <div className="relative shrink-0">
+              <Avatar className="w-12 h-12 rounded-2xl ring-4 ring-orange-500/5 transition-transform group-hover:scale-105 duration-500">
+                <AvatarImage 
+                  src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} 
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl text-xs font-black">
+                  {pedido?.title?.charAt(0) ?? "S"}
+                </AvatarFallback>
+              </Avatar>
+              {/* Indicador de Status/Online */}
+              <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-white dark:border-zinc-900 ${
+                pedido?.brevidade === "URGENTE" ? "bg-red-500 animate-pulse" : "bg-emerald-500"
+              }`} />
+            </div>
+            
+            <div className="flex flex-col min-w-0 pt-0.5">
+              <h4 className="font-black text-zinc-900 dark:text-zinc-100 text-sm md:text-base truncate uppercase tracking-tight group-hover:text-orange-600 transition-colors">
+                {pedido?.title}
+              </h4>
+              <p className="text-[11px] md:text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1 leading-relaxed font-medium">
+                {pedido?.content}
+              </p>
+            </div>
+          </div>
 
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="rounded-full shrink-0 h-8 w-8">
-                              <InfoIcon className="text-blue-500" size={18} />
-                            </Button>
-                          </DialogTrigger>
-                          <ServicesDialogDetails
-                            isSucces={isSuccess}
-                            nome={pedido.autor.nome}
-                            celular={pedido.autor.celular}
-                            provincia={pedido.autor.provincia}
-                            image_path={pedido.autor.image_path}
-                            municipio={pedido.autor.municipio}
-                          />
-                        </Dialog>
-                      </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-2xl shrink-0 h-10 w-10 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-blue-500 hover:text-white transition-all duration-300"
+              >
+                <InfoIcon size={18} />
+              </Button>
+            </DialogTrigger>
+            <ServicesDialogDetails
+              isSucces={isSuccess}
+              nome={pedido.autor.nome}
+              celular={pedido.autor.celular}
+              provincia={pedido.autor.provincia}
+              image_path={pedido.autor.image_path}
+              municipio={pedido.autor.municipio}
+            />
+          </Dialog>
+        </div>
 
-                      <div className="mt-3 flex items-center justify-between gap-2 pt-3 border-t border-zinc-50 dark:border-zinc-800/50">
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-1 text-orange-500">
-                            <MapPin size={12} strokeWidth={2.5} />
-                            <span className="text-[10px] font-black uppercase truncate max-w-[100px]">
-                              {pedido?.location}
-                            </span>
-                          </div>
-                          <Badge variant="secondary" className={`w-fit text-[8px] px-1.5 py-0 h-4 font-bold ${
-                            pedido?.brevidade === "URGENTE" ? "bg-red-100 text-red-600 dark:bg-red-900/30" :
-                            pedido?.brevidade === "MEDIO" ? "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30" :
-                            "bg-green-100 text-green-600 dark:bg-green-900/30"
-                          }`}>
-                            {pedido?.brevidade}
-                          </Badge>
-                        </div>
+        {/* Divisor Elegante (Gradiente) */}
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-100 dark:via-zinc-800 to-transparent my-4" />
 
-                        
-
-                        <BotaoNegociar 
-                          celular={pedido.autor.celular} 
-                          image_path={pedido.autor.image_path} 
-                          isSuccess={isSuccess} 
-                          nome={pedido.autor.nome} 
-                          onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
-                        />
-                      </div>
-                    </motion.div>
-                  );
-                })}
+        {/* Lado Inferior: Tags e Ação */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col gap-2">
+            {/* Localização com Icone Estilizado */}
+            <div className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400">
+              <div className="p-1.5 bg-orange-500/10 rounded-lg">
+                <MapPin size={12} strokeWidth={3} />
               </div>
+              <span className="text-[10px] font-black uppercase tracking-widest truncate max-w-[120px]">
+                {pedido?.location || "Angola"}
+              </span>
+            </div>
+            
+            {/* Badge com Estilo de Prioridade */}
+            <Badge 
+              variant="outline" 
+              className={`w-fit text-[9px] px-2.5 py-0.5 h-5 border-none font-black tracking-tighter rounded-lg ${
+                pedido?.brevidade === "URGENTE" 
+                  ? "bg-red-500/10 text-red-600 dark:bg-red-500/20" 
+                  : pedido?.brevidade === "MEDIO" 
+                    ? "bg-amber-500/10 text-amber-600 dark:bg-amber-500/20" 
+                    : "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20"
+              }`}
+            >
+              <span className="mr-1 opacity-50">•</span>
+              {pedido?.brevidade}
+            </Badge>
+          </div>
+
+          {/* Botão de Negociar - Dando destaque ao CTA principal */}
+          <div className="shrink-0 transform group-hover:scale-105 transition-transform">
+            <BotaoNegociar 
+              celular={pedido.autor.celular} 
+              image_path={pedido.autor.image_path} 
+              isSuccess={isSuccess} 
+              nome={pedido.autor.nome} 
+              onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
+            />
+          </div>
+        </div>
+      </motion.div>
+    );
+  })}
+</div>
             )}
           </AnimatePresence>
         </CardContent>

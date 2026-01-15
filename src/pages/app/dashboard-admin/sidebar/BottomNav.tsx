@@ -180,7 +180,7 @@ export function BottomNav() {
                               className="group/item justify-between h-16 rounded-[1.5rem] bg-slate-100/50 dark:bg-slate-900/50 hover:bg-orange-500 hover:text-white transition-all duration-300 px-6 border border-transparent hover:border-orange-400"
                             >
                               <span className="font-bold text-sm tracking-tight">{i.titulo}</span>
-                              <div className="p-2 rounded-full bg-white/20 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                              <div className="p-10 rounded-full bg-white/20 opacity-0 group-hover/item:opacity-100 transition-opacity">
                                 <Plus size={16} />
                               </div>
                             </Button>

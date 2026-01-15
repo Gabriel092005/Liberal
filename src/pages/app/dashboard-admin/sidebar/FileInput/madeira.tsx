@@ -97,7 +97,7 @@ export function MadeiraOficios() {
         </header>
         
         {/* ScrollArea: Crucial para listas longas no Mobile */}
-        <ScrollArea className="h-[320px] md:h-[400px] w-full pr-4">
+        <ScrollArea className="h-[100px] md:h-[400px] w-full pr-4">
           <div className="flex flex-col gap-3 pb-4">
             {servicos.map((nome) => (
               <ServicoButton

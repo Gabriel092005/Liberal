@@ -50,8 +50,8 @@ export function Profile() {
   };
 
   return (
-<div className="min-h-screen w-full bg-slate-50 dark:bg-[#080808] pb-20 overflow-y-auto selection:bg-blue-500/30">
-      <div className="max-w-2xl mx-auto pt-6 px-4 mb-10">
+    <div className="fixed inset-0 w-full bg-slate-50 dark:bg-[#080808] overflow-y-auto selection:bg-blue-500/30">
+      <div className="max-w-2xl mx-auto pt-6 px-4 pb-32">
         
         {/* HEADER / CAPA */}
         <motion.div 
@@ -59,8 +59,7 @@ export function Profile() {
           animate={{ opacity: 1, y: 0 }}
           className="relative group"
         >
-          {/* Ajuste na altura da capa para ser mais responsiva */}
-          <div className="h-44 sm:h-56 md:h-64 w-full rounded-[2.5rem] overflow-hidden shadow-2xl relative">
+          <div className="h-48 sm:h-56 md:h-64 w-full rounded-[2.5rem] overflow-hidden shadow-2xl relative">
             <img
               src={`${api.defaults.baseURL}/uploads/${profile?.image_path}`}
               alt="Capa"
@@ -91,8 +90,8 @@ export function Profile() {
         </motion.div>
 
         {/* INFO PRINCIPAL */}
-        <div className="mt-20 text-center space-y-2">
-          <h1 className="text-3xl font-black tracking-tight dark:text-white uppercase break-words">
+        <div className="mt-20 text-center space-y-2 px-2">
+          <h1 className="text-3xl font-black tracking-tight dark:text-white uppercase break-words leading-tight">
             {profile?.nome}
           </h1>
           <div className="flex items-center justify-center gap-2 text-muted-foreground font-semibold flex-wrap">
@@ -107,7 +106,7 @@ export function Profile() {
             <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500 shrink-0">
               <Phone size={20} />
             </div>
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0 overflow-hidden">
               <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Contato</span>
               <span className="font-bold text-sm truncate">+244 {profile?.celular}</span>
             </div>
@@ -117,7 +116,7 @@ export function Profile() {
             <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-500 shrink-0">
               <Briefcase size={20} />
             </div>
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0 overflow-hidden">
               <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Ocupação</span>
               <span className="font-bold text-sm truncate uppercase">{profile?.role}</span>
             </div>
@@ -127,18 +126,18 @@ export function Profile() {
         {/* SEÇÃO SOBRE / BIO */}
         <Card className="mt-6 border-none bg-white dark:bg-zinc-900 rounded-[2.5rem] shadow-sm overflow-hidden transition-all hover:shadow-md">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="flex items-center justify-between mb-4 gap-2">
               <h3 className="font-black text-sm uppercase tracking-widest flex items-center gap-2">
                 <Info size={18} className="text-blue-500" /> Biografia
               </h3>
               
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="rounded-full hover:bg-blue-500/10 text-blue-500 font-bold h-8">
+                  <Button variant="ghost" size="sm" className="rounded-full hover:bg-blue-500/10 text-blue-500 font-bold h-8 px-4">
                     <Pencil size={14} className="mr-2" /> Editar
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="rounded-[2.5rem] max-w-[90vw] sm:max-w-lg">
+                <DialogContent className="rounded-[2.5rem] max-w-[95vw] sm:max-w-lg">
                   <DialogHeader>
                     <DialogTitle className="font-black uppercase text-xl">Editar Biografia</DialogTitle>
                     <DialogDescription>Diga ao mundo quem você é e o que você faz.</DialogDescription>
@@ -162,31 +161,34 @@ export function Profile() {
           </CardContent>
         </Card>
 
-        {/* BOTÕES DE AÇÃO */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+        {/* BOTÕES DE AÇÃO - AJUSTADOS PARA PERFEITO SCROLL */}
+        <div className="mt-8 mb-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="w-full sm:flex-1 h-14 rounded-2xl bg-zinc-900 dark:bg-white dark:text-zinc-900 font-black uppercase tracking-tighter hover:bg-orange-600 hover:text-white transition-all shadow-lg active:scale-95">
+              <Button className="flex-1 h-14 rounded-2xl bg-zinc-900 dark:bg-white dark:text-zinc-900 font-black uppercase tracking-tight hover:bg-blue-600 hover:text-white transition-all shadow-lg active:scale-95">
                 Configurações da Conta
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl h-[85vh] overflow-y-auto rounded-[2.5rem] p-0 border-none">
-              <div className="p-6">
+            <DialogContent className="max-w-2xl h-[90vh] sm:h-[85vh] overflow-hidden flex flex-col rounded-[2.5rem] p-0 border-none">
+              <div className="overflow-y-auto p-6 flex-1">
                 <Config />
               </div>
             </DialogContent>
           </Dialog>
 
-          <Link to="/sign-in" className="w-full sm:w-auto">
+          <div className="w-full sm:w-auto">
             <Button 
               onClick={() => Sair()} 
               variant="outline" 
-              className="h-14 w-full sm:w-14 rounded-2xl border-2 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg flex items-center justify-center gap-2 sm:gap-0"
+              className="h-14 w-full sm:w-14 rounded-2xl border-2 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg flex items-center justify-center gap-3 sm:gap-0"
+              asChild
             >
-              <LogOut size={24} />
-              <span className="sm:hidden font-bold uppercase tracking-widest text-xs">Sair da Conta</span>
+              <Link to="/sign-in">
+                <LogOut size={24} className="shrink-0" />
+                <span className="sm:hidden font-bold uppercase tracking-widest text-xs">Sair da Conta</span>
+              </Link>
             </Button>
-          </Link>
+          </div>
         </div>
       </div>
     </div>

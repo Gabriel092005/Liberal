@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Handshake, BellRing } from "lucide-react";
+import { Loader2, Handshake,XCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent,  } from "@/components/ui/dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { api } from "@/lib/axios";
@@ -10,127 +10,127 @@ import { getInialts } from "@/lib/utils";
 import { CallButton } from "@/pages/Buscar/callButton";
 
 interface BotaoNegociarProps {
-  /** Função assíncrona executada ao clicar no botão */
   onClick: () => Promise<any>;
-  isSuccess:boolean
-  nome:string,
-  celular:string,
-  image_path:string | null,
-
-
-  // profile :{
-  //     usuario:Usuario
-  // }
-
+  isSuccess: boolean;
+  nome: string;
+  celular: string;
+  image_path: string | null;
 }
 
-/**
- * Componente de botão para iniciar negociação.
- * Exibe feedback visual e desabilita apenas o botão clicado.
- */
-export function BotaoNegociar({ onClick, isSuccess,celular,image_path,nome  }: BotaoNegociarProps) {
-
+export function BotaoNegociar({ onClick, isSuccess, celular, image_path, nome }: BotaoNegociarProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
-
-  const handleClick = async () => {
+  const handleAction = async () => {
     try {
       setIsLoading(true);
-      await onClick(); // executa a ação async passada pelo pai
-
-      setShowConfirmDialog(true);
-      setTimeout(() => setShowConfirmDialog(false), 1500);
-      toast.success("Negociação enviada com sucesso!");
+      await onClick();
+      setOpenModal(true); // Abre o modal apenas após a execução
+      if (isSuccess) {
+        toast.success("Solicitação enviada!");
+      }
     } catch (error) {
-      console.error("Erro ao negociar:", error);
-      // toast.error("Erro ao negociar. Tente novamente.");
+      setOpenModal(true); // Abre para mostrar o erro
+      toast.error("Não foi possível processar.");
     } finally {
-        
       setIsLoading(false);
     }
   };
 
   return (
-   <>
- <Dialog>
-    <DialogTrigger>
-         <Button
-      onClick={handleClick}
-      disabled={isLoading}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-md
-        ${isLoading 
-          ? "opacity-70 cursor-not-allowed bg-yellow-500 hover:bg-yellow-500" 
-          : "active:scale-[0.97]"
-        } text-white`}
-    >
-      {isLoading ? (
-        <>
-          <Loader2 className="w-4 h-4 animate-spin" />
-          <span>Processando...</span>
-        </>
-      ) : (
-        <>
-          <Handshake className="w-4 h-4" />
-          <span>Negociar</span>
-        </>
-      )}
-    </Button>
-    </DialogTrigger>
+    <>
+      <Button
+        onClick={handleAction}
+        disabled={isLoading}
+        className={`relative overflow-hidden flex items-center gap-2 px-6 py-5 rounded-2xl font-bold transition-all duration-500 shadow-lg active:scale-95 group
+          ${isLoading 
+            ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-800" 
+            : "bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20"
+          }`}
+      >
+        {isLoading ? (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            className="flex items-center gap-2"
+          >
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span>Validando...</span>
+          </motion.div>
+        ) : (
+          <>
+            <Handshake className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+            <span>Negociar</span>
+          </>
+        )}
+      </Button>
 
-     <DialogContent className="max-w-[250px] bg-white/90 dark:bg-black backdrop-blur-md shadow-xl border border-orange-200 flex flex-col items-center justify-center py-6">
-        {isSuccess && (
-            <AnimatePresence>
- 
+      <Dialog open={openModal} onOpenChange={setOpenModal}>
+        <DialogContent className="max-w-[320px] p-0 overflow-hidden border-none bg-white dark:bg-zinc-950 rounded-[2.5rem] shadow-2xl">
+          <AnimatePresence mode="wait">
+            {isSuccess ? (
               <motion.div
-                key="confirm"
-
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: [0.8, 1.2, 1] }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="flex flex-col items-center justify-center text-center"
+                key="success-content"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center"
               >
-              <div className="flex flex-col justify-center items-center">
-                  <Avatar>
-                    <AvatarFallback>{getInialts(nome)}</AvatarFallback>
-                      <AvatarImage src={`${api.defaults.baseURL}/uploads/${image_path}`}></AvatarImage>
-                  </Avatar>
-                  <div>
-                       <p className="mt-3 text-sm font-semibold text-muted-foreground">
-                     {nome}
-                </p>
-                  <div className="flex justify-center flex-col items-center">
-                      <p> +244{celular}</p>
-                <Button>
-                  <CallButton phoneNumber={celular}></CallButton>
-                </Button>
+                {/* Header do Modal com Gradiente */}
+                <div className="w-full h-24 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center relative">
+                  <div className="absolute -bottom-10">
+                    <Avatar className="w-20 h-20 border-4 border-white dark:border-zinc-950 shadow-xl">
+                      <AvatarImage src={`${api.defaults.baseURL}/uploads/${image_path}`} className="object-cover" />
+                      <AvatarFallback className="text-xl font-bold bg-zinc-100">{getInialts(nome)}</AvatarFallback>
+                    </Avatar>
                   </div>
+                  <CheckCircle2 className="absolute top-4 right-4 text-white/50 w-6 h-6" />
+                </div>
+
+                {/* Conteúdo do Contato */}
+                <div className="pt-12 pb-8 px-6 text-center w-full">
+                  <h3 className="text-xl font-black text-zinc-800 dark:text-zinc-100 uppercase tracking-tighter">
+                    {nome}
+                  </h3>
+                  <p className="text-sm text-zinc-500 font-medium mb-6">Cliente Verificado</p>
+                  
+                  <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-4 mb-6 border border-zinc-100 dark:border-zinc-800">
+                    <span className="text-xs text-zinc-400 uppercase font-bold tracking-widest block mb-1">Telemóvel</span>
+                    <p className="text-lg font-mono font-bold text-zinc-700 dark:text-zinc-300 tracking-wider">
+                      +244 {celular}
+                    </p>
                   </div>
-              </div>
-            
-             
+
+                  <div className="w-full">
+                    <CallButton phoneNumber={celular} />
+                  </div>
+                </div>
               </motion.div>
-       
+            ) : (
+              <motion.div
+                key="error-content"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-8 flex flex-col items-center text-center"
+              >
+                <div className="w-16 h-16 bg-red-50 dark:bg-red-950/30 rounded-full flex items-center justify-center mb-4">
+                  <XCircle className="w-10 h-10 text-red-500" />
+                </div>
+                <h3 className="font-bold text-lg text-zinc-800 dark:text-zinc-200">Ops! Algo falhou</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed">
+                  Verifique se possui <span className="text-orange-600 font-bold">créditos suficientes</span> ou se já enviou uma proposta para este pedido.
+                </p>
+                <Button 
+                  onClick={() => setOpenModal(false)}
+                  variant="outline" 
+                  className="mt-6 w-full rounded-xl border-zinc-200 dark:border-zinc-800"
+                >
+                  Entendi
+                </Button>
+              </motion.div>
+            )}
           </AnimatePresence>
-        )}
-        {isSuccess === false  && (
-           <div className="flex items-center flex-col">
-               <BellRing className="text-red-500"></BellRing>
-               <p className="text-muted-foreground">Alguma coisa deu errado!</p>
-               <p className="text-xs text-red-400">Por favor verifique se tens saldo na sua conta ou se já não negociou neste pedido.</p>
-           </div>
-
-        )}
         </DialogContent>
- </Dialog>
-  
-    
-            <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-       
-        </Dialog>
-
-     
+      </Dialog>
     </>
-  )
+  );
 }
