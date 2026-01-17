@@ -1,6 +1,12 @@
 import { CreateNewOrder } from "@/api/new-order"
 import { Button } from "@/components/ui/button"
-import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle
+} from "@/components/ui/dialog"
 import {
   Select,
   SelectContent,
@@ -12,6 +18,7 @@ import { cn } from "@/lib/utils"
 import { useMutation } from "@tanstack/react-query"
 import { AnimatePresence, motion } from "framer-motion"
 import {
+  ArrowLeft,
   ArrowRight,
   CheckCircle2,
   Clock,
@@ -21,10 +28,10 @@ import {
   MapPin,
   MapPinX,
   Wrench
-} from "lucide-react"
+} from "lucide-react"; // Verifique se o nome do pacote está correto ou use lucide-react
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { useUserLocation } from "./location-services"; // Certifique-se que este hook retorna { place, coords, loading }
+import { useUserLocation } from "./location-services"
 import { profissoesAngola } from "./profissoes"
 
 interface FastFazerPedidoProps {
@@ -34,18 +41,16 @@ interface FastFazerPedidoProps {
 export function FastFazerPedido({ selecionado }: FastFazerPedidoProps) {
   const { place, coords, loading } = useUserLocation()
   
-  // Estados do Formulário
   const [step, setStep] = useState(1)
-  const [categoria, setCategoria] = useState<string|undefined>(selecionado || "")
+  const [categoria, setCategoria] = useState<string | undefined>(selecionado || "")
   const [brevidade, setBrevidade] = useState("")
   const [manualLocation, setManualLocation] = useState("")
   const [descricao, setDescricao] = useState("")
   const [latitude, setLatitude] = useState<number | null>(null)
   const [longitude, setLongitude] = useState<number | null>(null)
   
-  // Estados de Sugestão de Endereço
   const [suggestions, setSuggestions] = useState<any[]>([])
-  const [loadingSuggestions, setLoadingSuggestions] = useState(false)
+  const [_, setLoadingSuggestions] = useState(false)
 
   const steps = [
     { id: 1, label: "Serviço", icon: Wrench },
@@ -55,7 +60,6 @@ export function FastFazerPedido({ selecionado }: FastFazerPedidoProps) {
     { id: 5, label: "Revisão", icon: CheckCircle2 },
   ]
 
-  // Sincronizar localização GPS automática
   useEffect(() => {
     if (coords?.latitude && coords?.longitude) {
       setLatitude(coords.latitude)
@@ -63,13 +67,11 @@ export function FastFazerPedido({ selecionado }: FastFazerPedidoProps) {
     }
   }, [coords])
 
-  // Busca de Endereços (OpenStreetMap Nominatim) com Debounce
   useEffect(() => {
-    if (!manualLocation || manualLocation.length < 4 || manualLocation === (place?.city || "")) {
+    if (!manualLocation || manualLocation.length < 4) {
       setSuggestions([])
       return
     }
-
     const timer = setTimeout(async () => {
       setLoadingSuggestions(true)
       try {
@@ -84,9 +86,8 @@ export function FastFazerPedido({ selecionado }: FastFazerPedidoProps) {
         setLoadingSuggestions(false)
       }
     }, 600)
-
     return () => clearTimeout(timer)
-  }, [manualLocation, place])
+  }, [manualLocation])
 
   const handleNext = () => setStep((p) => Math.min(p + 1, steps.length))
   const handlePrev = () => setStep((p) => Math.max(p - 1, 1))
@@ -102,268 +103,241 @@ export function FastFazerPedido({ selecionado }: FastFazerPedidoProps) {
     mutationFn: CreateNewOrder,
     onSuccess: () => {
       toast.success("Pedido enviado com sucesso!")
-      setStep(1) // Reset ou fechar modal
+      setStep(1)
     },
     onError: () => toast.error("Falha ao processar pedido")
   })
 
   return (
-    <DialogContent className="max-w-md p-0 overflow-hidden border-none bg-zinc-50 dark:bg-zinc-950 sm:rounded-[2.5rem] shadow-2xl">
+    <DialogPortal>
+      {/* 1. OVERLAY COM Z-INDEX MÁXIMO E BLUR PESADO */}
+      <DialogOverlay className="z-[999] bg-black/80 backdrop-blur-md" />
       
-      {/* 1. PROGRESS BAR SUPERIOR */}
-      <div className="flex w-full h-1.5 gap-1 px-8 pt-8">
-        {steps.map((s) => (
-          <div 
-            key={s.id} 
-            className={cn(
-              "h-full flex-1 rounded-full transition-all duration-500",
-              step >= s.id ? "bg-orange-500" : "bg-zinc-200 dark:bg-zinc-800"
-            )} 
-          />
-        ))}
-      </div>
+      {/* 2. CONTENT COM FOCO CORRIGIDO E SHADOW PROFUNDO */}
+      <DialogContent 
+        onOpenAutoFocus={(e) => e.preventDefault()} // Evita que o foco automático congele o Select
+        className="z-[1000] max-w-md p-0 overflow-hidden border-none bg-zinc-50 dark:bg-zinc-950 sm:rounded-[2.5rem] shadow-[0_0_60px_-15px_rgba(0,0,0,0.7)] outline-none"
+      >
+        
+        {/* PROGRESS BAR */}
+        <div className="flex w-full h-1.5 gap-1.5 px-8 pt-8">
+          {steps.map((s) => (
+            <div 
+              key={s.id} 
+              className={cn(
+                "h-full flex-1 rounded-full transition-all duration-700",
+                step >= s.id ? "bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]" : "bg-zinc-200 dark:bg-zinc-800"
+              )} 
+            />
+          ))}
+        </div>
 
-      {/* 2. HEADER DINÂMICO */}
-      <DialogHeader className="px-8 pt-6 pb-2 text-left">
-        <DialogTitle className="text-2xl font-black uppercase tracking-tighter flex items-center gap-2 text-zinc-900 dark:text-zinc-50">
-          {(() => {
-            const Icon = steps[step - 1].icon
-            return <Icon className="w-6 h-6 text-orange-500" />
-          })()}
-          {steps[step - 1].label}
-        </DialogTitle>
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-          Etapa {step} de 5
-        </p>
-      </DialogHeader>
+        {/* HEADER */}
+        <DialogHeader className="px-8 pt-6 pb-2 text-left">
+          <DialogTitle className="text-2xl font-black uppercase tracking-tighter flex items-center gap-2 text-zinc-900 dark:text-zinc-50">
+            {(() => {
+              const Icon = steps[step - 1].icon
+              return <Icon className="w-6 h-6 text-orange-500" />
+            })()}
+            {steps[step - 1].label}
+          </DialogTitle>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+            Etapa {step} de 5
+          </p>
+        </DialogHeader>
 
-      {/* 3. CONTEÚDO COM ANIMAÇÃO */}
-      <div className="px-8 pb-10 min-h-[360px] flex flex-col justify-center">
-        <AnimatePresence mode="wait">
-          
-          {/* PASSO 1: CATEGORIA */}
-          {step === 1 && (
-            <motion.div 
-              key="step1" 
-              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-              className="space-y-4"
-            >
-              <div className="text-center space-y-4">
+        {/* CONTENT AREA */}
+        <div className="px-8 pb-10 min-h-[420px] flex flex-col justify-center">
+          <AnimatePresence mode="wait">
+            
+            {/* STEP 1: SERVIÇO (CORREÇÃO DO SELECT QUE NÃO ABRE) */}
+            {step === 1 && (
+              <motion.div key="st1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
                 {selecionado ? (
-                  <div className="p-8 rounded-[2.5rem] bg-orange-500/10 border border-orange-500/20 shadow-inner">
+                  <div className="p-8 rounded-[2.5rem] bg-orange-500/10 border border-orange-500/20 text-center">
                     <Wrench className="w-12 h-12 text-orange-500 mx-auto mb-3" />
                     <h3 className="font-black uppercase text-orange-600 text-lg">{selecionado}</h3>
-                    <p className="text-xs text-orange-500/70 font-bold uppercase tracking-widest">Especialidade selecionada</p>
+                    <p className="text-[10px] text-orange-500/70 font-bold uppercase tracking-[0.2em]">Serviço Pré-definido</p>
                   </div>
                 ) : (
                   <Select onValueChange={setCategoria}>
-                    <SelectTrigger className="h-16 rounded-[1.5rem] border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-base font-medium focus:ring-orange-500">
-                      <SelectValue placeholder="O que você procura?" />
+                    <SelectTrigger className="h-16 rounded-[1.5rem] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-base font-bold shadow-sm focus:ring-2 focus:ring-orange-500">
+                      <SelectValue placeholder="O que você precisa?" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-2xl border-zinc-200 dark:border-zinc-800">
+                    {/* Z-INDEX 1100 PARA FICAR ACIMA DO DIALOG CONTENT */}
+                    <SelectContent position="popper" className="z-[1100] rounded-2xl max-h-[300px]">
                       {profissoesAngola.map((p) => (
-                        <SelectItem key={p.nome} value={p.nome} className="py-3 rounded-lg">{p.nome}</SelectItem>
+                        <SelectItem key={p.nome} value={p.nome} className="py-3 font-bold uppercase text-[10px] tracking-wider">
+                          {p.nome}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 )}
-                <Button 
-                  onClick={handleNext} 
-                  disabled={!categoria && !selecionado} 
-                  className="w-full h-16 rounded-[1.5rem] bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-tight text-lg shadow-xl shadow-orange-500/20 transition-all active:scale-95"
-                >
+                <Button onClick={handleNext} disabled={!categoria && !selecionado} className="w-full h-16 rounded-[1.5rem] bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-lg shadow-xl shadow-orange-500/30 transition-all active:scale-95">
                   Continuar <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
 
-          {/* PASSO 2: URGÊNCIA */}
-          {step === 2 && (
-            <motion.div 
-              key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-              className="grid gap-3"
-            >
-              {[
-                { id: "URGENTE", label: "Imediato", desc: "Preciso agora (Emergência)", icon: Clock, color: "text-red-500" },
-                { id: "MEDIO", label: "Hoje", desc: "Pode ser resolvido hoje", icon: Clock, color: "text-orange-500" },
-                { id: "BAIXO", label: "Agendado", desc: "Apenas para orçamento", icon: Clock, color: "text-blue-500" }
-              ].map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => { setBrevidade(opt.id); handleNext(); }}
-                  className={cn(
-                    "flex items-center justify-between p-5 rounded-[1.5rem] border-2 transition-all text-left group",
-                    brevidade === opt.id 
-                      ? "border-orange-500 bg-orange-50/50 dark:bg-orange-500/10" 
-                      : "border-zinc-100 dark:border-zinc-900 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700"
-                  )}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={cn("p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 group-hover:scale-110 transition-transform", opt.color)}>
-                      <opt.icon size={20} />
+            {/* STEP 2: URGÊNCIA */}
+            {step === 2 && (
+              <motion.div key="st2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="grid gap-3">
+                {[
+                  { id: "URGENTE", label: "Imediato", desc: "Emergência / Agora", color: "text-red-500", bg: "bg-red-500/10" },
+                  { id: "MEDIO", label: "Hoje", desc: "Resolver ainda hoje", color: "text-orange-500", bg: "bg-orange-500/10" },
+                  { id: "BAIXO", label: "Agendado", desc: "Apenas orçamentos", color: "text-blue-500", bg: "bg-blue-500/10" }
+                ].map((opt) => (
+                  <button key={opt.id} onClick={() => { setBrevidade(opt.id); handleNext(); }} className="flex items-center justify-between p-5 rounded-[1.8rem] border-2 border-zinc-100 dark:border-zinc-900 bg-white dark:bg-zinc-900 hover:border-orange-500 transition-all text-left active:scale-[0.98] group shadow-sm">
+                    <div className="flex items-center gap-4">
+                      <div className={cn("p-3 rounded-2xl transition-transform group-hover:rotate-12", opt.bg, opt.color)}>
+                        <Clock size={22} />
+                      </div>
+                      <div>
+                        <p className="font-black uppercase text-xs text-zinc-800 dark:text-zinc-100">{opt.label}</p>
+                        <p className="text-[10px] text-zinc-400 font-bold uppercase">{opt.desc}</p>
+                      </div>
+                    </div>
+                    <ArrowRight size={18} className="text-zinc-300 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
+                  </button>
+                ))}
+                <button onClick={handlePrev} className="mt-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase text-zinc-400 hover:text-orange-500 transition-colors">
+                  <ArrowLeft size={14}/> Voltar para o anterior
+                </button>
+              </motion.div>
+            )}
+
+            {/* STEP 3: LOCALIZAÇÃO (BANDEIRA INTEGRADA) */}
+            {step === 3 && (
+              <motion.div key="st3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <div className="p-5 rounded-[1.8rem] bg-zinc-100/50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between shadow-inner">
+                  <div className="flex items-center gap-3">
+                    <div className={cn("p-2.5 rounded-full shadow-sm", place?.city ? "bg-green-500 text-white" : "bg-zinc-200 text-zinc-400")}>
+                      {loading ? <Loader2 size={16} className="animate-spin" /> : place?.city ? <MapPin size={16} /> : <MapPinX size={16} />}
                     </div>
                     <div>
-                      <p className="font-black uppercase text-xs text-zinc-800 dark:text-zinc-200">{opt.label}</p>
-                      <p className="text-[10px] text-zinc-500 font-medium">{opt.desc}</p>
+                      <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Localização Detectada</p>
+                      <p className="text-xs font-black truncate max-w-[140px] text-zinc-800 dark:text-zinc-200">
+                        {place?.city ? `${place.city}, Angola` : "Procurando sinal..."}
+                      </p>
                     </div>
                   </div>
-                  <ArrowRight size={16} className="text-zinc-300 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
-                </button>
-              ))}
-              <Button variant="ghost" onClick={handlePrev} className="mt-2 font-bold uppercase text-[10px] tracking-widest text-zinc-400">Voltar</Button>
-            </motion.div>
-          )}
-
-          {/* PASSO 3: LOCALIZAÇÃO */}
-          {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-              
-              {/* Status GPS */}
-              <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={cn("p-2 rounded-full", place?.city ? "bg-green-500/10" : "bg-red-500/10")}>
-                    {loading ? <Loader2 size={16} className="animate-spin text-zinc-400" /> : place?.city ? <MapPin size={16} className="text-green-500" /> : <MapPinX size={16} className="text-red-500" />}
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-zinc-400 uppercase leading-none mb-1">Localização Atual</p>
-                    <p className="text-xs font-black truncate max-w-[180px]">
-                      {place?.city ? `${place.city}, ${place.country}` : "Não detectada"}
-                    </p>
+                  {/* Badge da Bandeira de Angola */}
+                  <div className="flex items-center gap-2 bg-white dark:bg-zinc-800 px-3 py-2 rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                    <span className="text-base leading-none">🇦🇴</span>
+                    <span className="text-[10px] font-black text-zinc-600 dark:text-zinc-400">+244</span>
                   </div>
                 </div>
-                {!place?.city && <span className="text-[9px] font-black bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded text-zinc-500 uppercase">GPS Off</span>}
-              </div>
 
-              {/* Input de Busca */}
-              <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors">
-                  <MapIcon size={18} />
-                </div>
-                <input
-                  placeholder="Digitar endereço (Bairro, Rua...)"
-                  value={manualLocation}
-                  onChange={(e) => setManualLocation(e.target.value)}
-                  className="w-full h-16 pl-12 pr-12 rounded-2xl border-2 border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 outline-none focus:border-orange-500 transition-all text-sm font-medium"
-                />
-                
-                {loadingSuggestions && (
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <Loader2 className="animate-spin text-orange-500" size={16} />
-                  </div>
-                )}
-
-                {/* Lista de Sugestões */}
-                <AnimatePresence>
-                  {suggestions.length > 0 && (
-                    <motion.ul 
-                      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-                      className="absolute z-50 w-full mt-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl max-h-56 overflow-y-auto"
-                    >
-                      {suggestions.map((s, i) => (
-                        <li key={i}>
-                          <button
-                            type="button"
-                            onClick={() => handleSuggestionSelect(s)}
-                            className="w-full text-left p-4 text-xs hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-colors border-b border-zinc-50 dark:border-zinc-800 last:border-none flex gap-3"
-                          >
-                            <MapPin size={14} className="text-orange-500 shrink-0 mt-0.5" />
-                            <span className="text-zinc-600 dark:text-zinc-300 leading-tight">{s.display_name}</span>
+                <div className="relative group">
+                  <MapIcon className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors" size={20} />
+                  <input
+                    placeholder="Bairro, Rua ou Referência"
+                    value={manualLocation}
+                    onChange={(e) => setManualLocation(e.target.value)}
+                    className="w-full h-16 pl-14 pr-12 rounded-[1.5rem] border-2 border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 outline-none focus:border-orange-500 text-sm font-bold uppercase transition-all shadow-sm"
+                  />
+                  
+                  <AnimatePresence>
+                    {suggestions.length > 0 && (
+                      <motion.ul 
+                        initial={{ opacity: 0, y: 10 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute z-[1001] w-full mt-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[1.5rem] shadow-2xl max-h-52 overflow-y-auto"
+                      >
+                        {suggestions.map((s, i) => (
+                          <button key={i} onClick={() => handleSuggestionSelect(s)} className="w-full text-left p-4 text-[10px] font-bold uppercase hover:bg-orange-50 dark:hover:bg-orange-500/10 border-b border-zinc-50 dark:border-zinc-800 flex gap-3 items-center transition-colors">
+                            <MapPin size={14} className="text-orange-500 shrink-0" />
+                            <span className="truncate leading-tight">{s.display_name}</span>
                           </button>
-                        </li>
-                      ))}
-                    </motion.ul>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <Button variant="outline" onClick={handlePrev} className="flex-1 h-14 rounded-xl font-black uppercase text-[10px] tracking-widest border-zinc-200">Voltar</Button>
-                <Button 
-                  onClick={handleNext} 
-                  disabled={!latitude || !longitude}
-                  className="flex-1 h-14 rounded-xl bg-zinc-900 dark:bg-orange-500 font-black uppercase text-[10px] tracking-widest"
-                >
-                  Avançar
-                </Button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* PASSO 4: DESCRIÇÃO */}
-          {step === 4 && (
-            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-              <div className="relative">
-                <textarea
-                  placeholder="Descreva o problema ou o que precisa exatamente. Ex: Torneira da cozinha pingando, preciso de troca da vedação."
-                  value={descricao}
-                  onChange={(e) => setDescricao(e.target.value)}
-                  className="w-full h-44 p-6 rounded-[2rem] border-2 border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 outline-none focus:border-orange-500 transition-all resize-none text-sm leading-relaxed font-medium placeholder:text-zinc-400"
-                />
-                <div className="absolute bottom-4 right-6 text-[10px] font-bold text-zinc-300 uppercase">
-                  {descricao.length} caracteres
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handlePrev} className="flex-1 h-14 rounded-xl font-black uppercase text-[10px] tracking-widest">Voltar</Button>
-                <Button onClick={handleNext} disabled={descricao.length < 10} className="flex-1 h-14 rounded-xl bg-orange-500 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-orange-500/20">Revisar</Button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* PASSO 5: REVISÃO E ENVIO */}
-          {step === 5 && (
-            <motion.div key="step5" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-6">
-              
-              <div className="p-6 rounded-[2rem] bg-zinc-100/50 dark:bg-zinc-900/50 border-2 border-dashed border-zinc-200 dark:border-zinc-800 space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase text-zinc-400 mb-1">Serviço Solicitado</p>
-                    <p className="text-sm font-black uppercase text-zinc-800 dark:text-zinc-100">{categoria || selecionado}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold uppercase text-zinc-400 mb-1">Urgência</p>
-                    <span className="px-2 py-0.5 rounded-full bg-orange-500 text-[9px] font-black text-white uppercase tracking-tighter">
-                      {brevidade}
-                    </span>
-                  </div>
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
-                  <p className="text-[10px] font-bold uppercase text-zinc-400 mb-1">Local da Execução</p>
-                  <p className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 leading-tight">
-                    {manualLocation || (place?.city ? `${place.city}, ${place.country}` : "Coordenadas GPS")}
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" onClick={handlePrev} className="flex-1 h-14 rounded-xl font-black uppercase text-[10px] tracking-widest border-zinc-200">Voltar</Button>
+                  <Button onClick={handleNext} disabled={!latitude || !longitude} className="flex-1 h-14 rounded-xl bg-zinc-900 dark:bg-orange-500 text-white font-black uppercase text-[10px] tracking-widest shadow-lg">Avançar</Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* STEP 4: DESCRIÇÃO */}
+            {step === 4 && (
+              <motion.div key="st4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                <div className="relative">
+                  <textarea
+                    placeholder="Detalhe o seu problema aqui..."
+                    value={descricao}
+                    onChange={(e) => setDescricao(e.target.value)}
+                    className="w-full h-48 p-7 rounded-[2.2rem] border-2 border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 outline-none focus:border-orange-500 transition-all resize-none text-sm font-bold leading-relaxed shadow-inner"
+                  />
+                  <div className="absolute bottom-5 right-7 px-2 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg text-[9px] font-black text-zinc-400 uppercase">
+                    {descricao.length} Caracteres
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handlePrev} className="flex-1 h-14 rounded-xl font-black uppercase text-[10px] tracking-widest">Voltar</Button>
+                  <Button onClick={handleNext} disabled={descricao.length < 10} className="flex-1 h-14 rounded-xl bg-orange-500 text-white font-black uppercase text-[10px] tracking-widest">Revisar Pedido</Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* STEP 5: REVISÃO FINAL */}
+            {step === 5 && (
+              <motion.div key="st5" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+                <div className="p-7 rounded-[2.5rem] bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950 border-2 border-dashed border-zinc-200 dark:border-zinc-800 space-y-6 shadow-sm">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-[9px] font-black text-zinc-400 uppercase tracking-tighter">Tipo de Serviço</p>
+                      <p className="text-sm font-black uppercase text-orange-600">{categoria || selecionado}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[9px] font-black text-zinc-400 uppercase tracking-tighter">Prioridade</p>
+                      <span className="text-[9px] font-black bg-orange-500 text-white px-3 py-1 rounded-full uppercase">{brevidade}</span>
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-start gap-3">
+                    <MapPin size={16} className="text-zinc-400 shrink-0" />
+                    <div>
+                      <p className="text-[9px] font-black text-zinc-400 uppercase tracking-tighter">Endereço de Execução</p>
+                      <p className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase leading-tight line-clamp-2">
+                        {manualLocation || (place?.city ? `${place.city}, Angola` : "Localização GPS")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <Button 
+                    onClick={() => sendOrder({ 
+                      title: categoria || selecionado, 
+                      brevidade, 
+                      content: descricao, 
+                      latitude, 
+                      longitude, 
+                      location: manualLocation || `${place?.city}` 
+                    })} 
+                    disabled={isPending}
+                    className="w-full h-16 rounded-[1.8rem] bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-lg shadow-2xl shadow-orange-500/40 transition-all active:scale-[0.97]"
+                  >
+                    {isPending ? <Loader2 className="animate-spin" /> : "Publicar Pedido Agora"}
+                  </Button>
+                  <p 
+                    className="text-center text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-orange-500 transition-colors"
+                    onClick={handlePrev}
+                  >
+                    Clique aqui para editar detalhes
                   </p>
                 </div>
-              </div>
+              </motion.div>
+            )}
 
-              <div className="flex flex-col gap-3">
-                <Button 
-                  onClick={() => sendOrder({ 
-                    title: categoria || selecionado , 
-                    brevidade, 
-                    content: descricao, 
-                    latitude, 
-                    longitude, 
-                    location: manualLocation || `${place?.city}, ${place?.country}` 
-                  })} 
-                  disabled={isPending}
-                  className="w-full h-16 rounded-[1.5rem] bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-tight text-lg shadow-2xl shadow-orange-500/30"
-                >
-                  {isPending ? <Loader2 className="animate-spin mr-2" /> : "Confirmar Pedido"}
-                </Button>
-                <button 
-                  onClick={handlePrev} 
-                  className="text-[10px] font-black uppercase text-zinc-400 hover:text-orange-500 transition-colors tracking-widest"
-                >
-                  Deseja alterar algo? Clique aqui
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-        </AnimatePresence>
-      </div>
-    </DialogContent>
+          </AnimatePresence>
+        </div>
+      </DialogContent>
+    </DialogPortal>
   )
 }

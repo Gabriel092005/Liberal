@@ -50,7 +50,7 @@ export function Docencia() {
   ]
 
   return (
-    <div className="w-full max-w-5xl mx-auto overflow-hidden rounded-[2.5rem] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col md:flex-row my-8">
+    <div className="w-full max-w-5xl mx-auto overflow-hidden rounded-[2.5rem] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col md:flex-row lg:my-8">
       
       {/* Lado Esquerdo: Identidade Visual (Igual ao Electricidade) */}
       <div className="relative w-full md:w-1/2 h-64 md:h-auto min-h-[300px] md:min-h-[450px]">
@@ -93,7 +93,7 @@ export function Docencia() {
           </h3>
         </header>
         
-        <ScrollArea className="h-[250px] md:h-auto w-full pr-4">
+        <ScrollArea className="h-[115px] md:h-auto w-full pr-4">
           <div className="flex flex-col gap-3 pb-2">
             {disciplinas.map((nome, index) => (
               <motion.div
@@ -112,11 +112,7 @@ export function Docencia() {
           </div>
         </ScrollArea>
 
-        <div className="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-          <p className="text-[10px] text-zinc-400 italic">
-            * Professores verificados com certificação comprovada em Angola.
-          </p>
-        </div>
+      
       </div>
     </div>
   )

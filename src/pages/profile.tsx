@@ -13,7 +13,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { EditarBio } from "@/api/editar-bio";
-import { Config } from "./app/Prestadores-dash/config-prestadores";
 import { Badge } from "@/components/ui/badge";
 
 const editarBioBodySchema = z.object({
@@ -163,18 +162,20 @@ export function Profile() {
 
         {/* BOTÕES DE AÇÃO - AJUSTADOS PARA PERFEITO SCROLL */}
         <div className="mt-8 mb-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="flex-1 h-14 rounded-2xl bg-zinc-900 dark:bg-white dark:text-zinc-900 font-black uppercase tracking-tight hover:bg-blue-600 hover:text-white transition-all shadow-lg active:scale-95">
+          {/* <Dialog> */}
+            {/* <DialogTrigger asChild> */}
+            <Link to='/config' className="flex flex-1 w-full">
+               <Button className="flex-1 h-14 rounded-2xl bg-zinc-900 dark:bg-white dark:text-zinc-900 font-black uppercase tracking-tight hover:bg-blue-600 hover:text-white transition-all shadow-lg active:scale-95">
                 Configurações da Conta
               </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl h-[90vh] sm:h-[85vh] overflow-hidden flex flex-col rounded-[2.5rem] p-0 border-none">
+            </Link>
+            {/* </DialogTrigger> */}
+            {/* <DialogContent className="max-w-2xl h-[90vh] sm:h-[85vh] overflow-hidden flex flex-col rounded-[2.5rem] p-0 border-none">
               <div className="overflow-y-auto p-6 flex-1">
                 <Config />
               </div>
-            </DialogContent>
-          </Dialog>
+            </DialogContent> */}
+          {/* </Dialog> */}
 
           <div className="w-full sm:w-auto">
             <Button 

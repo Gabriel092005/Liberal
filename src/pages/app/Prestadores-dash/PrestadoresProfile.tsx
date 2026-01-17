@@ -15,11 +15,11 @@ import z from "zod";
 
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Config } from "./config-prestadores";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { PromoverServicos } from "@/api/vitrine";
+import { Link } from "react-router-dom";
 
 
 const editarBioBodySchema = z.object({
@@ -329,17 +329,14 @@ const {
 
   {/* Botão: Configurações */}
   <Dialog>
-    <DialogTrigger asChild>
-      <Button className="w-full h-14 rounded-[1.5rem] bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold uppercase tracking-tight hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200/50 dark:border-zinc-700/50 gap-3">
+     <Link to='/config-prestadores'>
+       <Button variant={"link"} className="w-full h-14 rounded-[1.5rem] bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold uppercase tracking-tight hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200/50 dark:border-zinc-700/50 gap-3">
         <Settings size={20} className="text-zinc-500" />
         Configurações da Conta
       </Button>
-    </DialogTrigger>
-    <DialogContent className="max-w-2xl w-[95vw] h-[85vh] overflow-hidden rounded-[3rem] p-0 border-none bg-zinc-50 dark:bg-zinc-950 shadow-2xl">
-      <div className="h-full overflow-y-auto p-6">
-        <Config />
-      </div>
-    </DialogContent>
+     </Link>
+    
+   
   </Dialog>
 
   {/* Botão: Sair (Design mais limpo e discreto) */}

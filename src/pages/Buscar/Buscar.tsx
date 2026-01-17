@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Briefcase,  Search, X, HeartOff, Star, MapPin, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -127,9 +127,12 @@ export function BuscarPrestadores() {
                             <HeartOff size={18} />
                           </Button>
                         </div>
-                        <Button className="rounded-xl bg-zinc-900 dark:bg-white dark:text-black hover:bg-orange-500 dark:hover:bg-orange-500 hover:text-white transition-all font-bold text-xs h-10 px-6">
+                         <Link to={`/users/${card.prestador.id}/profile`} className="mt-6">
+                             <Button className="rounded-xl bg-zinc-900 dark:bg-white dark:text-black hover:bg-orange-500 dark:hover:bg-orange-500 hover:text-white transition-all font-bold text-xs h-10 px-6">
                           Ver Perfil
                         </Button>
+                         </Link>
+                      
                       </div>
                     </CardContent>
                   </Card>

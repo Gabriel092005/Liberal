@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
 import { ChevronRight,  } from 'lucide-react'
 import { FastFazerPedido } from '../DialogFastPrestadoresPedido'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 type ServicoButtonProps = {
   nome: string
@@ -76,24 +77,22 @@ export function BelezaModa() {
           <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-6">
             Selecione um serviço
           </p>
-          
-          <div className="flex flex-col gap-3">
-            {servicos.map((servico) => (
-              <ServicoButton
-                key={servico}
-                nome={servico}
-                selecionado={servicoSelecionado}
-                onSelect={setServicoSelecionado}
-              />
-            ))}
-          </div>
+        <ScrollArea className="h-full max-h-[130px] w-full rounded-3xl border border-transparent">
+    <div className="flex flex-col gap-3 pr-4 pb-4"> 
+      {/* O pr-4 evita que o conteúdo fique colado na barra de scroll */}
+      {servicos.map((servico) => (
+        <ServicoButton
+          key={servico}
+          nome={servico}
+          selecionado={servicoSelecionado}
+          onSelect={setServicoSelecionado}
+        />
+      ))}
+    </div>
+  </ScrollArea>
         </div>
         
-        <footer className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-          <p className="text-[10px] text-zinc-500 text-center">
-            Atendimento domiciliar ou em salão parceiro.
-          </p>
-        </footer>
+      
       </div>
     </div>
   )

@@ -23,6 +23,7 @@ import { ServicesDialogDetails } from "./ServicesDialogDetails";
 import { Vitrine } from "./Vitrine";
 import logo from '@/assets/liberal.png'
 import { ModeToggle } from "@/components/theme/theme-toggle";
+import { ChatIntegrado } from "../dashboard-admin/sidebar/Mensagens";
 
 
 function useDebounce<T>(value: T, delay = 400): T {
@@ -126,11 +127,11 @@ export function HomeContent() {
       <Sheet>
         <SheetTrigger asChild>
           <Button 
-            variant="ghost" 
+            variant="outline" 
             size="icon" 
-            className="rounded-2xl h-11 w-11 bg-orange-500 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-orange-600 dark:hover:bg-orange-500 hover:text-white active:scale-95 transition-all duration-300 shadow-lg shadow-orange-500/10"
+            className="rounded-2xl h-11 w-11   text-white dark:text-zinc-900 0 hover:text-white active:scale-95 transition-all duration-300 shadow-lg shadow-orange-500/10"
           >
-            <Menu className="h-5 w-5 stroke-[2.5px]" />
+            <Menu className="h-5 w-5 text-muted-foreground hover:text-white stroke-[2.5px]" />
           </Button>
 
         </SheetTrigger>
@@ -148,6 +149,7 @@ export function HomeContent() {
         </SheetContent>
       </Sheet>
       <ModeToggle></ModeToggle>
+      <ChatIntegrado></ChatIntegrado>
     </div>
   </div>
 </header>

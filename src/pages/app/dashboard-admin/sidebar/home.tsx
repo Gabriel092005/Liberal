@@ -2,7 +2,7 @@ import { GetCategory } from "@/api/get-categories";
 import { GetUserProfile } from "@/api/get-profile";
 import { GetProfission } from "@/api/get-profissions";
 import { Logout } from "@/api/log-out";
-import logo from '@/assets/logo-01.png'
+import logo from '@/assets/logo-01.png';
 
 import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
 import { UpdatePhoto } from "@/api/update-profile-photo";
@@ -44,9 +44,9 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { DestaquesAuto } from "./destacados";
+import { AppFooter } from "./footer";
 import { ChatIntegrado } from "./Mensagens";
 import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
-import { AppFooter } from "./footer";
 
 
 
@@ -287,15 +287,15 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-4  py-3 space-y-8 pb-24">
           
           {/* BOTÕES DE NAVEGAÇÃO HORIZONTAL */}
-          <div className="flex items-center gap-4 overflow-x-auto no-scrollbar -pb-1">
+          <div className="flex items-center  justify-center gap-4 overflow-x-auto no-scrollbar -pb-1">
             <Link to="/vitrine">
-              <motion.div whileHover={{ y: -2 }} className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-900 border rounded-full shadow-sm">
+              <motion.div whileHover={{ y: -2 }} className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-zinc-900 dark:border-none  border rounded-full shadow-sm">
                 <div className="p-2 bg-orange-500 rounded-full text-white"><BookMarked size={16}/></div>
                 <div className="flex flex-col"><span className="text-xs font-bold leading-none">Vitrine</span><span className="text-[9px] text-muted-foreground">Explorar</span></div>
               </motion.div>
             </Link>
             <Link to="/comment">
-              <motion.div whileHover={{ y: -2 }} className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-slate-900 border rounded-full shadow-sm">
+              <motion.div whileHover={{ y: -2 }} className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-zinc-900 dark:border-none  border rounded-full shadow-sm">
                 <div className="p-2 bg-blue-500 rounded-full text-white"><MessageCircle size={16}/></div>
                 <div className="flex flex-col"><span className="text-xs font-bold leading-none">Feedbacks</span><span className="text-[9px] text-muted-foreground">Comunidade</span></div>
               </motion.div>

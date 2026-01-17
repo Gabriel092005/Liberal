@@ -2,12 +2,12 @@ import { Commentar } from "@/api/commentar-prestadores";
 import { CostumerOrders, Interessado } from "@/api/costumer-orders";
 import { Deletar } from "@/api/deletar-order";
 import { Favoritar } from "@/api/favoritar";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,7 +19,7 @@ import { formatNotificationDate } from "@/lib/utils";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { AlertCircle, Briefcase, ChevronDown, Clock, File, MapPin, MessageCircle, Phone, Pin, Search, Trash2 } from "lucide-react";
+import { AlertCircle, Briefcase, ChevronRight, Clock, File, MapPin, MessageCircle, Phone, Pin, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
@@ -148,7 +148,7 @@ const { mutate: EliminarPedido } = useMutation({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <Card className="w-full max-w-lg border-none bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] rounded-[2.5rem] overflow-hidden">
+      <Card className="w-full max-w-lg border-none bg-white/80 dark:bg-zinc-950  backdrop-blur-xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] rounded-[2.5rem] overflow-hidden">
         <CardHeader className="pb-4">
           <div className="flex justify-between items-center mb-2">
             <div>
@@ -166,7 +166,7 @@ const { mutate: EliminarPedido } = useMutation({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por título ou descrição..."
-              className="h-12 pl-12 rounded-2xl bg-slate-100/50 dark:bg-slate-900/50 border-none focus-visible:ring-2 focus-visible:ring-orange-500/50 transition-all"
+              className="h-12 pl-12 rounded-2xl bg-slate-100/50  dark:bg-zinc-900   border-none focus-visible:ring-2 focus-visible:ring-orange-500/50 transition-all"
             />
           </div>
         </CardHeader>
@@ -186,7 +186,7 @@ const { mutate: EliminarPedido } = useMutation({
                   <motion.div 
                     key={pedido.id}
                     layout
-                    className="group relative p-4 rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300"
+                    className="group relative p-4 rounded-3xl border border-slate-100   bg-white dark:bg-zinc-950 dark:border-none  hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300"
                   >
                     <div className="flex gap-4">
                       {/* Avatar do Serviço */}
@@ -234,149 +234,160 @@ const { mutate: EliminarPedido } = useMutation({
                         </div>
 
                         {/* Dropdown de Prestadores Refatorado */}
-                        <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="w-full justify-between h-10 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-orange-500 hover:text-white transition-all group/btn">
-                                <div className="flex items-center gap-2">
-                                  <Briefcase size={14} className="group-hover/btn:text-white text-orange-500 transition-colors" />
-                                  <span className="text-xs font-bold"> Interessados</span>
-                                </div>
-                                <ChevronDown size={14} className="opacity-50" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            
-                            <DropdownMenuContent  align="end" className="w-[320px] p-2 rounded-[2rem] border-none shadow-2xl bg-white/95 dark:bg-slate-950/95  backdrop-blur-xl">
-                              <ScrollArea className="max-h-[350px]">
-                                {pedido.interessados?.length > 0 ? (
-                                  pedido.interessados.map((i: Interessado) => (
-                                <div className="relative max-h-[70vh] overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-orange-500/40 scrollbar-track-transparent">
-
-  <div
-    key={i.prestadorId}
-    onClick={() =>
-      handleSetCommentSearchParams({
-        userId: String(i.prestadorId),
-      })
-    }
-    className="group/item relative p-4 rounded-[2rem] bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-900 hover:shadow-2xl hover:shadow-orange-500/5 transition-all duration-500"
-  >
-    <div className="flex items-center gap-4">
-      {/* Avatar */}
-      <div className="relative">
-        <Avatar className="h-12 w-12 rounded-2xl ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 ring-transparent group-hover/item:ring-orange-500/20 transition-all duration-500">
-          <AvatarImage
-            src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`}
-            className="object-cover"
-          />
-          <AvatarFallback className="bg-orange-100 text-orange-600 text-xs font-bold">
-            {i.prestador.nome.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 bg-green-500 border-2 border-white dark:border-zinc-950 rounded-full" />
-      </div>
-
-      {/* Nome */}
-      <div className="flex-1 min-w-0">
-        <p className="text-base max-w-44 w-32 font-black tracking-tight text-zinc-800 dark:text-zinc-100 truncate">
-          {i.prestador.nome}
-        </p>
-        <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[9px] font-black uppercase tracking-widest mt-0.5">
-          {i.prestador.profissao}
+                        <div className="mt-4  -ml-10 border-t border-slate-50 dark:border-slate-800">
+               
+                              <div className="w-full max-w-full sm:px-0">
+      {/* Header Adaptável */}
+      <div className="flex items-center justify-between  px-2">
+        <div className="flex items-center gap-2">
+          <Briefcase size={16} className="text-orange-500" />
+          <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">
+            Interessados ({pedido.interessados?.length || 0})
+          </h3>
         </div>
       </div>
 
-      <PedidoCard
-        refetch={refetch}
-        isRefetching={isRefetching}
-        prestadorId={i.prestadorId}
-        id={pedido.id}
-        status={i.status}
-      />
-    </div>
-
-    {/* Footer */}
-    <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/50 flex items-center justify-between opacity-0 group-hover/item:opacity-100 transform translate-y-2 group-hover/item:translate-y-0 transition-all duration-300">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          onClick={() => favoritar({ prestadorId: i.prestadorId })}
-          className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-orange-500/10 hover:text-orange-600 transition-colors"
-        >
-          <Pin size={15} />
-        </Button>
-
-        <Button
-          variant="ghost"
-          className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-yellow-500/10 hover:text-yellow-600 transition-colors overflow-visible"
-        >
-          <StarButton prestadorId={i.prestadorId} />
-        </Button>
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-9 w-9 p-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-blue-500/10 hover:text-blue-600 transition-colors"
-            >
-              <MessageCircle size={15} />
-            </Button>
-          </DialogTrigger>
-
-          <DialogContent className="sm:max-w-[425px] rounded-[2.5rem] p-6 backdrop-blur-2xl bg-white/90 dark:bg-zinc-950/90 border-zinc-200/50">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-black tracking-tighter uppercase">
-                Avaliar Atendimento
-              </DialogTitle>
-              <DialogDescription className="text-zinc-500 font-medium">
-                Sua opinião ajuda a comunidade a escolher os melhores profissionais.
-              </DialogDescription>
-            </DialogHeader>
-
-            <form
-              onSubmit={handleSubmit(handlecomentar)}
-              className="space-y-4 mt-4"
-            >
-              <Textarea
-                {...register("content")}
-                placeholder="Como foi sua experiência?"
-                className="min-h-[120px] rounded-3xl border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus:ring-orange-500/20"
-              />
-              <Button
-                type="submit"
-                className="w-full h-12 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase tracking-widest transition-all active:scale-95"
+      <ScrollArea className="h-[400px] sm:h-[200px] w-full pr-2">
+        {pedido.interessados?.length > 0 ? (
+          <Accordion type="single" collapsible className="w-full space-y-3">
+            {pedido.interessados.map((i: Interessado) => (
+              <AccordionItem
+                key={i.prestadorId}
+                value={String(i.prestadorId)}
+                className="border-none bg-white dark:bg-zinc-900/50 rounded-[1.5rem] sm:rounded-[2rem] px-3 sm:px-4 border border-zinc-100 dark:border-zinc-800 shadow-sm overflow-hidden"
               >
-                Enviar Avaliação
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+                {/* CABEÇALHO RESPONSIVO */}
+                <AccordionTrigger className="hover:no-underline py-4 group">
+                  <div className="flex items-center justify-between w-full gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative shrink-0">
+                        <Avatar className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl">
+                          <AvatarImage
+                            src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`}
+                            className="object-cover"
+                          />
+                          <AvatarFallback className="bg-orange-100 text-orange-600 font-bold text-xs">
+                            {i.prestador.nome.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border-2 border-white dark:border-zinc-900 rounded-full" />
+                      </div>
 
-      <a
-        href={`tel:+244${i.prestador.celular}`}
-        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-zinc-950/10"
-      >
-        <Phone size={12} className="fill-current" />
-        <span className="text-[10px] font-black uppercase tracking-tighter">
-          +244 {i.prestador.celular}
-        </span>
-      </a>
+                      <div className="text-left min-w-0">
+                        <p className="text-xs sm:text-sm font-black text-zinc-800 dark:text-zinc-100 truncate pr-2 uppercase">
+                          {i.prestador.nome.split(' ')[0]} {/* Apenas primeiro nome no mobile */}
+                        </p>
+                        <p className="text-[8px] sm:text-[10px] font-bold text-orange-500 uppercase tracking-tighter sm:tracking-widest truncate">
+                          {i.prestador.profissao}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Botão de Status (Oculto em telas muito pequenas se necessário, ou reduzido) */}
+                    <div className="shrink-0 scale-75 sm:scale-90 origin-right">
+                       <PedidoCard
+                          refetch={refetch}
+                          isRefetching={isRefetching}
+                          prestadorId={i.prestadorId}
+                          id={pedido.id}
+                          status={i.status}
+                        />
+                    </div>
+                  </div>
+                </AccordionTrigger>
+
+                {/* CONTEÚDO EXPANSÍVEL (Ações focadas em toque) */}
+                <AccordionContent className="pb-5 pt-0">
+                  <div className="flex flex-col gap-3 mt-2 border-t border-zinc-50 dark:border-zinc-800/50 pt-4">
+                    
+                    {/* Grid de Botões Secundários */}
+                    <div className="grid grid-cols-3 gap-2 w-full">
+                      <Button
+                        variant="secondary"
+                        onClick={() => favoritar({ prestadorId: i.prestadorId })}
+                        className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex flex-col items-center justify-center gap-1"
+                      >
+                        <Pin size={14} className="text-zinc-500" />
+                        <span className="text-[8px] font-black uppercase">Fixar</span>
+                      </Button>
+
+                      <Button
+                        variant="secondary"
+                        className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex flex-col items-center justify-center gap-1"
+                      >
+                        <StarButton prestadorId={i.prestadorId} />
+                        <span className="text-[8px] font-black uppercase">Avaliar</span>
+                      </Button>
+                      <Dialog>
+  <DialogTrigger asChild>
+    <Button
+      variant="secondary"
+      onClick={() => handleSetCommentSearchParams({ userId: String(i.prestadorId) })}
+      className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex flex-col items-center justify-center gap-1"
+    >
+      <MessageCircle size={14} className="text-zinc-500" />
+      <span className="text-[8px] font-black uppercase">comentar</span>
+    </Button>
+  </DialogTrigger>
+
+  {/* Usamos DialogPortal sem o DialogOverlay */}
+    <DialogContent 
+    
+      className="z-[1001] fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] sm:max-w-[400px] rounded-[2rem] p-6 bg-white dark:bg-zinc-950 shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] border-zinc-200 dark:border-zinc-800 outline-none"
+    >
+      <DialogHeader>
+        <DialogTitle className="text-xl font-black uppercase tracking-tighter">
+          Avaliar Prestador
+        </DialogTitle>
+      </DialogHeader>
+      
+      <form onSubmit={handleSubmit(handlecomentar)} className="mt-4 space-y-4">
+        <p className="text-xs font-medium text-zinc-500">
+          Diga como foi o serviço de <span className="text-orange-500 font-bold">{i.prestador.nome}</span>
+        </p>
+        
+        <Textarea 
+         {...register('content')}
+          placeholder="Escreva aqui..." 
+          className="min-h-[100px] rounded-2xl bg-zinc-50 dark:bg-zinc-900 border-none focus-visible:ring-orange-500"
+        />
+        
+        <Button type="submit" className="w-full h-12 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-xs tracking-widest">
+          Enviar Comentário
+        </Button>
+      </form>
+    </DialogContent>
+</Dialog>
+                     
+                    </div>
+
+                    {/* Botão de Chamada - Grande para Mobile */}
+                    <a
+                      href={`tel:+244${i.prestador.celular}`}
+                      className="flex items-center justify-between w-full h-14 px-4 rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Phone size={18} fill="currentColor" />
+                        <div className="text-left">
+                          <p className="text-[7px] font-black uppercase opacity-80 leading-none">Ligar agora para</p>
+                          <p className="text-xs font-black tracking-widest">+244 {i.prestador.celular}</p>
+                        </div>
+                      </div>
+                      <ChevronRight size={16} />
+                    </a>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        ) : (
+          <div className="py-10 text-center rounded-[2rem] border-2 border-dashed border-zinc-100 dark:border-zinc-800">
+            <AlertCircle size={30} className="mx-auto mb-2 text-zinc-300" />
+            <p className="text-[9px] font-black uppercase text-zinc-400">Nenhum interessado</p>
+          </div>
+        )}
+      </ScrollArea>
     </div>
-  </div>
-
-</div>
-
-                                  ))
-                                ) : (
-                                  <div className="py-8 text-center text-muted-foreground">
-                                    <AlertCircle size={32} className="mx-auto mb-2 opacity-20" />
-                                    <p className="text-xs font-bold">Ninguém interessado ainda</p>
-                                  </div>
-                                )}
-                              </ScrollArea>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
                         </div>
                       </div>
                     </div>

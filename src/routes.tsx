@@ -39,6 +39,7 @@ import { PrestadoresTableFilters } from './pages/dash-admin/prestadores/prestado
 import { LoadingPage } from './pages/Loading';
 import { PaginaProfissoes } from './profissionals-page';
 import { PrestadoreProfile } from './pages/app/dashboard-admin/sidebar/PrestadorProfile';
+import { ConfigPrestadores } from './pages/app/Prestadores-dash/config-prestadores';
 export const router = createBrowserRouter([
   {
 
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
       { path: '/vitrine', element: <Vitrine/> },
       { path: '/comment', element: <CommentsList/> },
       { path: '/notif-costumer', element: <NotificacoesMobileCostumer/> },
+      { path: '/users/:id/profile', element: <PrestadoreProfile /> }, // ROTA DINÂMICA
       { path: '/ensino', element: <Docencia/> },
       { path: '/tecnologia', element: <TecnologiaDesign/> },
       { path: '/electricidade', element: <Electricidade/> },
@@ -82,10 +84,10 @@ export const router = createBrowserRouter([
       // {path:'/', <PrestadoresLayout}
       {path: '/loading', element:<LoadingPage/> },
       { path: '/servicos', element: <PrestadoresDash/> },
-      { path: '/users/:id/profile', element: <PrestadoreProfile /> }, // ROTA DINÂMICA
+      
 
       { path: '/notif-prestadores', element: <NotificacoesMobile/> },
-      { path: '/config-prestadores', element: <Config/> },
+      { path: '/config-prestadores', element: <ConfigPrestadores/> },
       { path: '/prestadores-pedidos', element: <PrestadoresPedidos/> },
       { path: '/profile', element: <ProfilePage/> },
       { path: '/package', element: <Package/> },
