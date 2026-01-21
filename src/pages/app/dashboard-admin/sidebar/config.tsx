@@ -3,8 +3,8 @@ import { ModeToggle } from "@/components/theme/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import angolaSvg from '@/assets/angola.png'
 
+import { ScrollArea } from "@/components/ui/scroll-area"; // Importação adicionada
 import {
   Select,
   SelectContent,
@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ScrollArea } from "@/components/ui/scroll-area" // Importação adicionada
 import { provinceMunicipalityMap } from "@/data/province"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
@@ -107,7 +106,7 @@ export function Config() {
       className="h-12 rounded-2xl bg-background border-none ring-1 ring-border pl-20 focus-visible:ring-2 focus-visible:ring-blue-500 transition-all"
     />
     <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 border-r pr-2 border-border">
-      <img src={angolaSvg} alt="" className="h-10"/>
+      {/* <img src={angolaSvg} alt="" className="h-10"/> */}
       <span className="text-base" role="img" aria-label="Angola">
         🇦🇴
       </span>

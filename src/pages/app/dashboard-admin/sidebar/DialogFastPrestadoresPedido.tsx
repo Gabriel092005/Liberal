@@ -102,7 +102,7 @@ export function FastFazerPedido({ selecionado }: FastFazerPedidoProps) {
   const { mutateAsync: sendOrder, isPending } = useMutation({
     mutationFn: CreateNewOrder,
     onSuccess: () => {
-      toast.success("Pedido enviado com sucesso!")
+      toast.success("O seu pedido foi publicado e está visível para prestadores.")
       setStep(1)
     },
     onError: () => toast.error("Falha ao processar pedido")

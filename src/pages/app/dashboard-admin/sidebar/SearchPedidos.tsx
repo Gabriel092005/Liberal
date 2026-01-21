@@ -15,15 +15,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/axios";
 import { queryClient } from "@/lib/react-query";
 import { socket } from "@/lib/socket";
-import { formatNotificationDate } from "@/lib/utils";
+import { formatNotificationDate, getInialts } from "@/lib/utils";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { AlertCircle, Briefcase, ChevronRight, Clock, File, MapPin, MessageCircle, Phone, Pin, Search, Trash2 } from "lucide-react";
+import { Briefcase, ChevronRight, Clock, File, MapPin, Maximize2, MessageCircle, Phone, Pin, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import z from "zod";
+import { EmptyInteressados } from "./EmptyInterssados";
+import { ExpandableContent } from "./pedido-description";
 import { PedidoCard } from "./pedidos-confirmar";
 import { StarButton } from "./stars-button";
 
@@ -67,6 +70,9 @@ export function SearchPedidos() {
 
     const {mutateAsync:favoritar} = useMutation({
     mutationFn : Favoritar,
+    onSuccess(){
+      toast.success("O Prestador foi colocado nos favoritos com sucesso.")
+    }
   })
 const { mutate: EliminarPedido } = useMutation({
     mutationFn: Deletar,
@@ -78,7 +84,7 @@ const { mutate: EliminarPedido } = useMutation({
       });
     },
   });
-  const { data: orders, isLoading, refetch,isRefetching } = useQuery({
+  const { data: orders, isLoading, refetch} = useQuery({
   queryKey: ["orders", searchTerm],
   refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
   refetchOnReconnect: true,       // Rebusca se a internet voltar
@@ -172,7 +178,7 @@ const { mutate: EliminarPedido } = useMutation({
         </CardHeader>
 
         <CardContent className="p-0">
-          <ScrollArea className="h-[calc(100vh-320px)] px-6 pb-6">
+          <ScrollArea className="h-[calc(100vh-320px)] px-1 pb-6">
             <div ref={parent} className="space-y-4">
               {isLoading ? (
                 <PedidoSkeleton />
@@ -191,10 +197,55 @@ const { mutate: EliminarPedido } = useMutation({
                     <div className="flex gap-4">
                       {/* Avatar do Serviço */}
                       <div className="relative flex-shrink-0">
-                        <Avatar className="w-14 h-14 rounded-2xl shadow-inner ring-2 ring-white dark:ring-slate-800">
-                          <AvatarImage src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} className="object-cover" />
-                          <AvatarFallback className="bg-orange-50 text-orange-500 font-bold">{pedido.title.substring(0,2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
+
+
+<Dialog>
+  <DialogTrigger asChild>
+    <div className="relative group cursor-zoom-in">
+      <Avatar className="w-14 h-14 rounded-2xl shadow-inner ring-2 ring-white dark:ring-slate-800 transition-transform duration-300 group-hover:scale-105">
+        <AvatarImage 
+          src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} 
+          className="object-cover" 
+        />
+        <AvatarFallback className="bg-orange-50 text-orange-500 font-bold">
+          {pedido.title.substring(0,2).toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
+      
+      {/* Overlay sutil de hover */}
+      <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center">
+        <Maximize2 size={14} className="text-white shadow-sm" />
+      </div>
+    </div>
+  </DialogTrigger>
+
+  <DialogContent className="max-w-[90vw] sm:max-w-[500px] p-0 overflow-hidden bg-transparent border-none shadow-none z-[9999]">
+    {/* Animação de entrada da foto */}
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      className="relative aspect-square w-full"
+    >
+      <img 
+        src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} 
+        alt={pedido.title}
+        className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl ring-4 ring-white/10"
+      />
+      
+      {/* Legenda Flutuante */}
+      <div className="absolute bottom-4 left-4 right-4 p-4 bg-black/40 backdrop-blur-md rounded-[1.5rem] border border-white/10">
+        <p className="text-white font-black italic uppercase tracking-tighter text-sm">
+          {pedido.title}
+        </p>
+        <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+          Visualização do Pedido
+        </p>
+      </div>
+
+     
+    </motion.div>
+  </DialogContent>
+</Dialog>
                         {pedido._count.interessados > 0 && (
                           <span className="absolute -top-2 -right-2 h-6 w-6 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center ring-4 ring-white dark:ring-slate-950 animate-bounce">
                             {pedido._count.interessados}
@@ -213,9 +264,7 @@ const { mutate: EliminarPedido } = useMutation({
                           </button>
                         </div>
                         
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1 leading-relaxed">
-                          {pedido.content}
-                        </p>
+                      <ExpandableContent content={pedido.content}></ExpandableContent>
 
                         <div className="mt-4 flex flex-wrap items-center gap-3">
                           <Badge variant="outline" className={`rounded-lg px-2 py-0.5 font-bold text-[10px] ${getUrgencyStyles(pedido.brevidade)}`}>
@@ -261,15 +310,53 @@ const { mutate: EliminarPedido } = useMutation({
                   <div className="flex items-center justify-between w-full gap-2">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="relative shrink-0">
-                        <Avatar className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl">
-                          <AvatarImage
-                            src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`}
-                            className="object-cover"
-                          />
-                          <AvatarFallback className="bg-orange-100 text-orange-600 font-bold text-xs">
-                            {i.prestador.nome.substring(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                   <Dialog>
+  <DialogTrigger asChild>
+    <div className="relative ">
+      <Avatar className="w-14 h-14 rounded-2xl shadow-inner ring-2 ring-white dark:ring-slate-800 transition-transform duration-300 group-hover:scale-105">
+        <AvatarImage 
+          src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`} 
+          className="object-cover" 
+        />
+        <AvatarFallback className="bg-orange-50 text-orange-500 font-bold">
+        {getInialts(i.prestador.nome)}
+        </AvatarFallback>
+      </Avatar>
+      
+      {/* Overlay sutil de hover */}
+      <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center">
+        <Maximize2 size={14} className="text-white shadow-sm" />
+      </div>
+    </div>
+  </DialogTrigger>
+
+  <DialogContent className="max-w-[90vw] sm:max-w-[500px] p-0 overflow-hidden bg-transparent border-none shadow-none z-[9999]">
+    {/* Animação de entrada da foto */}
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      className="relative aspect-square w-full"
+    >
+      <img 
+        src={`${api.defaults.baseURL}/uploads/${i.prestador.image_path}`} 
+        alt={i.prestador.nome}
+        className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl ring-4 ring-white/10"
+      />
+      
+      {/* Legenda Flutuante */}
+      <div className="absolute bottom-4 left-4 right-4 p-4 bg-black/40 backdrop-blur-md rounded-[1.5rem] border border-white/10">
+        <p className="text-white font-black italic uppercase tracking-tighter text-sm">
+          {i.prestador.profissao}
+        </p>
+        <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+          Visualização do Pedido
+        </p>
+      </div>
+
+     
+    </motion.div>
+  </DialogContent>
+</Dialog>
                         <span className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border-2 border-white dark:border-zinc-900 rounded-full" />
                       </div>
 
@@ -287,7 +374,6 @@ const { mutate: EliminarPedido } = useMutation({
                     <div className="shrink-0 scale-75 sm:scale-90 origin-right">
                        <PedidoCard
                           refetch={refetch}
-                          isRefetching={isRefetching}
                           prestadorId={i.prestadorId}
                           id={pedido.id}
                           status={i.status}
@@ -381,10 +467,7 @@ const { mutate: EliminarPedido } = useMutation({
             ))}
           </Accordion>
         ) : (
-          <div className="py-10 text-center rounded-[2rem] border-2 border-dashed border-zinc-100 dark:border-zinc-800">
-            <AlertCircle size={30} className="mx-auto mb-2 text-zinc-300" />
-            <p className="text-[9px] font-black uppercase text-zinc-400">Nenhum interessado</p>
-          </div>
+         <EmptyInteressados></EmptyInteressados>
         )}
       </ScrollArea>
     </div>
