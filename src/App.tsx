@@ -81,7 +81,7 @@ if (permission !== 'granted') {
 
   return(
     <HelmetProvider>
-      <Helmet titleTemplate='%s | quintal.'/>
+      <Helmet titleTemplate='%s | Liberal.'/>
         <Toaster richColors/>
       <ThemeProvider storageKey="vite-ui-theme" defaultTheme="light">
       <QueryClientProvider client={queryClient}>
