@@ -3,7 +3,6 @@ import { GetUserProfile } from "@/api/get-profile";
 import { GetProfission } from "@/api/get-profissions";
 import { Logout } from "@/api/log-out";
 import logo from '@/assets/logo-01.png';
-
 import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
 import { UpdatePhoto } from "@/api/update-profile-photo";
 import servico1 from "@/assets/IMG-20250928-WA0054.jpg";
@@ -47,10 +46,6 @@ import { DestaquesAuto } from "./destacados";
 import { AppFooter } from "./footer";
 import { ChatIntegrado } from "./Mensagens";
 import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
-
-
-
-
 
 export function Home() {
   const categorias = [

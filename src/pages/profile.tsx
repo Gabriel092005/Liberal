@@ -29,8 +29,9 @@ export function Profile() {
     queryFn: GetUserProfile,
   });
 
+  
   const { mutateAsync: Sair } = useMutation({ mutationFn: Logout });
-
+  
   const { register: registar, handleSubmit: submeter, reset } = useForm<EditarBodySchemaTypes>();
 
   const { mutateAsync: salvar, isPending } = useMutation({
@@ -39,11 +40,11 @@ export function Profile() {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
   });
-
+  
   useEffect(() => {
     if (profile?.description) reset({ description: profile.description });
   }, [profile, reset]);
-
+  
   const handleEditarBio = async (data: EditarBodySchemaTypes) => {
     await salvar({ description: data.description });
   };

@@ -1,4 +1,3 @@
-import { registerPushNotifications } from "@/hooks/usePushNotifications"
 import { api } from "@/lib/axios"
 import { redirect} from "react-router-dom"
 
@@ -22,18 +21,18 @@ export async function signIn({password,phone}:SignInRequest) {
      document.cookie=`token=${token}; Secure; SameSite=Lax; Path=/`;  
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-    const fcmToken = await registerPushNotifications();
+    // const fcmToken = await registerPushNotifications();
 
-    if (fcmToken) {
-      // 4. CHAMA A ROTA DO TOKEN LOGO EM SEGUIDA
-      await api.patch('/users/fcm-token', { fcmToken });
-      console.log("Token vinculado ao usuário com sucesso!");
-    }
+    // if (fcmToken) {
+    //   // 4. CHAMA A ROTA DO TOKEN LOGO EM SEGUIDA
+    //   await api.patch('/users/fcm-token', { fcmToken });
+    //   console.log("Token vinculado ao usuário com sucesso!");
+    // }
 
-    if (fcmToken) {
-      localStorage.setItem('@Liberal:token', fcmToken);
-      await registerPushNotifications();
-  }
+//     if (fcmToken) {
+//       localStorage.setItem('@Liberal:token', fcmToken);
+//       await registerPushNotifications();
+//   }
 
      if(response.data.role==='ADMIN'){
          redirect("/início")

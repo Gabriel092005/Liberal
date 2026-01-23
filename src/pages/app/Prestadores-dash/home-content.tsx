@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { api } from "@/lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import {File, InfoIcon, MapPin, Menu, MoveDownLeft, MoveUpRight, RefreshCw, Search } from "lucide-react";
+import { File, InfoIcon, MapPin, Menu, MoveDownLeft, MoveUpRight, RefreshCw, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -24,7 +24,6 @@ import { Vitrine } from "./Vitrine";
 import logo from '@/assets/liberal.png'
 import { ModeToggle } from "@/components/theme/theme-toggle";
 import { ChatIntegrado } from "../dashboard-admin/sidebar/Mensagens";
-
 
 function useDebounce<T>(value: T, delay = 400): T {
   const [debounced, setDebounced] = useState(value);
@@ -42,14 +41,14 @@ export function HomeContent() {
   const [searchTerm, setSearchTerm] = useState(queryFromParams);
   const debouncedQuery = useDebounce(searchTerm, 400);
 
-    const { data: profile } = useQuery({
-      queryKey: ["profile"],
-      queryFn: GetUserProfile,
-      refetchOnWindowFocus: true,
-      refetchOnReconnect: true,
-      refetchOnMount: true,
-      staleTime: 0,
-    })
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: GetUserProfile,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
+    staleTime: 0,
+  })
 
   useEffect(() => {
     const newParams = new URLSearchParams();
@@ -60,8 +59,8 @@ export function HomeContent() {
   const { data: orders, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["orders", filter, debouncedQuery],
     queryFn: async () => {
-      return filter === "all" 
-        ? await FetchAllOrders({ query: debouncedQuery }) 
+      return filter === "all"
+        ? await FetchAllOrders({ query: debouncedQuery })
         : await InterestedOrdersPrestadores();
     },
     staleTime: 1000 * 30,
@@ -76,7 +75,7 @@ export function HomeContent() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[100dvh] w-full p-4">
-        <div className="w-full max-w-md space-y-4">
+        <div className="w-full max-w-md lg:max-w-6xl space-y-4 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4">
           <SkeletonsDemo />
           <SkeletonsDemo />
           <SkeletonsDemo />
@@ -87,77 +86,44 @@ export function HomeContent() {
 
   return (
     <motion.div
-      // Centralização total no viewport do smartphone
-      className="fixed inset-0 flex pb-10 items-center justify-center bg-background px-4 py-2"
+      // Mobile: Ocupa tudo fixo | Desktop: Centralizado com padding
+      className="fixed inset-0 lg:relative lg:inset-auto lg:min-h-screen lg:h-screen w-full flex items-center justify-center bg-background px-0 py-0 lg:px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      <Card className="w-full max-w-md h-full max-h-[92dvh] flex flex-col border-none shadow-none md:shadow-lg overflow-hidden bg-transparent md:bg-card">
-        <div className="flex flex-col    w-full bg-zinc-50 dark:bg-zinc-950 overflow-hidden">
-      
-      {/* 1. HEADER - FIXO NO TOPO */}
-    <header className="w-full shrink-0 md:hidden z-50 sticky top-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 supports-[backdrop-filter]:bg-white/60">
-  {/* Padding para Safe Area do iOS/Android */}
-  <div className="h-[env(safe-area-inset-top)] w-full" />
-  
-  <div className="h-16 px-4 flex items-center justify-between">
-    {/* Logo com efeito de brilho */}
-    <div className="relative group">
-      <div className="absolute -inset-2 bg-orange-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-      <img 
-        src={logo} 
-        alt="Logo" 
-        className="h-10 w-auto relative z-10 hover:scale-105 transition-transform duration-300" 
-      />
-    </div>
-
-    {/* Lado Direito: Ações */}
-    <div className="flex items-center gap-2">
-      {/* Container de Notificação Estilizado */}
-      <div className="relative flex items-center justify-center bg-zinc-100/80 dark:bg-zinc-800/80 rounded-2xl p-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
-        {profile && (
-          <div className="scale-90 origin-center">
-            <NotificationDropdown {...profile} />
-          </div>
-        )}
-      </div>
-
-      {/* Menu Sanduíche com Sheet */}
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="rounded-2xl h-11 w-11   text-white dark:text-zinc-900 0 hover:text-white active:scale-95 transition-all duration-300 shadow-lg shadow-orange-500/10"
-          >
-            <Menu className="h-5 w-5 text-muted-foreground hover:text-white stroke-[2.5px]" />
-          </Button>
-
-        </SheetTrigger>
+      {/* Card Mobile: Sem bordas, sem sombra | Desktop: Rounded e Shadow */}
+      <Card className="w-full h-full lg:max-w-6xl lg:h-[95dvh] flex flex-col border-none lg:border-none shadow-none lg:shadow-1xl overflow-hidden bg-transparent lg:bg-card">
         
-        
-        {/* SheetContent com animação e bordas arredondadas */}
-        <SheetContent 
-          side="right" 
-          className="w-[85%] p-0 border-l border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 sm:max-w-none"
-        >
-          {/* O componente Vitrine deve lidar com o scroll interno */}
-          <div className="h-full pt-[env(safe-area-inset-top)]">
-            <Vitrine />
+        {/* HEADER MOBILE (Identico ao seu original) */}
+        <header className="w-full lg:hidden shrink-0 z-50 sticky top-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50">
+          <div className="h-[env(safe-area-inset-top)] w-full" />
+          <div className="h-16 px-4 flex items-center justify-between">
+            <img src={logo} alt="Logo" className="h-10 w-auto" />
+            <div className="flex items-center gap-2">
+              <div className="bg-zinc-100/80 dark:bg-zinc-800/80 rounded-2xl p-0.5">
+                {profile && <NotificationDropdown {...profile} />}
+              </div>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="rounded-2xl h-11 w-11">
+                    <Menu className="h-5 w-5 text-muted-foreground" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[85%] p-0">
+                  <Vitrine />
+                </SheetContent>
+              </Sheet>
+              <ModeToggle />
+              <ChatIntegrado />
+            </div>
           </div>
-        </SheetContent>
-      </Sheet>
-      <ModeToggle></ModeToggle>
-      <ChatIntegrado></ChatIntegrado>
-    </div>
-  </div>
-</header>
-      </div>
-        {/* Header fixo no topo do card */}
-        <CardHeader className="px-2 pb-4 pt-2 shrink-0">
-          <div className="flex justify-between items-center mb-1">
-            <CardTitle className="text-2xl font-black tracking-tighter">
+        </header>
+
+        {/* HEADER DE CONTEÚDO (Pedidos + Busca) */}
+        <CardHeader className="px-4 lg:px-8 pb-4 pt-4 lg:pt-6 shrink-0 bg-white dark:bg-zinc-950 border-b lg:border-none">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-2xl lg:text-4xl font-black tracking-tighter">
               Pedidos
             </CardTitle>
             <Button 
@@ -166,168 +132,140 @@ export function HomeContent() {
               onClick={() => refetch()} 
               className={`rounded-full ${isFetching ? "animate-spin" : ""}`}
             >
-              <RefreshCw size={18} />
+              <RefreshCw size={20} />
             </Button>
           </div>
-          <CardDescription className="text-xs">
-            {filter === "all"
-              ? "Encontre novas oportunidades de trabalho."
-              : "Pedidos que você demonstrou interesse."}
+          <CardDescription className="text-xs lg:text-sm">
+            {filter === "all" ? "Novas oportunidades de trabalho." : "Pedidos interessados."}
           </CardDescription>
 
-          <div className="flex flex-col gap-3 mt-4">
-            <div className="relative w-full">
+          <div className="flex flex-col lg:flex-row gap-3 mt-4">
+            <div className="relative w-full lg:max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
               <Input
                 placeholder="Buscar serviços..."
-                className="pl-9 h-10 bg-zinc-100 dark:bg-zinc-900 border-none rounded-xl text-sm"
+                className="pl-9 h-10 lg:h-12 bg-zinc-100 dark:bg-zinc-900 border-none rounded-xl lg:rounded-2xl text-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
-            <div className="flex flex-row gap-2 overflow-x-auto pb-1 no-scrollbar shrink-0">
+            <div className="flex flex-row gap-2 overflow-x-auto no-scrollbar shrink-0">
               <Button
                 variant={filter === "all" ? "default" : "secondary"}
                 onClick={() => setFilter("all")}
-                className="rounded-full whitespace-nowrap h-8 text-[11px]"
+                className="rounded-full h-9 lg:h-11 text-[11px] lg:text-sm px-4"
               >
-                Novos <MoveUpRight size={12} className="ml-1" />
+                Todos <MoveUpRight size={14} className="ml-1" />
               </Button>
               <Button
                 variant={filter === "accepted" ? "default" : "secondary"}
                 onClick={() => setFilter("accepted")}
-                className="rounded-full whitespace-nowrap h-8 text-[11px]"
+                className="rounded-full h-9 lg:h-11 text-[11px] lg:text-sm px-4"
               >
-                Negociando <MoveDownLeft size={12} className="ml-1" />
+                Negociando <MoveDownLeft size={14} className="ml-1" />
               </Button>
             </div>
           </div>
         </CardHeader>
 
-        {/* Área de conteúdo com scroll independente */}
-        <CardContent className="flex-1 overflow-y-auto px-2 pb-6 no-scrollbar">
+        {/* LISTAGEM (O segredo está no grid responsivo) */}
+        <CardContent className="flex-1 overflow-y-auto px-3 lg:px-8 pb-20 lg:pb-8 no-scrollbar bg-zinc-50/30 dark:bg-transparent">
           <AnimatePresence mode="popLayout">
             {!orders?.length ? (
-              <motion.div 
-                className="flex flex-col items-center justify-center py-20 text-muted-foreground"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              >
-                <File size={48} strokeWidth={1} className="mb-2 opacity-20" />
-                <p className="text-sm font-medium">Nenhum pedido encontrado.</p>
+              <motion.div className="flex flex-col items-center justify-center py-20 opacity-40">
+                <File size={48} />
+                <p>Nenhum pedido encontrado.</p>
               </motion.div>
             ) : (
-       <div className="space-y-4 p-1">
-  {orders.map((card) => {
-    const isInteresseComPedido = "pedido" in card;
-    const pedido = isInteresseComPedido ? card.pedido : card;
+              // grid-cols-1 para Mobile (Lista vertical) | lg:grid-cols-2 ou 3 para Desktop
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mt-2 lg:mt-4">
+                {orders.map((card) => {
+                  const isInteresseComPedido = "pedido" in card;
+                  const pedido = isInteresseComPedido ? card.pedido : card;
 
-    return (
-      <motion.div
-        key={card.id}
-        layout
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="group relative bg-white dark:bg-zinc-900/50 backdrop-blur-sm p-5 rounded-[2rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 hover:border-orange-500/20 active:scale-[0.99] transition-all duration-300"
-      >
-        {/* Lado Superior: Info Principal */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex gap-4 min-w-0">
-            {/* Avatar com Shape Moderno */}
-            <div className="relative shrink-0">
-              <Avatar className="w-12 h-12 rounded-2xl ring-4 ring-orange-500/5 transition-transform group-hover:scale-105 duration-500">
-                <AvatarImage 
-                  src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} 
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl text-xs font-black">
-                  {pedido?.title?.charAt(0) ?? "S"}
-                </AvatarFallback>
-              </Avatar>
-              {/* Indicador de Status/Online */}
-              <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-white dark:border-zinc-900 ${
-                pedido?.brevidade === "URGENTE" ? "bg-red-500 animate-pulse" : "bg-emerald-500"
-              }`} />
-            </div>
-            
-            <div className="flex flex-col min-w-0 pt-0.5">
-              <h4 className="font-black text-zinc-900 dark:text-zinc-100 text-sm md:text-base truncate uppercase tracking-tight group-hover:text-orange-600 transition-colors">
-                {pedido?.title}
-              </h4>
-              <p className="text-[11px] md:text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1 leading-relaxed font-medium">
-                {pedido?.content}
-              </p>
-            </div>
-          </div>
+                  return (
+                    <motion.div
+                      key={card.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      // Design do Card: Otimizado para os dois ambientes
+                      className="group relative bg-white dark:bg-zinc-900/50 p-4 lg:p-6 rounded-[1.8rem] lg:rounded-[2.2rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex gap-3 min-w-0">
+                            <div className="relative shrink-0">
+                              <Avatar className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl ring-2 ring-orange-500/5">
+                                <AvatarImage 
+                                  src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} 
+                                  className="object-cover"
+                                />
+                                <AvatarFallback className="bg-orange-500 text-white rounded-2xl font-black">
+                                  {pedido?.title?.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-zinc-900 ${
+                                pedido?.brevidade === "URGENTE" ? "bg-red-500 animate-pulse" : "bg-emerald-500"
+                              }`} />
+                            </div>
+                            
+                            <div className="flex flex-col min-w-0 pt-0.5">
+                              <h4 className="font-black text-zinc-900 dark:text-zinc-100 text-sm lg:text-base truncate uppercase">
+                                {pedido?.title}
+                              </h4>
+                              <p className="text-[11px] lg:text-xs text-zinc-500 line-clamp-2 mt-0.5">
+                                {pedido?.content}
+                              </p>
+                            </div>
+                          </div>
 
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="rounded-2xl shrink-0 h-10 w-10 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-blue-500 hover:text-white transition-all duration-300"
-              >
-                <InfoIcon size={18} />
-              </Button>
-            </DialogTrigger>
-            <ServicesDialogDetails
-              isSucces={isSuccess}
-              nome={pedido.autor.nome}
-              celular={pedido.autor.celular}
-              provincia={pedido.autor.provincia}
-              image_path={pedido.autor.image_path}
-              municipio={pedido.autor.municipio}
-            />
-          </Dialog>
-        </div>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="rounded-xl shrink-0 h-9 w-9 bg-zinc-50 dark:bg-zinc-800/50">
+                                <InfoIcon size={16} />
+                              </Button>
+                            </DialogTrigger>
+                            <ServicesDialogDetails
+                              isSucces={isSuccess}
+                              nome={pedido.autor.nome}
+                              celular={pedido.autor.celular}
+                              provincia={pedido.autor.provincia}
+                              image_path={pedido.autor.image_path}
+                              municipio={pedido.autor.municipio}
+                            />
+                          </Dialog>
+                        </div>
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-100 dark:via-zinc-800 to-transparent my-3 lg:my-4" />
+                      </div>
 
-        {/* Divisor Elegante (Gradiente) */}
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-100 dark:via-zinc-800 to-transparent my-4" />
-
-        {/* Lado Inferior: Tags e Ação */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex flex-col gap-2">
-            {/* Localização com Icone Estilizado */}
-            <div className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400">
-              <div className="p-1.5 bg-orange-500/10 rounded-lg">
-                <MapPin size={12} strokeWidth={3} />
+                      <div className="flex items-center justify-between mt-1">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-1 text-orange-600">
+                            <MapPin size={10} strokeWidth={3} />
+                            <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-tighter truncate max-w-[100px]">
+                              {pedido?.location || "Angola"}
+                            </span>
+                          </div>
+                          <Badge className={`text-[8px] lg:text-[9px] px-2 py-0 border-none font-black rounded-lg ${
+                             pedido?.brevidade === "URGENTE" ? "bg-red-500/10 text-red-600" : "bg-emerald-500/10 text-emerald-600"
+                          }`}>
+                            {pedido?.brevidade}
+                          </Badge>
+                        </div>
+                        <BotaoNegociar 
+                          celular={pedido.autor.celular} 
+                          image_path={pedido.autor.image_path} 
+                          isSuccess={isSuccess} 
+                          nome={pedido.autor.nome} 
+                          onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
+                        />
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
-              <span className="text-[10px] font-black uppercase tracking-widest truncate max-w-[120px]">
-                {pedido?.location || "Angola"}
-              </span>
-            </div>
-            
-            {/* Badge com Estilo de Prioridade */}
-            <Badge 
-              variant="outline" 
-              className={`w-fit text-[9px] px-2.5 py-0.5 h-5 border-none font-black tracking-tighter rounded-lg ${
-                pedido?.brevidade === "URGENTE" 
-                  ? "bg-red-500/10 text-red-600 dark:bg-red-500/20" 
-                  : pedido?.brevidade === "MEDIO" 
-                    ? "bg-amber-500/10 text-amber-600 dark:bg-amber-500/20" 
-                    : "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20"
-              }`}
-            >
-              <span className="mr-1 opacity-50">•</span>
-              {pedido?.brevidade}
-            </Badge>
-          </div>
-
-          {/* Botão de Negociar - Dando destaque ao CTA principal */}
-          <div className="shrink-0 transform group-hover:scale-105 transition-transform">
-            <BotaoNegociar 
-              celular={pedido.autor.celular} 
-              image_path={pedido.autor.image_path} 
-              isSuccess={isSuccess} 
-              nome={pedido.autor.nome} 
-              onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
-            />
-          </div>
-        </div>
-      </motion.div>
-    );
-  })}
-</div>
             )}
           </AnimatePresence>
         </CardContent>

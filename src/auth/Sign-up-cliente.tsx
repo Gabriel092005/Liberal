@@ -115,7 +115,7 @@ export function SignUp() {
         <form onSubmit={handleSubmit(handleRegisterUsers)} className="relative overflow-visible">
           <AnimatePresence mode="wait" custom={direction}>
             {step === 1 && (
-              <motion.div key="step1" custom={direction} variants={formVariants} initial="enter" animate="center" exit="exit" className="space-y-5">
+              <motion.div key="step1" custom={direction} variants={formVariants} initial="enter" animate="center" exit="exit" className="space-y-1">
                 <div className="space-y-2">
                   <Label className="text-xs font-bold uppercase tracking-widest text-zinc-500 ml-1">Nome Completo / Empresa</Label>
                   <div className="relative group">
@@ -212,35 +212,322 @@ export function SignUp() {
             )}
 
             {step === 3 && (
-              <motion.div key="step3" custom={direction} variants={formVariants} initial="enter" animate="center" exit="exit" className="space-y-5">
-                <div className="flex flex-col items-center text-center space-y-2">
-                  <div className="p-3 bg-orange-500/10 rounded-full"><ShieldCheck className="h-8 w-8 text-orange-500" /></div>
-                  <h2 className="text-xl font-black">Termos e Privacidade</h2>
-                  <p className="text-xs text-zinc-500 px-4">Leia atentamente as políticas da plataforma Liberal.</p>
-                </div>
+             <motion.div key="step3" custom={direction} variants={formVariants} initial="enter" animate="center" exit="exit" className="space-y-5">
+  <div className="flex flex-col items-center text-center space-y-2">
+    <div className="p-3 bg-orange-500/10 rounded-full">
+      <ShieldCheck className="h-8 w-8 text-orange-500" />
+    </div>
+    <h2 className="text-xl font-black italic uppercase tracking-tighter">Termos e Privacidade</h2>
+    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 px-4">
+      Leia atentamente as políticas da plataforma Liberal.
+    </p>
+  </div>
 
-                <div className={`h-48 overflow-y-auto p-5 rounded-[2rem] bg-zinc-50 dark:bg-zinc-900 border-2 transition-all ${errors.termo_privacidade ? 'border-red-500' : 'border-zinc-100 dark:border-zinc-800'}`}>
-                  <div className="text-[11px] text-zinc-500 space-y-3 leading-relaxed">
-                    <p>1. Os dados fornecidos serão usados exclusivamente para a conexão entre clientes e prestadores.</p>
-                    <p>2. A Liberal não se responsabiliza por pagamentos feitos fora da plataforma.</p>
-                    <p>3. É proibido o uso de fotos que não correspondam à identidade real ou logótipo da empresa.</p>
-                  </div>
-                </div>
+  {/* Container de Termos com Scroll - Texto Oficial Adaptado */}
+  <div className={`h-56 overflow-y-auto p-5 rounded-[2rem] bg-zinc-50 dark:bg-zinc-900 border-2 transition-all shadow-inner ${errors.termo_privacidade ? 'border-red-500' : 'border-zinc-100 dark:border-zinc-800'}`}>
+    <div className="text-[11px] text-zinc-600 dark:text-zinc-400 space-y-4 leading-relaxed">
+      
+      <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">1.IDENTIFICAÇÃO DA PLATAFORMA</h4>
+        <p>A LIBERAL é uma plataforma digital e marca pertencente à LISA HELP SECURITY, PRESTAÇÃO DE 
+SERVIÇOS, LDA., sociedade por quotas, regularmente constituída e registada sob o n.º 31445-25/250829, 
+pessoa colectiva de direito privado, nos termos da legislação da República de Angola
+<p>
+<ol className="list-decimal list-inside space-y-2 ml-1">
+  <li><span className="font-bold text-zinc-800 dark:text-zinc-200">Plataforma digital</span> de intermediação de serviços profissionais;</li>
+  <li><span className="font-bold text-zinc-800 dark:text-zinc-200">Ambiente tecnológico</span> para anúncios de serviços;</li>
+  <li><span className="font-bold text-zinc-800 dark:text-zinc-200">Ferramenta de contacto</span> entre Clientes e Prestadores.</li>
+</ol>
+<p>
+  A LIBERAL não presta directamente os serviços anunciados, limitando-se a disponibilizar a infraestrutura 
+tecnológica necessária à intermediação.
+</p>
+</p>
+</p>
+      </section>
 
-                <div className={`flex items-start space-x-3 p-4 rounded-2xl border-2 transition-all ${errors.termo_privacidade ? 'border-red-500 bg-red-50/50' : 'border-transparent'}`}>
-                  <Controller name="termo_privacidade" control={control} rules={{ required: true }} render={({ field }) => (
-                    <Checkbox id="terms" checked={field.value} onCheckedChange={field.onChange} className="mt-1 border-orange-500 data-[state=checked]:bg-orange-500" />
-                  )} />
-                  <label htmlFor="terms" className="text-xs font-bold text-zinc-600 dark:text-zinc-400 cursor-pointer">Li e aceito todos os termos de uso e políticas de privacidade.</label>
-                </div>
+      <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">2. ACEITAÇÃO DOS TERMOS</h4>
+        <p>
+          <div className="space-y-2">
+  <p className="font-bold">A LIBERAL actua como:</p>
+  <ol className="list-decimal list-inside space-y-1 ml-1">
+    <li><span className="font-bold text-zinc-800 dark:text-zinc-200">Plataforma digital</span> de intermediação de serviços profissionais;</li>
+    <li><span className="font-bold text-zinc-800 dark:text-zinc-200">Ambiente tecnológico</span> para anúncios de serviços;</li>
+    <li><span className="font-bold text-zinc-800 dark:text-zinc-200">Ferramenta de contacto</span> entre Clientes e Prestadores.</li>
+  </ol>
+</div>
+        </p>
+      </section>
 
-                <div className="flex gap-3 pt-2">
-                  <Button type="button" variant="outline" onClick={prevStep} className="h-14 px-6 rounded-2xl border-zinc-200"><ArrowLeft className="h-4 w-4" /></Button>
-                  <Button disabled={isPending} type="submit" className="flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-orange-500/20">
-                    {isPending ? <Loader2 className="animate-spin" /> : <span className="flex items-center gap-2">Finalizar Registo <CheckCircle2 size={20} /></span>}
-                  </Button>
-                </div>
-              </motion.div>
+      <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">3. OBJECTO DOS SERVIÇOS</h4>
+        <p>A LIBERAL tem por objecto:
+a) Permitir que Clientes publiquem pedidos de serviços e solicitem orçamentos;
+b) Possibilitar que Prestadores acedam a oportunidades de trabalho mediante uso de créditos internos 
+(“Moedas”);
+c) Facilitar o contacto directo entre Prestadores e Clientes;
+d) Disponibilizar anúncios de serviços profissionais;
+e) Gerir um sistema interno de créditos para acesso a funcionalidades da Plataforma.
+A LIBERAL não interfere na negociação, contratação, execução ou pagamento dos serviços acordados 
+entre os Utilizadores</p>
+      </section>
+
+      <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">4. NATUREZA DA PLATAFORMA</h4>
+        <p> A LIBERAL actua exclusivamente como intermediária tecnológica;
+b) Não existe qualquer relação laboral, societária ou de subordinação entre a LIBERAL e os Prestadores;
+c) Os contratos são celebrados exclusivamente entre Cliente e Prestador; d) A LIBERAL não garante resultados, qualidade, prazos ou valores dos serviços contratados.</p>
+      </section>
+
+      <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">5.  CAPACIDADE PARA UTILIZAÇÃO</h4>
+        <p>a) Apenas podem utilizar a Plataforma pessoas singulares maiores de idade ou pessoas colectivas legalmente constituídas;
+b) É proibida a utilização por menores ou pessoas legalmente incapazes;
+c) Cada Utilizador pode manter apenas uma conta, vinculada a um único número de telefone, e -m ail ou NIF.
+A LIBERAL reserva -s e o direito de suspender ou eliminar contas duplicadas, falsas ou fraudulentas..</p>
+      </section>
+
+      
+      <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">6.  SISTEMA DE MOEDAS (CRÉDITOS INTERNOS)</h4>
+<p>
+  A LIBERAL utiliza um sistema interno de créditos denominado “Moedas”;
+As Moedas permitem, entre outros:
+Acesso a contactos de Clientes;
+Destaque de anúncios;
+Activação de funcionalidades específicas;
+As Moedas:
+São pessoais e intransmissíveis;
+Não são convertíveis em dinheiro;
+Têm validade definida conforme o plano adquirido.
+</p>
+      </section>
+
+            <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">7.  CONTEÚDOS E SERVIÇOS PROIBIDOS</h4>
+<p>
+É expressamente proibido: a) Anunciar serviços ilegais ou contrários à lei angolana;
+b) Publicar conteúdos ofensivos, discriminatórios ou ilícitos;
+c) Utilizar a Plataforma para venda ou aluguer de bens;
+d) Inserir contactos externos nos anúncios;
+e) Praticar fraude, manipulação do sistema ou actos abusivos.
+A LIBERAL poderá remover conteúdos e suspender contas sem aviso prévio.
+</p>
+      </section>
+
+
+            <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">8.  REGISTO E CONTA DO UTILIZADOR</h4>
+<p>
+  a) O Utilizador é responsável pela veracidade dos dados fornecidos;
+b) A LIBERAL pode solicitar documentos adicionais para validação;
+c) O acesso à conta é pessoal e intransmissível;
+d) O Utilizador é responsável por todas as actividades realizadas na sua conta;
+e) É proibida a venda, cedência ou aluguer de contas.
+</p>
+      </section>
+
+               <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">9. SISTEMA DE AVALIAÇÕES</h4>
+<p>
+a) Os Prestadores estão sujeitos a avaliações dos Clientes;
+b) As avaliações reflectem opiniões pessoais dos Utilizadores;
+c) A LIBERAL pode suspender contas com avaliações negativas reiteradas;
+d) A LIBERAL não se responsabiliza pelo conteúdo das avaliações.
+</p>
+      </section>     
+
+                     <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">10.  OBRIGAÇÕES DOS UTILIZADORES</h4>
+<p>
+Os Utilizadores obrigam-se a: 
+a) Cumprir a legislação aplicável;
+b) Assumir todas as obrigações fiscais, laborais e contratuais;
+c) Emitir ou exigir facturação nos termos legais;
+d) Actuar de boa -f é nas negociações.
+</p>
+      </section>    
+
+                           <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">11.   RESPONSABILIDADE DA PLATAFORMA</h4>
+<p>
+A LIBERAL não se responsabiliza por:
+Execução ou qualidade dos serviços;
+Danos decorrentes de negociações entre Utilizadores;
+Falhas de internet, sistemas ou dispositivos do Utilizador;
+Conteúdos publicados por terceiros.
+</p>
+      </section>       
+
+                                <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">12.  PROPRIEDADE INTELECTUAL</h4>
+<p>
+Todos os direitos sobre a marca LIBERAL, logótipos, layout, sistemas, conteúdos e software pertencem à LISA HELP SECURITY, LDA., sendo proibida a sua utilização sem autorização expressa.
+</p>
+      </section>  
+
+                                     <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">13.  SANÇÕES</h4>
+<p>
+    A LIBERAL pode, a seu critério:
+Advertir;
+Suspender temporariamente;
+Excluir definitivamente contas;
+Cancelar anúncios e créditos,
+sem direito a indemnização.
+</p>
+      </section>    
+
+                                        <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">14.  INDEMNIZAÇÃO</h4>
+<p>
+   O Utilizador obriga -s e a indemnizar a LIBERAL por quaisquer danos, custos ou processos resultantes do uso indevido da Plataforma ou violação destes Termos.
+</p>
+      </section>    
+
+
+                                           <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">15.  DADOS PESSOAIS RECOLHIDOS</h4>
+<p>
+  A LIBERAL recolhe apenas os dados necessários ao funcionamento da plataforma, incluindo:
+Nome completo;
+Contactos (telefone e e-mail);
+Localização;
+Endereço IP;
+Dados de perfil;
+Dados da carteira digital e histórico de operações;
+Dados técnicos de acesso e utilização.
+</p>
+      </section>  
+
+
+
+                                           <section>
+        <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">16.  FINALIDADE DO TRATAMENTO</h4>
+<p>
+Os dados são utilizados para:
+Criar e gerir contas;
+Facilitar contacto entre utilizadores;
+Processar créditos e recargas;
+Melhorar a experiência do utilizador;
+Prevenir fraudes;
+Cumprir obrigações legais.
+A LIBERAL não vende dados pessoais.
+Os dados poderão ser partilhados apenas:
+Com parceiros tecnológicos;
+Para cumprimento de obrigações legais;
+Mediante consentimento do titular.
+</p>
+      </section>  
+
+
+ 
+      {/* 17. DIREITOS DO TITULAR DOS DADOS */}
+<section>
+  <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">17. DIREITOS DO TITULAR DOS DADOS</h4>
+  <div className="space-y-1">
+    <p>O Utilizador tem direito a:</p>
+    <ul className="list-disc list-inside ml-2">
+      <li>Acesso e Rectificação;</li>
+      <li>Eliminação (quando legalmente possível);</li>
+      <li>Oposição ou limitação do tratamento;</li>
+      <li>Retirada do consentimento.</li>
+    </ul>
+  </div>
+</section>
+
+{/* 20. SEGURANÇA DA INFORMAÇÃO */}
+<section>
+  <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">18. SEGURANÇA DA INFORMAÇÃO</h4>
+  <p>
+    A LIBERAL adopta medidas técnicas e organizativas adequadas para proteger os dados pessoais, incluindo 
+    controlo de acessos, criptografia e monitorização contínua.
+  </p>
+</section>
+
+{/* 21. COOKIES */}
+<section>
+  <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">19. COOKIES</h4>
+  <p>
+    A Plataforma utiliza cookies para garantir funcionamento, melhorar a experiência e analisar padrões de uso. 
+    O Utilizador pode gerir cookies no seu navegador.
+  </p>
+</section>
+
+{/* 22. ALTERAÇÕES AO DOCUMENTO */}
+<section>
+  <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">20. ALTERAÇÕES AO DOCUMENTO</h4>
+  <p>
+    Este documento pode ser alterado a qualquer momento. As alterações produzem efeitos após 8 dias a contar 
+    da publicação na Plataforma.
+  </p>
+</section>
+
+{/* 23. LEI APLICÁVEL E FORUM */}
+<section>
+  <h4 className="font-black text-zinc-900 dark:text-white uppercase mb-1">21. LEI APLICÁVEL E FORUM</h4>
+  <p>
+    O presente documento rege-se pelas leis da República de Angola. Fica eleito o Forum da Comarca de Belas, 
+    com exclusão de qualquer outro.
+  </p>
+</section>
+
+{/* RODAPÉ JURÍDICO / COPYRIGHT */}
+<div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 mt-6 text-[9px] text-zinc-400 leading-relaxed italic">
+  <p>
+    © 2025 – LIBERAL | LISA HELP SECURITY, LDA. Luanda, Município do Camama, Bairro Antigos 
+    Guerrilheiros, Rua e Casa s/n.º, próximo ao Supermercado Deskontão. 
+    <br />
+    Contacto: 926 135 066. Todos os direitos reservados.
+  </p>
+</div>
+    </div>
+  </div>
+
+  {/* Checkbox de Aceitação */}
+  <div className={`flex items-start space-x-3 p-4 rounded-2xl border-2 transition-all ${errors.termo_privacidade ? 'border-red-500 bg-red-50/50' : 'border-transparent bg-zinc-50/50 dark:bg-zinc-900/50'}`}>
+    <Controller 
+      name="termo_privacidade" 
+      control={control} 
+      rules={{ required: true }} 
+      render={({ field }) => (
+        <Checkbox 
+          id="terms" 
+          checked={field.value} 
+          onCheckedChange={field.onChange} 
+          className="mt-1 border-orange-500 data-[state=checked]:bg-orange-500 rounded-md" 
+        />
+      )} 
+    />
+    <label htmlFor="terms" className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 cursor-pointer leading-tight">
+      Li e aceito integralmente os <span className="text-orange-500">Termos de Uso</span> e a <span className="text-orange-500">Política de Privacidade</span> da Liberal.
+    </label>
+  </div>
+
+  {/* Ações */}
+  <div className="flex gap-3 pt-2">
+    <Button 
+      type="button" 
+      variant="outline" 
+      onClick={prevStep} 
+      className="h-14 px-6 rounded-2xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100"
+    >
+      <ArrowLeft className="h-4 w-4" />
+    </Button>
+    <Button 
+      disabled={isPending} 
+      type="submit" 
+      className="flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black italic uppercase tracking-tighter text-lg shadow-xl shadow-orange-500/20 active:scale-[0.98] transition-all"
+    >
+      {isPending ? (
+        <Loader2 className="animate-spin h-6 w-6" />
+      ) : (
+        <span className="flex items-center gap-2">Finalizar Registo <CheckCircle2 size={20} /></span>
+      )}
+    </Button>
+  </div>
+</motion.div>
             )}
           </AnimatePresence>
         </form>

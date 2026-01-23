@@ -63,7 +63,7 @@ export  function AppLayoutPestadores(){
    if(profile?.estado_conta ==='DESATIVADA' || profile?.estado_conta==='PENDENTE'){
      navigate("/home")
   }
-  
+  if(profile) localStorage.setItem("@liberal:userId", String(profile.id))
   return(
     <div className="flex min-h-screen fixed     antialiased ">
          <div className="flex ml-[40px]  pt-10  flex-1 flex-col ">

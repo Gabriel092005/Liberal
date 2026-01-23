@@ -58,4 +58,5 @@ export const profissoesAngola = [
   { nome: "Psicólogo", to: "/busca/psicologo" },
   { nome: "Nutricionista", to: "/busca/nutricionista" },
   { nome: "Veterinário", to: "/busca/veterinario" },
+  { nome: "Agricultor", to: "/busca/veterinario" },
 ];
