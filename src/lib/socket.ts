@@ -5,13 +5,14 @@ console.log(localStorage.getItem("@liberal:userId"))
 
 export const socket = io("https://liberalconnect.org/api", {
   path: "/socket.io/",
-  transports: ["polling", "websocket"], 
+  transports: ["websocket","polling"], 
   reconnectionAttempts: 5,
   withCredentials: true,
   autoConnect: false,
   query: {
-    userId:localStorage.getItem("@liberal:userId"), // Substitua pela sua chave real
-  }
+    userId:'2', // Substitua pela sua chave real
+  },
+  secure:true
 });
 
 export const connectSocket = (userId: string) => {
