@@ -7,16 +7,16 @@ interface OrderCallData {
 }
 
 const SOCKET_URL = "https://liberalconnect.org"; // Geralmente a URL base
-const SOCKET_PATH = "/api/socket.io/"; // O path costuma incluir o prefixo da API se houver proxy
+// const SOCKET_PATH = "/api/socket.io/"; // O path costuma incluir o prefixo da API se houver proxy
 
 // Singleton do Socket para evitar múltiplas instâncias
 export const socket: Socket = io(SOCKET_URL, {
-  path: SOCKET_PATH,
-  transports: ["websocket", "polling"], // Começa com polling por segurança e faz upgrade
+  path: "/api/socket.io/", // O Nginx vai receber isso e remover o /api/
+  transports: ["polling","websocket"], // Começa com polling por segurança e faz upgrade
   reconnectionAttempts: 10,
   reconnectionDelay: 2000,
   withCredentials: true,
-  autoConnect: false,
+  autoConnect: true,
   secure: true,
 });
 
