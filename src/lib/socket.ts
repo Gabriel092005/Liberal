@@ -1,80 +1,95 @@
 import { io, Socket } from "socket.io-client";
 
-// Tipagem básica para os dados (ajuste conforme seu contrato de backend)
 interface OrderCallData {
   id: string;
   [key: string]: any;
 }
 
-const SOCKET_URL = "https://liberalconnect.org"; // Geralmente a URL base
-// const SOCKET_PATH = "/api/socket.io/"; // O path costuma incluir o prefixo da API se houver proxy
+const SOCKET_URL = "https://liberalconnect.org";
+const SOCKET_PATH = "/api/socket.io/";
 
-// Singleton do Socket para evitar múltiplas instâncias
+/**
+ * CONFIGURAÇÃO DO SINGLETON
+ * autoConnect: false evita conexões fantasmas sem autenticação.
+ */
 export const socket: Socket = io(SOCKET_URL, {
-  path: "/api/socket.io/", // O Nginx vai receber isso e remover o /api/
-  transports: ["polling","websocket"], // Começa com polling por segurança e faz upgrade
-  reconnectionAttempts: 10,
-  reconnectionDelay: 2000,
+  path: SOCKET_PATH,
+  transports: ["websocket"], // WebSocket puro é mais estável para sistemas de chamadas
+  reconnection: true,
+  reconnectionAttempts: Infinity, // Não desiste nunca em apps críticos
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  timeout: 20000,
   withCredentials: true,
-  autoConnect: true,
+  autoConnect: false,
   secure: true,
 });
 
 /**
- * Gerenciador de conexão robusto
+ * GERENCIADOR DE CONEXÃO
+ * Resolve o problema de loops de reconexão e troca de usuário.
  */
 export const connectSocket = (userId: string) => {
   if (!userId) {
-    console.warn("⚠️ Tentativa de conexão sem userId válida.");
+    console.error("❌ Erro: userId é obrigatório para conectar o socket.");
     return;
   }
 
-  // Se já estiver conectado com o mesmo usuário, não faz nada
-  if (socket.connected && socket.io.opts.query?.userId === userId) {
-    console.log("ℹ️ Socket já conectado para este usuário.");
+  // Se já estiver conectado ou conectando com o mesmo usuário, ignora
+  const currentUserId = socket.io.opts.query?.userId;
+  if (socket.connected && currentUserId === userId) {
+    console.log("ℹ️ Socket já ativo para este usuário.");
     return;
   }
 
-  // Limpa conexões pendentes antes de reiniciar
-  if (socket.connected) {
-    console.log("🔄 Reiniciando conexão para novo contexto de usuário...");
+  // Se mudar o usuário, limpa a conexão anterior completamente
+  if (socket.connected || socket.active) {
+    console.log("🔄 Trocando usuário: Limpando conexão anterior...");
+    socket.removeAllListeners(); // Remove listeners antigos para evitar vazamento de memória
     socket.disconnect();
   }
 
-  // Configurações dinâmicas
+  // Atualiza credenciais e conecta
   socket.io.opts.query = { userId };
+  setupSocketListeners(); // Reatribui os listeners essenciais após o reset
   
-  console.log(`🔌 Iniciando conexão para o usuário: ${userId}`);
+  console.log(`🔌 Conectando socket para o usuário: ${userId}`);
   socket.connect();
 };
 
 /**
- * Configuração de Listeners Globais 
- * (Evita duplicação de eventos usando .off() antes de .on())
+ * LISTENERS ESSENCIAIS
+ * Centralizado para garantir que nunca existam duplicatas.
  */
-const setupSocketListeners = () => {
-  socket.off("connect").on("connect", () => {
+function setupSocketListeners() {
+  // Remove todos para garantir que não haverá duplicados ao re-chamar a função
+  socket.off(); 
+
+  socket.on("connect", () => {
     console.log("%c✅ Socket Conectado!", "color: #2ecc71; font-weight: bold;", socket.id);
   });
 
-  socket.off("connect_error").on("connect_error", (err) => {
-    console.error("❌ Erro na Conexão Socket:", err.message);
-    // Se o erro for 404, verifique se o 'path' no backend coincide com o do frontend
+  socket.on("connect_error", (err) => {
+    console.error("❌ Erro de Conexão:", err.message);
+    // Tenta reconectar automaticamente se for erro de transporte
+    if (err.message === "xhr poll error") {
+       socket.connect();
+    }
   });
 
-  socket.off("order_call").on("order_call", (data: OrderCallData) => {
-    console.log("📦 Chamada recebida:", data);
-    alert(`CHAMADA RECEBIDA: ${data.id || 'Nova Ordem'}`);
+  socket.on("order_call", (data: OrderCallData) => {
+    console.log("📦 Nova ordem recebida:", data);
+    // Aqui você pode disparar um evento global ou atualizar um store (Redux/Zustand)
   });
 
-  socket.off("disconnect").on("disconnect", (reason) => {
-    console.log(`🔌 Socket desconectado: ${reason}`);
+  socket.on("disconnect", (reason) => {
+    console.warn(`🔌 Desconectado: ${reason}`);
+    // Se o servidor forçar o fechamento, o socket.io não tenta reconectar por padrão
     if (reason === "io server disconnect") {
-      // O servidor forçou a desconexão, precisamos reconectar manualmente
       socket.connect();
     }
   });
-};
+}
 
-// Inicializa os ouvintes uma única vez
+// Inicializa os listeners básicos
 setupSocketListeners();
