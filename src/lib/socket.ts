@@ -4,11 +4,11 @@ console.log(localStorage.getItem("@liberal:userId"))
 
 
 export const socket = io("https://liberalconnect.org/api", {
+  path: "/socket.io/",
   transports: ["polling", "websocket"], 
   reconnectionAttempts: 5,
   withCredentials: true,
-autoConnect: false,
-
+  autoConnect: false,
   query: {
     userId:localStorage.getItem("@liberal:userId"), // Substitua pela sua chave real
   }
@@ -20,6 +20,15 @@ export const connectSocket = (userId: string) => {
   socket.io.opts.query = { userId };
   socket.connect();
   console.log(`🔌 Tentando conectar socket para o usuário: ${userId}`);
+
+  // Digite isso no console do seu navegador onde o app está aberto
+console.log("Status do Socket:", socket.connected);
+console.log("ID do Usuário enviado:", socket.io.opts.query.userId);
+
+socket.on("order_call", (data) => {
+  alert("CHAMADA RECEBIDA COM SUCESSO!");
+  console.log(data);
+});
 };
 
 // Log simples de depuração (fora de hooks)
