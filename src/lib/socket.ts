@@ -19,6 +19,9 @@ export const socket: Socket = io(SOCKET_URL, {
   reconnectionAttempts: Infinity, // Não desiste nunca em apps críticos
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
+  query:{
+    userId:localStorage.getItem("@liberal:userId") || '2'
+  },
   timeout: 20000,
   withCredentials: true,
   autoConnect: false,

@@ -8,6 +8,7 @@ import { queryClient } from './lib/react-query'
 import { ThemeProvider } from './components/theme/theme-provider'
 import { useEffect } from 'react'
 import { api } from './lib/axios'
+import { socket } from './lib/socket'
 
 
 
@@ -15,6 +16,12 @@ import { api } from './lib/axios'
 
 export function App() {
 
+
+   socket.on("order_call", (data) => {
+      console.log("📦 Nova ordem recebida:", data);
+      // Aqui você pode disparar um evento global ou atualizar um store (Redux/Zustand)
+    });
+  
 
 
 // Função auxiliar necessária para o Chrome/Edge converter a VAPID key
@@ -28,6 +35,9 @@ function urlBase64ToUint8Array(base64String: string) {
   }
   return outputArray;
 }
+
+
+
 
 
 const registerPush = async () => {
