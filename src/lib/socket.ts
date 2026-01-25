@@ -5,29 +5,25 @@ interface OrderCallData {
   [key: string]: any;
 }
 
-const SOCKET_URL = "https://liberalconnect.org";
-const SOCKET_PATH = "/api/socket.io/";
 
-/**
- * CONFIGURAÇÃO DO SINGLETON
- * autoConnect: false evita conexões fantasmas sem autenticação.
- */
+const SOCKET_URL = "https://liberalconnect.org/api"; // Removi a barra final
+const SOCKET_PATH = "/api/socket.io/"; // <--- DEVE ser igual ao backend
+
 export const socket: Socket = io(SOCKET_URL, {
-  path: SOCKET_PATH,
-  transports: ["websocket"], // WebSocket puro é mais estável para sistemas de chamadas
+  path: SOCKET_PATH, // <--- Adicione/Descomente esta linha
+  transports: ["polling","websocket"], // Adicionado polling para maior compatibilidade
   reconnection: true,
-  reconnectionAttempts: Infinity, // Não desiste nunca em apps críticos
+  reconnectionAttempts: Infinity,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
-  query:{
-    userId:localStorage.getItem("@liberal:userId") || '2'
+  query: {
+    userId: localStorage.getItem("@liberal:userId") || '7'
   },
   timeout: 20000,
   withCredentials: true,
   autoConnect: false,
-  secure: true,
+  secure: false, // Mude para false enquanto estiver em localhost (sem HTTPS)
 });
-
 /**
  * GERENCIADOR DE CONEXÃO
  * Resolve o problema de loops de reconexão e troca de usuário.

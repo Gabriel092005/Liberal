@@ -2,7 +2,6 @@ import { GetCategory } from "@/api/get-categories";
 import { GetUserProfile } from "@/api/get-profile";
 import { GetProfission } from "@/api/get-profissions";
 import { Logout } from "@/api/log-out";
-import logo from '@/assets/logo-01.png';
 import { PrestadoresDestaques } from "@/api/porfissionais-destaques";
 import { UpdatePhoto } from "@/api/update-profile-photo";
 import servico1 from "@/assets/IMG-20250928-WA0054.jpg";
@@ -11,6 +10,7 @@ import servico2 from "@/assets/IMG-20250928-WA0057.jpg";
 import servico4 from "@/assets/IMG-20250928-WA0058.jpg";
 import servico5 from "@/assets/IMG-20250928-WA0059.jpg";
 import servico6 from "@/assets/IMG-20250928-WA0069.jpg";
+import logo from '@/assets/logo-01.png';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -26,7 +26,6 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/axios";
-import { socket } from "@/lib/socket";
 import { getInialts } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
@@ -40,7 +39,7 @@ import {
   Search,
   Sparkles
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { DestaquesAuto } from "./destacados";
 import { AppFooter } from "./footer";
@@ -65,7 +64,7 @@ export function Home() {
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const navigate = useNavigate();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+
 
   // Queries
   const { data: categories, refetch: refetchCategories } = useQuery({
@@ -80,7 +79,7 @@ export function Home() {
     staleTime: 0,
   });
 
-  const { data: profile, refetch } = useQuery({
+  const { data: profile} = useQuery({
     queryKey: ["profile"],
     queryFn: GetUserProfile,
     refetchOnMount: true,
@@ -138,22 +137,9 @@ export function Home() {
     if (!seen) navigate("/sign-up");
   }, [navigate]);
 
-  useEffect(() => {
-    if (!profile?.id) return;
-    socket.emit("register", profile.id);
-    audioRef.current = new Audio("/bell-98033.mp3");
-    socket.on("user", () => {
-      refetch();
-      audioRef.current?.play().catch(() => {});
-    });
-    return () => { socket.off("user"); };
-  }, [profile, refetch]);
 
-  // Roles Check
-  useEffect(() => {
-    if (profile?.role === 'PRESTADOR_COLECTIVO' || profile?.role === 'PRESTADOR_INDIVIDUAL') navigate("/servicos");
-    if (profile?.role === 'ADMIN') navigate("/início");
-  }, [profile, navigate]);
+
+// Dentro da sua função Home
 
   // Loading State
   if (!profile || !categories || !profissao) {

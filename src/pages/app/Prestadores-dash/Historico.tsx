@@ -93,7 +93,7 @@ export function Historico({ data, isLoading, isError }: HistoricoProps) {
     return data.map((i) => (
       <TableRow
         key={i.id}
-        className="hover:bg-gray-50 dark:hover:bg-zinc-800/40 transition-colors"
+        className="hover:bg-gray-50 p-8 dark:hover:bg-zinc-800/40 transition-colors"
       >
         <TableCell className="text-gray-700 dark:text-gray-300 text-nowrap">
           <span className="text-xs text-muted-foreground">
@@ -131,7 +131,7 @@ export function Historico({ data, isLoading, isError }: HistoricoProps) {
   };
 
   return (
-    <div className="mb-10 bg-white w-full overflow-hidden dark:bg-zinc-900 rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-800">
+    <div className="mb-10 bg-white w-full h-[20rem] overflow-hidden dark:bg-zinc-900 rounded-2xl shadow-lg  border-gray-200 dark:border-zinc-800">
       {/* Cabeçalho */}
       <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-zinc-800">
         <h2 className="text-[0.9rem] font-semibold text-gray-800 dark:text-gray-100">

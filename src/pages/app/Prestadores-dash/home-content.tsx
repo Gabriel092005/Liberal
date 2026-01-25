@@ -6,14 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { api } from "@/lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { File, InfoIcon, MapPin, Menu, MoveDownLeft, MoveUpRight, RefreshCw, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Camera, CheckCircle2, File, InfoIcon, LogOut, MapPin, Menu, MoveDownLeft, MoveUpRight, RefreshCw, Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { NotificationDropdown } from "../dashboard-admin/sidebar/Notification/notification-dropdown";
@@ -21,9 +21,14 @@ import { BotaoNegociar } from "./botao-negociar";
 import { SkeletonsDemo } from "./NearClientsSearch";
 import { ServicesDialogDetails } from "./ServicesDialogDetails";
 import { Vitrine } from "./Vitrine";
-import logo from '@/assets/liberal.png'
+import logo from '@/assets/logo-01.png'
 import { ModeToggle } from "@/components/theme/theme-toggle";
 import { ChatIntegrado } from "../dashboard-admin/sidebar/Mensagens";
+import { socket } from "@/lib/socket";
+import { Logout } from "@/api/log-out";
+import { UpdatePhoto } from "@/api/update-profile-photo";
+import { Separator } from "@/components/ui/separator";
+import { queryClient } from "@/lib/react-query";
 
 function useDebounce<T>(value: T, delay = 400): T {
   const [debounced, setDebounced] = useState(value);
@@ -35,13 +40,16 @@ function useDebounce<T>(value: T, delay = 400): T {
 }
 
 export function HomeContent() {
-  const [filter, setFilter] = useState<"all" | "accepted">("all");
+  const [filter, setFilter] = useState<"all" | "accepted"| "completed">("all");
   const [searchParams, setSearchParams] = useSearchParams();
   const queryFromParams = searchParams.get("query") || "";
   const [searchTerm, setSearchTerm] = useState(queryFromParams);
   const debouncedQuery = useDebounce(searchTerm, 400);
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [_, setNotif] = useState<any[]>([]);
 
-  const { data: profile } = useQuery({
+  const { data: profile, refetch:refetchProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: GetUserProfile,
     refetchOnWindowFocus: true,
@@ -49,6 +57,75 @@ export function HomeContent() {
     refetchOnMount: true,
     staleTime: 0,
   })
+  useEffect(() => {
+    audioRef.current = new Audio("/bell-98033.mp3");
+    audioRef.current.volume = 0.7;
+  }, []);
+  const { mutateAsync: Sair } = useMutation({ mutationFn: Logout });
+  const { mutateAsync: changeProfilePhoto } = useMutation({ mutationFn: UpdatePhoto });
+  const [preview, setPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+  const handleSignOut = async () => { await Sair(); };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const { mutateAsync: concluirPedido } = useMutation({
+    mutationFn: async (pedidoId: number) => {
+      console.log("pedido:",pedidoId)
+      return await api.patch("/pedidos/concluir", { pedidoId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success("Serviço finalizado com sucesso!");
+    },
+    onError: () => toast.error("Erro ao finalizar serviço.")
+  });
+  
+
+  const handleSave = () => {
+    if (selectedFile) changeProfilePhoto({ image_path: selectedFile });
+  };
+
+  const imageSrc = preview || (profile?.image_path
+    ? `${api.defaults.baseURL}/uploads/${profile.image_path}`
+    : "https://i.pravatar.cc/150?u=placeholder");
+
+  // 🎧 Socket para notificações
+useEffect(() => {
+  if (!profile?.id) return;
+
+  socket.emit("register", profile.id);
+  console.log("✅ Registrado no socket como:", profile.id);
+
+  const handleUserNotification = (data: any[]) => {
+    console.log("🔔 Nova notificação recebida:", data);
+    refetchProfile();
+
+    setNotif((prev) => {
+      if (data.length > prev.length && audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+      return data;
+    });
+  };
+  
+  socket.on("user", handleUserNotification);
+  
+  // 👇 conversão explícita pra deixar claro que o retorno é void
+  return () => {
+    socket.off("user", handleUserNotification);
+    return void 0;
+  };
+}, [profile?.id]);
+
+
 
   useEffect(() => {
     const newParams = new URLSearchParams();
@@ -59,13 +136,32 @@ export function HomeContent() {
   const { data: orders, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["orders", filter, debouncedQuery],
     queryFn: async () => {
-      return filter === "all"
+      // Se o filtro for 'all', busca tudo. Caso contrário, busca os interessados/negociando.
+      const response = filter === "all"
         ? await FetchAllOrders({ query: debouncedQuery })
         : await InterestedOrdersPrestadores();
+      
+      return response;
+    },
+    // Lógica de filtragem local baseada no status INTERRUPTED
+    select: (data) => {
+      if (!data) return [];
+      if (filter === "completed") {
+        return data.filter((item: any) => {
+          const p = "pedido" in item ? item.pedido : item;
+          return p.status === "CONFIRMED";
+        });
+      }
+      if (filter === "accepted") {
+        return data.filter((item: any) => {
+          const p = "pedido" in item ? item.pedido : item;
+          return p.status !== "ACEPTED"; // Mostra os que ainda estão em negociação
+        });
+      }
+      return data;
     },
     staleTime: 1000 * 30,
   });
-
   const { mutateAsync: SeInteressar, isSuccess } = useMutation({
     mutationFn: InteressarPedidos,
     onSuccess: () => toast.success("Pedido marcado para negociação!"),
@@ -83,6 +179,9 @@ export function HomeContent() {
       </div>
     );
   }
+ 
+ 
+
 
   return (
     <motion.div
@@ -99,7 +198,67 @@ export function HomeContent() {
         <header className="w-full lg:hidden shrink-0 z-50 sticky top-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50">
           <div className="h-[env(safe-area-inset-top)] w-full" />
           <div className="h-16 px-4 flex items-center justify-between">
-            <img src={logo} alt="Logo" className="h-10 w-auto" />
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0 px-2">
+  {/* 1. Logotipo de lado */}
+  <motion.div 
+    initial={{ opacity: 0, x: -10 }} 
+    animate={{ opacity: 1, x: 0 }}
+    className="flex items-center"
+  >
+    <img src={logo} alt="Logo" className="h-8 sm:h-10 w-auto object-contain" />
+  </motion.div>
+
+  {/* 2. Componente Separator do Shadcn-UI */}
+  <Separator orientation="vertical" className="h-8 bg-zinc-200 dark:bg-zinc-800" />
+
+  {/* 3. Avatar e Informações do Perfil */}
+  <div className="flex items-center gap-3 flex-shrink-0">
+    <Dialog>
+      <DialogTrigger asChild>
+        <motion.button whileTap={{ scale: 0.95 }} className="relative group focus:outline-none">
+          <Avatar className="h-10 w-10 sm:h-12 sm:w-12 ring-2 ring-orange-500/10 group-hover:ring-orange-500 transition-all">
+            <AvatarImage src={imageSrc} className="object-cover" />
+            <AvatarFallback className="font-bold">
+              {profile?.nome?.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
+        </motion.button>
+      </DialogTrigger>
+
+      <DialogContent className="max-w-md rounded-[2.5rem]">
+        <DialogHeader><DialogTitle className="text-center">Minha Conta</DialogTitle></DialogHeader>
+        <div className="flex flex-col items-center gap-4 py-4">
+          <div className="relative group">
+            <img src={imageSrc} className="w-28 h-28 rounded-full object-cover ring-4 ring-orange-400" />
+            <label htmlFor="file-up" className="absolute bottom-0 right-0 bg-orange-500 p-2 rounded-full cursor-pointer text-white shadow-lg">
+              <Camera size={18} />
+            </label>
+            <input id="file-up" type="file" className="hidden" onChange={handleFileChange} />
+          </div>
+          <div className="text-center">
+            <h3 className="font-bold text-lg">{profile?.nome}</h3>
+            <p className="text-sm text-muted-foreground">+244 {profile?.celular}</p>
+          </div>
+        </div>
+        <div className="grid gap-2">
+          <Button onClick={handleSave} className="bg-orange-500 hover:bg-orange-600 rounded-xl font-bold">Salvar</Button>
+          <Button onClick={handleSignOut} variant="outline" className="text-red-500 rounded-xl">
+            <LogOut className="mr-2" size={16}/> Sair
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Informações de Texto (Visíveis no Desktop) */}
+    <div className="hidden lg:flex flex-col truncate max-w-[100px]">
+      <span className="text-sm font-bold truncate leading-none">
+        {profile?.nome?.split(' ')[0]}
+      </span>
+      <span className="text-[10px] text-orange-500 font-bold uppercase mt-1">Ouro</span>
+    </div>
+  </div>
+</div>
             <div className="flex items-center gap-2">
               <div className="bg-zinc-100/80 dark:bg-zinc-800/80 rounded-2xl p-0.5">
                 {profile && <NotificationDropdown {...profile} />}
@@ -150,125 +309,175 @@ export function HomeContent() {
               />
             </div>
 
-            <div className="flex flex-row gap-2 overflow-x-auto no-scrollbar shrink-0">
-              <Button
-                variant={filter === "all" ? "default" : "secondary"}
-                onClick={() => setFilter("all")}
-                className="rounded-full h-9 lg:h-11 text-[11px] lg:text-sm px-4"
-              >
-                Todos <MoveUpRight size={14} className="ml-1" />
-              </Button>
-              <Button
-                variant={filter === "accepted" ? "default" : "secondary"}
-                onClick={() => setFilter("accepted")}
-                className="rounded-full h-9 lg:h-11 text-[11px] lg:text-sm px-4"
-              >
-                Negociando <MoveDownLeft size={14} className="ml-1" />
-              </Button>
-            </div>
+            <div className="flex flex-row gap-2 overflow-x-auto no-scrollbar shrink-0 pb-2">
+  <Button
+    variant={filter === "all" ? "default" : "secondary"}
+    onClick={() => setFilter("all")}
+    className="rounded-full h-9 lg:h-11 text-[11px] lg:text-sm px-4 transition-all"
+  >
+    Todos <MoveUpRight size={14} className="ml-1 opacity-60" />
+  </Button>
+
+  <Button
+    variant={filter === "accepted" ? "default" : "secondary"}
+    onClick={() => setFilter("accepted")}
+    className="rounded-full h-9 lg:h-11 text-[11px] lg:text-sm px-4 transition-all"
+  >
+    Negociando <MoveDownLeft size={14} className="ml-1 opacity-60" />
+  </Button>
+
+  {/* Novo Botão de Pedidos Concluídos */}
+  <Button
+    variant={filter === "completed" ? "default" : "secondary"}
+    onClick={() => setFilter("completed")}
+    className="rounded-full h-9 lg:h-11 text-[11px] lg:text-sm px-4 transition-all"
+  >
+    Concluídos <CheckCircle2 size={14} className="ml-1 opacity-60" />
+  </Button>
+</div>
           </div>
         </CardHeader>
 
         {/* LISTAGEM (O segredo está no grid responsivo) */}
         <CardContent className="flex-1 overflow-y-auto px-3 lg:px-8 pb-20 lg:pb-8 no-scrollbar bg-zinc-50/30 dark:bg-transparent">
-          <AnimatePresence mode="popLayout">
-            {!orders?.length ? (
-              <motion.div className="flex flex-col items-center justify-center py-20 opacity-40">
-                <File size={48} />
-                <p>Nenhum pedido encontrado.</p>
-              </motion.div>
-            ) : (
-              // grid-cols-1 para Mobile (Lista vertical) | lg:grid-cols-2 ou 3 para Desktop
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mt-2 lg:mt-4">
-                {orders.map((card) => {
-                  const isInteresseComPedido = "pedido" in card;
-                  const pedido = isInteresseComPedido ? card.pedido : card;
+  <AnimatePresence mode="popLayout">
+    {!orders?.length ? (
+      <motion.div className="flex flex-col items-center justify-center py-20 opacity-40">
+        <File size={48} />
+        <p>Nenhum pedido encontrado.</p>
+      </motion.div>
+    ) : (
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mt-2 lg:mt-4">
+        {orders.map((card) => {
+          const isInteresseComPedido = "pedido" in card;
+          const pedido = isInteresseComPedido ? card.pedido : card;
+          
+          // LÓGICA DE STATUS
+          const isCompleted = pedido?.status === "CONFIRMED"; // Ou a sua variável de controle
 
-                  return (
-                    <motion.div
-                      key={card.id}
-                      layout
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      // Design do Card: Otimizado para os dois ambientes
-                      className="group relative bg-white dark:bg-zinc-900/50 p-4 lg:p-6 rounded-[1.8rem] lg:rounded-[2.2rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex gap-3 min-w-0">
-                            <div className="relative shrink-0">
-                              <Avatar className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl ring-2 ring-orange-500/5">
-                                <AvatarImage 
-                                  src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} 
-                                  className="object-cover"
-                                />
-                                <AvatarFallback className="bg-orange-500 text-white rounded-2xl font-black">
-                                  {pedido?.title?.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-zinc-900 ${
-                                pedido?.brevidade === "URGENTE" ? "bg-red-500 animate-pulse" : "bg-emerald-500"
-                              }`} />
-                            </div>
-                            
-                            <div className="flex flex-col min-w-0 pt-0.5">
-                              <h4 className="font-black text-zinc-900 dark:text-zinc-100 text-sm lg:text-base truncate uppercase">
-                                {pedido?.title}
-                              </h4>
-                              <p className="text-[11px] lg:text-xs text-zinc-500 line-clamp-2 mt-0.5">
-                                {pedido?.content}
-                              </p>
-                            </div>
-                          </div>
-
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="rounded-xl shrink-0 h-9 w-9 bg-zinc-50 dark:bg-zinc-800/50">
-                                <InfoIcon size={16} />
-                              </Button>
-                            </DialogTrigger>
-                            <ServicesDialogDetails
-                              isSucces={isSuccess}
-                              nome={pedido.autor.nome}
-                              celular={pedido.autor.celular}
-                              provincia={pedido.autor.provincia}
-                              image_path={pedido.autor.image_path}
-                              municipio={pedido.autor.municipio}
-                            />
-                          </Dialog>
-                        </div>
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-100 dark:via-zinc-800 to-transparent my-3 lg:my-4" />
-                      </div>
-
-                      <div className="flex items-center justify-between mt-1">
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-1 text-orange-600">
-                            <MapPin size={10} strokeWidth={3} />
-                            <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-tighter truncate max-w-[100px]">
-                              {pedido?.location || "Angola"}
-                            </span>
-                          </div>
-                          <Badge className={`text-[8px] lg:text-[9px] px-2 py-0 border-none font-black rounded-lg ${
-                             pedido?.brevidade === "URGENTE" ? "bg-red-500/10 text-red-600" : "bg-emerald-500/10 text-emerald-600"
-                          }`}>
-                            {pedido?.brevidade}
-                          </Badge>
-                        </div>
-                        <BotaoNegociar 
-                          celular={pedido.autor.celular} 
-                          image_path={pedido.autor.image_path} 
-                          isSuccess={isSuccess} 
-                          nome={pedido.autor.nome} 
-                          onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
+          return (
+            <motion.div
+              key={card.id}
+              layout
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ 
+                opacity: isCompleted ? 0.7 : 1, // Opacidade reduzida se concluído
+                scale: 1,
+                filter: isCompleted ? "grayscale(0.4)" : "grayscale(0)" // Efeito visual de finalizado
+              }}
+              className={`group relative p-4 lg:p-6 rounded-[1.8rem] lg:rounded-[2.2rem] border transition-all flex flex-col justify-between 
+                ${isCompleted 
+                  ? "bg-zinc-100/50 dark:bg-zinc-800/20 border-zinc-200 dark:border-zinc-700/50 shadow-none" 
+                  : "bg-white dark:bg-zinc-900/50 border-zinc-100 dark:border-zinc-800/50 shadow-sm"
+                }`}
+            >
+              <div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex gap-3 min-w-0">
+                    <div className="relative shrink-0">
+                      <Avatar className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl ring-2 ${isCompleted ? "ring-zinc-300" : "ring-orange-500/5"}`}>
+                        <AvatarImage 
+                          src={`${api.defaults.baseURL}/uploads/${pedido.image_path}`} 
+                          className="object-cover"
                         />
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                        <AvatarFallback className={`${isCompleted ? "bg-zinc-400" : "bg-orange-500"} text-white rounded-2xl font-black`}>
+                          {pedido?.title?.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      {/* Badge de Status no Avatar */}
+                      <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-zinc-900 ${
+                        isCompleted ? "bg-zinc-400" : (pedido?.brevidade === "URGENTE" ? "bg-red-500 animate-pulse" : "bg-emerald-500")
+                      }`} />
+                    </div>
+                    
+                    <div className="flex flex-col min-w-0 pt-0.5">
+                      <h4 className={`font-black text-sm lg:text-base truncate uppercase ${isCompleted ? "text-zinc-500 line-through decoration-zinc-400" : "text-zinc-900 dark:text-zinc-100"}`}>
+                        {pedido?.title}
+                      </h4>
+                      <p className="text-[11px] lg:text-xs text-zinc-500 line-clamp-2 mt-0.5">
+                        {pedido?.content}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="rounded-xl shrink-0 h-9 w-9 bg-zinc-50 dark:bg-zinc-800/50">
+                        <InfoIcon size={16} />
+                      </Button>
+                    </DialogTrigger>
+                    <ServicesDialogDetails
+                      isSucces={isSuccess}
+                      nome={pedido.autor.nome}
+                      celular={pedido.autor.celular}
+                      provincia={pedido.autor.provincia}
+                      image_path={pedido.autor.image_path}
+                      municipio={pedido.autor.municipio}
+                    />
+                  </Dialog>
+                </div>
+                <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-100 dark:via-zinc-800 to-transparent my-3 lg:my-4" />
               </div>
-            )}
-          </AnimatePresence>
-        </CardContent>
+
+              <div className="flex items-center justify-between mt-1">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1 text-zinc-500">
+                    <MapPin size={10} strokeWidth={3} className={isCompleted ? "" : "text-orange-600"} />
+                    <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-tighter truncate max-w-[100px]">
+                      {pedido?.location || "Angola"}
+                    </span>
+                  </div>
+                  <Badge className={`text-[8px] lg:text-[9px] px-2 py-0 border-none font-black rounded-lg ${
+                      isCompleted ? "bg-zinc-200 text-zinc-500" : (pedido?.brevidade === "URGENTE" ? "bg-red-500/10 text-red-600" : "bg-emerald-500/10 text-emerald-600")
+                  }`}>
+                    {isCompleted ? "FINALIZADO" : pedido?.brevidade}
+                  </Badge>
+                </div>
+
+             
+
+                {/* LOGICA DO BOTÃO: Se concluído, mostra selo, senão mostra o botão de negociar */}
+                <div className="flex items-center justify-between mt-1">
+
+
+  {/* LÓGICA DINÂMICA DE BOTÕES */}
+  <div className="flex items-center gap-2">
+    {isCompleted ? (
+      // ESTADO 1: JÁ CONCLUÍDO (Selo estático)
+      <div className="flex items-center gap-1.5 px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700">
+        <CheckCircle2 size={14} className="text-emerald-500" />
+        <span className="text-[9px] font-black text-zinc-500 uppercase">Finalizado</span>
+      </div>
+    ) : isInteresseComPedido ? (
+      // ESTADO 2: EM NEGOCIAÇÃO (Botão para Concluir)
+      <Button 
+        size="sm"
+        onClick={() => concluirPedido(card.pedido.id)}
+        className="rounded-xl h-9 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase px-4 shadow-sm"
+      >
+        Concluir <CheckCircle2 size={14} className="ml-2" />
+      </Button>
+    ) : (
+      // ESTADO 3: DISPONÍVEL (Botão para Negociar)
+      <BotaoNegociar 
+        celular={pedido.autor.celular} 
+        image_path={pedido.autor.image_path} 
+        isSuccess={isSuccess} 
+        nome={pedido.autor.nome} 
+        onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
+      />
+    )}
+  </div>
+</div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    )}
+  </AnimatePresence>
+</CardContent>
       </Card>
     </motion.div>
   );

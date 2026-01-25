@@ -1,17 +1,14 @@
 import { GetCarteira } from "@/api/get-carteira";
 import { GetUserProfile } from "@/api/get-profile";
-import { socket } from "@/lib/socket";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HomeContent } from "./home-content";
 import { SkeletonsCard } from "./prestadores-home-skeletons/creditcard-skeletons";
 import { TableSkeletons } from "./prestadores-home-skeletons/table-sketons";
 
 export function PrestadoresDash() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [_, setNotif] = useState<any[]>([]);
+ 
   
   const navigate = useNavigate();
 
@@ -20,7 +17,7 @@ export function PrestadoresDash() {
   //   queryFn:useHistoricoCarteira
   // })
 
-  const { data: profile, isLoading: isLoadingUserProfile, refetch } = useQuery({
+  const { data: profile, isLoading: isLoadingUserProfile} = useQuery({
     queryKey: ["profile"],
     queryFn: GetUserProfile,
     refetchOnWindowFocus: true,
@@ -49,38 +46,7 @@ export function PrestadoresDash() {
   //   queryFn:()=>GetHistorico({carteiraId:Number(carteiraId)})
   // })
   // 🔔 Configura som
-  useEffect(() => {
-    audioRef.current = new Audio("/bell-98033.mp3");
-    audioRef.current.volume = 0.7;
-  }, []);
 
-  // 🎧 Socket para notificações
-useEffect(() => {
-  if (!profile?.id) return;
-
-  socket.emit("register", profile.id);
-  console.log("✅ Registrado no socket como:", profile.id);
-
-  const handleUserNotification = (data: any[]) => {
-    console.log("🔔 Nova notificação recebida:", data);
-    refetch();
-
-    setNotif((prev) => {
-      if (data.length > prev.length && audioRef.current) {
-        audioRef.current.play().catch(() => {});
-      }
-      return data;
-    });
-  };
-  
-  socket.on("user", handleUserNotification);
-  
-  // 👇 conversão explícita pra deixar claro que o retorno é void
-  return () => {
-    socket.off("user", handleUserNotification);
-    return void 0;
-  };
-}, [profile?.id]);
   if(profile?.role =='CLIENTE_INDIVIDUAL' || profile?.role=='CLIENTE_COLECTIVO'){
      navigate("/")
   }

@@ -26,7 +26,7 @@ export interface InteresseComPedidoResponse {
   id: number;
   prestadorId: number;
   pedidoId: number;
-  status: 'PENDING'|'INTERRUPTED'|'ACEPTED';
+  status: 'PENDING'|'INTERRUPTED'|'ACEPTED'|'CONFIRMED';
   pedido: PedidoComDetalhes;
 }
 

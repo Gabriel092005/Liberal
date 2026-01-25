@@ -17,7 +17,7 @@ export interface FetchAllOrdersResponse{
           celular:string
 
     }
-    status: 'PENDING'|'INTERRUPTED'|'ACEPTED';
+    status: 'PENDING'|'INTERRUPTED'|'ACEPTED'|'CONFIRMED';
     latitude: number;
 
 }

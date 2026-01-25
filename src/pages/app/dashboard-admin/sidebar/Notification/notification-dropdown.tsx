@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -8,17 +8,35 @@ import { Usuario } from "@/api/get-profile";
 import { api } from "@/lib/axios";
 
 export function NotificationDropdown({ notificacoes, _count }: Usuario) {
+
   const [unreadCount, setUnreadCount] = useState<number>(_count?.notificacoes || 0);
+
+  // SINCRONIZAÇÃO EM TEMPO REAL:
+  // Sempre que o _count vindo das props (do cache do React Query/API) mudar, 
+  // ele atualiza o estado interno do badge.
+  useEffect(() => {
+    if (_count?.notificacoes !== undefined) {
+      setUnreadCount(_count.notificacoes);
+    }
+  }, [_count?.notificacoes]);
 
   const handleOpenMenu = useCallback(async () => {
     if (unreadCount === 0) return;
+
+    // "Optimistic Update": Zera o badge visualmente na hora do clique
     setUnreadCount(0);
+
     try {
       await api.patch("/notifications/mark-as-seen");
+      
+      // DICA: Se você usa React Query, o ideal aqui seria dar um 
+      // queryClient.invalidateQueries(['profile']) para o back-end confirmar o zero.
     } catch (error) {
-      console.error("Erro:", error);
+      console.error("Erro ao marcar como lidas:", error);
+      // Se falhar, volta o valor original
+      setUnreadCount(_count?.notificacoes || 0);
     }
-  }, [unreadCount]);
+  }, [unreadCount, _count?.notificacoes]);
 
   return (
     <DropdownMenu onOpenChange={(open) => open && handleOpenMenu()}>

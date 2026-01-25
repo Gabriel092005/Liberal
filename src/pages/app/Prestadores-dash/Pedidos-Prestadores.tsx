@@ -29,7 +29,7 @@ export function PrestadoresPedidos() {
     setSearchParams(newParams);
   }, [debouncedQuery, setSearchParams]);
 
-  const {isLoading} = useQuery({
+  const { isLoading } = useQuery({
     queryKey: ["orders", filter, debouncedQuery],
     queryFn: async () => {
       return filter === "all" 
@@ -39,15 +39,9 @@ export function PrestadoresPedidos() {
     staleTime: 1000 * 30,
   });
 
-  // const { mutateAsync: SeInteressar, isSuccess } = useMutation({
-  //   mutationFn: InteressarPedidos,
-  //   onSuccess: () => toast.success("Pedido marcado para negociação!"),
-  //   onError: () => toast.error("Oops! Só pode negociar uma vez!"),
-  // });
-
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-[100dvh] w-full p-4">
+      <div className="flex items-center justify-center h-screen w-full p-4 bg-zinc-50 dark:bg-zinc-950">
         <div className="w-full max-w-md space-y-4">
           <SkeletonsDemo />
           <SkeletonsDemo />
@@ -59,13 +53,12 @@ export function PrestadoresPedidos() {
 
   return (
     <motion.div
-      // Centralização total no viewport do smartphone
-      className="fixed inset-0 flex items-center justify-center bg-background px-4 py-2"
+      className="fixed inset-0 w-full h-full bg-background"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.3 }}
     >
-     <Cartaa></Cartaa>
+      <Cartaa />
     </motion.div>
   );
 }
