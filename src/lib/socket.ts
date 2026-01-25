@@ -6,23 +6,23 @@ interface OrderCallData {
 }
 
 
-const SOCKET_URL = "https://liberalconnect.org/api"; // Removi a barra final
-const SOCKET_PATH = "/api/socket.io/"; // <--- DEVE ser igual ao backend
+// Mantenha sua URL, mas vamos tratar o objeto de conexão
+const SOCKET_URL = "https://liberalconnect.org"; 
+
+// O segredo está aqui: o path deve conter o /api/
+const SOCKET_PATH = "/api/socket.io/"; 
 
 export const socket: Socket = io(SOCKET_URL, {
-  path: SOCKET_PATH, // <--- Adicione/Descomente esta linha
-  transports: ["polling","websocket"], // Adicionado polling para maior compatibilidade
-  reconnection: true,
-  reconnectionAttempts: Infinity,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
+  path: SOCKET_PATH,
+  // Forçamos o namespace padrão '/' explicitamente
+  // Isso evita que o Socket.io tente conectar em '/api'
+  forceNew: true, 
+  transports: ["websocket", "polling"],
   query: {
     userId: localStorage.getItem("@liberal:userId") || '7'
   },
-  timeout: 20000,
   withCredentials: true,
   autoConnect: false,
-  secure: false, // Mude para false enquanto estiver em localhost (sem HTTPS)
 });
 /**
  * GERENCIADOR DE CONEXÃO
