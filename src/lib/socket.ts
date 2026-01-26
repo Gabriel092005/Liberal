@@ -1,7 +1,9 @@
 import { io, Socket } from "socket.io-client";
 
 
-const SOCKET_URL = "https://liberalconnect.org/api";
+const SOCKET_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:3333" 
+  : "https://liberalconnect.org"; // Seu domínio real
 const SOCKET_PATH = "/api/socket.io/"; // <--- IGUAL AO BACKEND
 
 export const socket: Socket = io(SOCKET_URL, {
