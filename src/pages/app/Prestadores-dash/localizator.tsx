@@ -1,27 +1,24 @@
 // import { UpdateOrderLocation } from "@/api/update-order"; // Supondo esta API
+import { changeLocation } from "@/api/update-location";
 import { Button } from "@/components/ui/button";
 import {
-  DialogContent,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
+    DialogContent,
+    DialogHeader,
+    DialogTitle
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  CheckCircle2,
-  Loader2,
-  Map as MapIcon,
-  MapPin,
-  MapPinX,
-  Navigation,
+    CheckCircle2,
+    Loader2,
+    Map as MapIcon,
+    MapPin,
+    Navigation
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useUserLocation } from "../dashboard-admin/sidebar/location-services";
-import { changeLocation } from "@/api/update-location";
 
 
 interface UpdateLocationProps {

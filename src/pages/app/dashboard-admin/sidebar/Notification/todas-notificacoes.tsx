@@ -8,11 +8,11 @@ import { useQuery } from "@tanstack/react-query"
 import { formatDistanceToNow } from "date-fns"
 import { pt } from "date-fns/locale"
 import { AnimatePresence, motion } from "framer-motion"
-import { Bell, Check, ChevronLeft, Inbox, RefreshCw } from "lucide-react"
+import { Bell, Check, ChevronLeft, Inbox } from "lucide-react"
 import { Link } from "react-router-dom"
 
 export function NotificacoesMobile() {
-  const { data: user, isLoading, refetch, isFetching } = useQuery({
+  const { data: user, isLoading, isFetching } = useQuery({
     queryKey: ["user-profile"],
     queryFn: GetUserProfile
   })

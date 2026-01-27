@@ -1,4 +1,3 @@
-import { api } from "@/lib/axios";
 
 interface updateLocationRequest{
      latitude : number|null

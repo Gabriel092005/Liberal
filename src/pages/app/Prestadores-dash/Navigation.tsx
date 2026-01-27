@@ -3,7 +3,8 @@ import { formatDistanceToNow } from "date-fns";
 import { pt } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Box, CreditCard, Handshake, Home, Loader, MapPin, Menu, Search, User, WifiOff,
+  Box, CreditCard,
+  Home, Loader, MapPin, Menu, Search, User, WifiOff
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
