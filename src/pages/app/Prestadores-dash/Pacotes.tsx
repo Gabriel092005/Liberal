@@ -186,7 +186,7 @@ export function Package() {
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.8, y: 20 }} 
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  className="p-8 rounded-[2.5rem] bg-orange-500/5 border-2 border-dashed border-orange-500/30 text-center"
+                  className="p-5 rounded-[2.5rem] bg-orange-500/5 border-2 border-dashed border-orange-500/30 text-center"
                 >
                   <p className="text-[10px] uppercase font-black text-orange-500 mb-3 tracking-[0.3em]">Copie a Referência</p>
                   <p className="text-5xl font-black tracking-widest text-zinc-900 dark:text-white select-all">

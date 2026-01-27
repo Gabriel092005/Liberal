@@ -40,6 +40,7 @@ import { LoadingPage } from './pages/Loading';
 import { PaginaProfissoes } from './profissionals-page';
 import { PrestadoreProfile } from './pages/app/dashboard-admin/sidebar/PrestadorProfile';
 import { ConfigPrestadores } from './pages/app/Prestadores-dash/config-prestadores';
+import { AreaEstatisticas } from './pages/app/Prestadores-dash/statisticas';
 export const router = createBrowserRouter([
   {
 
@@ -88,6 +89,8 @@ export const router = createBrowserRouter([
 
       { path: '/notif-prestadores', element: <NotificacoesMobile/> },
       { path: '/config-prestadores', element: <ConfigPrestadores/> },
+      { path: '/vitrine-prestadores', element: <Vitrine/> },
+      { path: '/stats', element: <AreaEstatisticas/> },
       { path: '/prestadores-pedidos', element: <PrestadoresPedidos/> },
       { path: '/profile', element: <ProfilePage/> },
       { path: '/package', element: <Package/> },

@@ -8,7 +8,8 @@ import { useQuery } from "@tanstack/react-query"
 import { formatDistanceToNow } from "date-fns"
 import { pt } from "date-fns/locale"
 import { AnimatePresence, motion } from "framer-motion"
-import { Bell, Check, Inbox, RefreshCw } from "lucide-react"
+import { Bell, Check, ChevronLeft, Inbox, RefreshCw } from "lucide-react"
+import { Link } from "react-router-dom"
 
 export function NotificacoesMobile() {
   const { data: user, isLoading, refetch, isFetching } = useQuery({
@@ -55,14 +56,17 @@ export function NotificacoesMobile() {
             </div>
           </div>
 
+          <Link to='/servicos'>
           <Button
-            variant="ghost"
+            variant="link"
             size="icon"
-            onClick={() => refetch()}
             className={`rounded-2xl bg-zinc-100 dark:bg-zinc-900 h-12 w-12 ${isFetching ? 'animate-spin' : 'active:scale-90 transition-transform'}`}
           >
-            <RefreshCw className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
+            <ChevronLeft></ChevronLeft>
           </Button>
+          
+          </Link>
+       
         </header>
 
         <ScrollArea className="flex-1 px-4">
@@ -150,14 +154,6 @@ export function NotificacoesMobile() {
         </ScrollArea>
 
         {/* Botão flutuante para fechar ou ação extra (Estilo Mobile) */}
-        <div className="absolute bottom-6 left-0 right-0 px-6 sm:hidden">
-          <Button 
-            className="w-full h-14 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-lg shadow-2xl active:scale-95 transition-transform"
-            onClick={() => {/* Lógica de fechar */}}
-          >
-            Fechar
-          </Button>
-        </div>
       </motion.div>
     </div>
   )

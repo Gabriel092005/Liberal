@@ -3,8 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { pt } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Box, CreditCard,
-  Home, Loader, MapPin, Menu, Search, User, WifiOff
+  Box, CreditCard, Handshake, Home, Loader, MapPin, Menu, Search, User, WifiOff,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -35,7 +34,7 @@ const LUANDA_COORDS = { latitude: -8.8147, longitude: 13.2302 };
 const NAV_ITEMS = [
   { label: "Início", icon: Home, path: "/servicos" },
   { label: "Pacotes", icon: Box, path: "/package" },
-  { label: "carteira", icon: CreditCard, path: "/prestadores-pedidos" },
+  { label: "Credítos", icon: CreditCard, path: "/prestadores-pedidos" },
   { label: "Perfil", icon: User, path: "/profile" },
 ];
 
