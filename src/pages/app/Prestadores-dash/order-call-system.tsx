@@ -141,7 +141,9 @@ export function OrderCallSystem() {
                          </div>
                          <div className="min-w-0">
                             <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-tighter">Localização</p>
-                            <p className="dark:text-white text-xs font-bold truncate">{incomingOrder.location}</p>
+                            <p className="dark:text-white text-xs font-bold truncate max-w-[150px]" title={incomingOrder.location}>
+  {incomingOrder.location}
+</p>
                          </div>
                       </div>
 
