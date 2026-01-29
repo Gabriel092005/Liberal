@@ -1,3 +1,4 @@
+import { api } from "@/lib/axios"
 
 interface updateLocationRequest{
      latitude : number|null
@@ -5,7 +6,6 @@ interface updateLocationRequest{
      description:string|null
 }
 
-export async function changeLocation({latitude,longitude}:updateLocationRequest){
-     console.log(latitude,longitude)
-    
+export async function changeLocation({latitude,longitude,description}:updateLocationRequest){
+     api.put("/update-location", {latitude,longitude,description})
 }

@@ -7,8 +7,7 @@ import { Check, Loader2, MapPin, Phone, PhoneOff, ShieldCheck } from "lucide-rea
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 
-const ringtone = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3");
-
+const ringtone = new Audio("https://assets.mixkit.co/active_storage/sfx/2357/2357-preview.mp3");
 export function OrderCallSystem() {
   const [incomingOrder, setIncomingOrder] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
