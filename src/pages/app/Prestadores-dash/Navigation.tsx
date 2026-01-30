@@ -156,7 +156,7 @@ export function Navigation() {
             </li>
 
             <li className="flex-1">
-              <MobileNavItem to="/prestadores-pedidos" icon={CreditCard} label="Pedidos" active={location.pathname === "/prestadores-pedidos"} />
+              <MobileNavItem to="/prestadores-pedidos" icon={CreditCard} label="CRÉDITOS" active={location.pathname === "/prestadores-pedidos"} />
             </li>
             <li className="flex-1">
               <MobileNavItem to="/profile" icon={User} label="Perfil" active={location.pathname === "/profile"} />

@@ -65,13 +65,23 @@ export  function AppLayoutPestadores(){
   }
   if(profile) localStorage.setItem("@liberal:userId", String(profile.id))
   return(
-    <div className="flex min-h-screen fixed     antialiased ">
-         <div className="flex ml-[40px]  pt-10  flex-1 flex-col ">
-        {/* <BottomNavPrestadores/>S */}
-        <Navigation></Navigation>
-        <Outlet/>
-      </div>
+    <div className="h-[100dvh] w-full bg-background flex flex-col overflow-hidden antialiased select-none">
+      
+    {/* AREA DE CONTEUDO CENTRALIZADA */}
+    <div className="flex-1 w-full flex justify-center overflow-hidden">
+      {/* max-w-7xl impede que o conteúdo espalhe demais em telas grandes */}
+      <main className="w-full max-w-7xl h-full  flex flex-col relative px-0">
+        <Outlet />
+      </main>
     </div>
+
+    {/* NAVEGAÇÃO INFERIOR COM SUPORTE A IPHONE (Safe Area) */}
+    {/* <footer className="flex-none w-full border-t bg-background/95 backdrop-blur-xl z-[100] flex justify-center pb-[env(safe-area-inset-bottom)]"> */}
+      <div className="w-full max-w-7xl px-4 h-16 flex items-center justify-center">
+        <Navigation />
+      </div>
+    {/* </footer> */}
+  </div>
 
   )
 
