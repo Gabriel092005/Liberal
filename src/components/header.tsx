@@ -54,7 +54,7 @@ export function Header() {
   }
 
   return (
-    <header className="w-full fixed top-0 left-0 right-0 px-4 py-3 border-b border-zinc-200 bg-white dark:bg-black shadow-md z-50">
+    <header className="w-full fixed top-0 left-0 right-0 px-4 py-3 border-b border-zinc-200  bg-white bg-white dark:bg-black  z-50">
       <div className="flex items-center justify-between w-full max-w-screen-xl mx-auto">
         {/* Logo */}
         <div className="flex items-center gap-2">

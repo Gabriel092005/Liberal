@@ -291,7 +291,7 @@ const { mutate: EliminarPedido } = useMutation({
         <div className="flex items-center gap-2">
           <Briefcase size={16} className="text-orange-500" />
           <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">
-            Interessados ({pedido.interessados?.length || 0})
+            À procura de profissionais..
           </h3>
         </div>
       </div>

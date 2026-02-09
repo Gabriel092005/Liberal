@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { isAxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { GetUserProfile } from "@/api/get-profile";
+import { socket } from "@/lib/socket";
 
 export function AppLayoutClients() {
   const navigate = useNavigate();
@@ -15,6 +16,36 @@ export function AppLayoutClients() {
     queryFn: GetUserProfile,
     staleTime: Infinity,
   });
+
+  // Quando o usuário logar
+// Onde você tem os dados do usuário logado
+// No teu App.tsx
+useEffect(() => {
+  function conectarSala() {
+    const userId = profile?.id; // Garante que pegas o ID atual
+    if (userId) {
+      console.log("🔌 [Socket] Forçando entrada na sala:", userId);
+      socket.emit("join_room", String(userId));
+    }
+  }
+
+  // Tenta entrar na sala logo ao carregar
+  conectarSala();
+
+  // Se a internet cair e voltar, ele entra na sala de novo automaticamente
+  socket.on("connect", conectarSala);
+
+  return () => {
+    socket.off("connect", conectarSala);
+  };
+}, []);
+useEffect(() => {
+  if (profile?.id) {
+    console.log("Entrando na sala do usuário:", profile.id);
+    socket.emit("join_room", String(profile.id)); 
+    // Certifique-se que o backend tem um socket.on("join_room", (id) => socket.join(id))
+  }
+}, [profile]);
 
   useEffect(() => {
     if (isLoading || !profile) return;

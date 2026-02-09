@@ -7,6 +7,7 @@ import { OpenOnFullScreenPhoto } from "./OpenOnFullPhotoDialog";
 
 type Autor = {
   nome: string;
+  status:'PENDING'|'INTERRUPTED'|'ACEPTED'|'CONFIRMED';
   provincia: string;
   municipio: string;
   isSucces: boolean;
@@ -18,9 +19,9 @@ export function ServicesDialogDetails({
   image_path,
   municipio,
   nome,
+  status,
   provincia,
   celular,
-  isSucces,
 }: Autor) {
   return (
     <DialogContent className="sm:max-w-[400px] w-[92%] rounded-[2.5rem] p-0 overflow-hidden bg-white dark:bg-zinc-950 border-none shadow-2xl">
@@ -47,7 +48,7 @@ export function ServicesDialogDetails({
             </AvatarFallback>
           </Avatar>
           
-          {isSucces && (
+          {status && (
             <div className="absolute bottom-1 right-1 bg-white dark:bg-zinc-900 rounded-full p-1">
               <CheckCircle2 className="text-green-500 w-6 h-6 fill-green-500/10" />
             </div>
@@ -68,7 +69,7 @@ export function ServicesDialogDetails({
 
       {/* Info Body */}
       <div className="p-6 pt-0 space-y-3">
-        {isSucces ? (
+        {status==='ACEPTED' ? (
           <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-[1.5rem] p-4 flex items-center justify-between border border-zinc-100 dark:border-zinc-800">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-orange-500/10 rounded-full text-orange-600">
@@ -91,7 +92,7 @@ export function ServicesDialogDetails({
         ) : (
           <div className="p-4 text-center border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-[1.5rem]">
             <p className="text-[10px] font-bold text-zinc-400 uppercase">
-              Contrate para ver o contacto
+              Aguarde a confirmação do cliente
             </p>
           </div>
         )}

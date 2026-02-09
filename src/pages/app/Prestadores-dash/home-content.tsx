@@ -519,6 +519,7 @@ useEffect(() => {
                     </DialogTrigger>
                     <ServicesDialogDetails
                       isSucces={isSuccess}
+                      status={pedido.status}
                       nome={pedido.autor.nome}
                       celular={pedido.autor.celular}
                       provincia={pedido.autor.provincia}
@@ -573,7 +574,8 @@ useEffect(() => {
       <BotaoNegociar 
         celular={pedido.autor.celular} 
         image_path={pedido.autor.image_path} 
-        isSuccess={isSuccess} 
+        status={pedido.status} 
+        isSucess={isSuccess}
         nome={pedido.autor.nome} 
         onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
       />

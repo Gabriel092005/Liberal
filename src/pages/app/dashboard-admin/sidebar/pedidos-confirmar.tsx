@@ -73,7 +73,7 @@ export function PedidoCard({ id, prestadorId, status = "PENDING", refetch }: Car
       setLocalStatus("PENDING");
       setShowCancelDialog(false);
       setSelectedReason("");
-      toast.info("Pedido cancelado.");
+      toast.info("Negociação cancelada.");
       refetch();
     },
     onError: () => toast.error("Erro ao cancelar!"),

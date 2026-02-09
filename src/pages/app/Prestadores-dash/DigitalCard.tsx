@@ -180,6 +180,7 @@ export function PrestadoresPedidos() {
                             </Button>
                           </DialogTrigger>
                           <ServicesDialogDetails
+                            status={pedido.status}
                             isSucces={isSuccess}
                             nome={pedido.autor.nome}
                             celular={pedido.autor.celular}
@@ -207,13 +208,14 @@ export function PrestadoresPedidos() {
                           </Badge>
                         </div>
 
-                        <BotaoNegociar 
-                          celular={pedido.autor.celular} 
-                          image_path={pedido.autor.image_path} 
-                          isSuccess={isSuccess} 
-                          nome={pedido.autor.nome} 
-                          onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
-                        />
+                     <BotaoNegociar 
+  celular={pedido.autor.celular} 
+  image_path={pedido.autor.image_path} 
+  isSucess={true}  // Ajustado para bater com a interface (sucess)
+  status={pedido.status} // ADICIONE ESTA LINHA (ou 'PENDING', etc)
+  nome={pedido.autor.nome} 
+  onClick={() => SeInteressar({ pedidoId: Number(pedido.id) })} 
+/>
                       </div>
                     </motion.div>
                   );

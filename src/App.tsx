@@ -1,27 +1,20 @@
-import { RouterProvider } from 'react-router-dom'
-import './global.css'
-import { router } from './routes'
-import {Helmet,HelmetProvider} from 'react-helmet-async'
-import { Toaster } from 'sonner'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { queryClient } from './lib/react-query'
-import { ThemeProvider } from './components/theme/theme-provider'
 import { useEffect } from 'react'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
+import { RouterProvider } from 'react-router-dom'
+import { Toaster } from 'sonner'
+import { ThemeProvider } from './components/theme/theme-provider'
+import './global.css'
 import { api } from './lib/axios'
-import { socket } from './lib/socket'
+import { queryClient } from './lib/react-query'
+import { NegotiationPopUp } from './pages/app/Prestadores-dash/NegociationPopup'
+import { router } from './routes'
 
 
 
 
 
 export function App() {
-
-
-   socket.on("order_call", (data) => {
-      console.log("📦 Nova ordem recebida:", data);
-      // Aqui você pode disparar um evento global ou atualizar um store (Redux/Zustand)
-    });
-  
 
 
 // Função auxiliar necessária para o Chrome/Edge converter a VAPID key
@@ -88,18 +81,25 @@ if (permission !== 'granted') {
   }, []); // Executa apenas uma vez ao carregar o App
 
 // Chame a função em um useEffect ou após o login
-
-  return(
-    <HelmetProvider>
-      <Helmet titleTemplate='%s | Liberal.'/>
-        <Toaster richColors/>
-      <ThemeProvider storageKey="vite-ui-theme" defaultTheme="light">
+if (window.socket && window.socket.connected) {
+  console.log("Conectado!");
+} else {
+  console.log("O socket ainda não está pronto ou está desconectado.");
+}
+return(
+  <HelmetProvider>
+    <Helmet titleTemplate='%s | Liberal.'/>
+    <Toaster richColors/>
+    
+    <ThemeProvider storageKey="vite-ui-theme" defaultTheme="light">
       <QueryClientProvider client={queryClient}>
-           <RouterProvider router={router}/>
+        {/* Mantenha o Popup aqui dentro para ele herdar contextos se necessário */}
+        <NegotiationPopUp />
+        <RouterProvider router={router}/>
       </QueryClientProvider>
     </ThemeProvider>
   </HelmetProvider>
-  )
+)
 
 }
 

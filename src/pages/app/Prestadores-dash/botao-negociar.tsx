@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Handshake,XCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, Handshake,XCircle, CheckCircle2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent,  } from "@/components/ui/dialog";
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,13 +11,14 @@ import { CallButton } from "@/pages/Buscar/callButton";
 
 interface BotaoNegociarProps {
   onClick: () => Promise<any>;
-  isSuccess: boolean;
+  status: 'PENDING'|'INTERRUPTED'|'ACEPTED'|'CONFIRMED';
+  isSucess: boolean;
   nome: string;
   celular: string;
   image_path: string | null;
 }
 
-export function BotaoNegociar({ onClick, isSuccess, celular, image_path, nome }: BotaoNegociarProps) {
+export function BotaoNegociar({ onClick, status, celular, isSucess,image_path, nome }: BotaoNegociarProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
@@ -26,7 +27,7 @@ export function BotaoNegociar({ onClick, isSuccess, celular, image_path, nome }:
       setIsLoading(true);
       await onClick();
       setOpenModal(true); // Abre o modal apenas após a execução
-      if (isSuccess) {
+      if (status) {
         toast.success("Solicitação enviada!");
       }
     } catch (error) {
@@ -68,7 +69,7 @@ export function BotaoNegociar({ onClick, isSuccess, celular, image_path, nome }:
       <Dialog open={openModal} onOpenChange={setOpenModal}>
         <DialogContent className="max-w-[320px] p-0 overflow-hidden border-none bg-white dark:bg-zinc-950 rounded-[2.5rem] shadow-2xl">
           <AnimatePresence mode="wait">
-            {isSuccess ? (
+            {isSucess? (
               <motion.div
                 key="success-content"
                 initial={{ opacity: 0, y: 20 }}
@@ -93,12 +94,24 @@ export function BotaoNegociar({ onClick, isSuccess, celular, image_path, nome }:
                   </h3>
                   <p className="text-sm text-zinc-500 font-medium mb-6">Cliente Verificado</p>
                   
-                  <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-4 mb-6 border border-zinc-100 dark:border-zinc-800">
+                  {status==='ACEPTED'?(
+                        <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-4 mb-6 border border-zinc-100 dark:border-zinc-800">
                     <span className="text-xs text-zinc-400 uppercase font-bold tracking-widest block mb-1">Telemóvel</span>
                     <p className="text-lg font-mono font-bold text-zinc-700 dark:text-zinc-300 tracking-wider">
                       +244 {celular}
                     </p>
                   </div>
+                  ):(
+                     <div>
+                             <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-4 mb-6 border border-zinc-100 dark:border-zinc-800">
+                    <span className="text-xs text-zinc-400 uppercase font-bold tracking-widest block mb-1">Telemóvel</span>
+                    <p className="text-lg font-mono font-bold text-zinc-700 dark:text-zinc-300 tracking-wider">
+                      <Lock></Lock>
+                      Número Indisponivél
+                    </p>
+                  </div>
+                     </div>
+                  )}
 
                   <div className="w-full">
                     <CallButton phoneNumber={celular} />

@@ -10,9 +10,14 @@ export const socket: Socket = io(SOCKET_URL, {
   path: SOCKET_PATH,
   autoConnect: false,
   withCredentials: true,
+  query: {
+    userId: 3
+  },
   // Permita polling para que o handshake inicial funcione sempre
   transports: ["polling", "websocket"], 
 });
+window.socket = socket;
+
 export const connectSocket = (userId: string) => {
   if (!userId) return;
 

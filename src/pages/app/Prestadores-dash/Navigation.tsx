@@ -59,9 +59,7 @@ export function Navigation() {
   return (
     <>
       <OrderCallSystem />
-
-      {/* 🖥️ DESKTOP INTERFACE */}
-      <header className="hidden md:block fixed top-0 inset-x-0 z-[100] h-20 pointer-events-none">
+      <header className="hidden md:block fixed bg-white dark:bg-black top-0 inset-x-0 z-[100] h-20 pointer-events-none">
         <div className="max-w-[1440px] mx-auto h-full flex items-center justify-between px-8">
           {/* LOGOTIPO */}
           <div className="flex items-center gap-4 pointer-events-auto min-w-[200px]">
@@ -76,14 +74,12 @@ export function Navigation() {
               <span className="text-[9px] font-black text-orange-500 tracking-widest uppercase">Angola Business</span>
             </div>
           </div>
-
-          {/* BARRA CENTRAL */}
           <nav className={`
             absolute left-1/2 -translate-x-1/2 h-14 pointer-events-auto
             flex items-center gap-1 p-1.5 rounded-[1.5rem]
             transition-all duration-700 cubic-bezier(0.19, 1, 0.22, 1)
             ${scrolled 
-              ? "bg-white/70 dark:bg-zinc-950/70 backdrop-blur-3xl border border-white/40 dark:border-zinc-800/50 shadow-2xl translate-y-2 scale-105" 
+              ? "bg-white/70 dark:bg-zinc-950/70  border dark:border-zinc-800/50 shadow-2xl translate-y-2 scale-105" 
               : "bg-white/10 dark:bg-zinc-900/10 backdrop-blur-md border border-white/10 dark:border-zinc-800/10"}
           `}>
             {NAV_ITEMS.map((item) => {
@@ -104,8 +100,6 @@ export function Navigation() {
               );
             })}
           </nav>
-
-          {/* AÇÕES DIREITA */}
           <div className="flex items-center gap-3 pointer-events-auto min-w-[300px] justify-end">
             <SearchModal coords={coords} isOnline={isOnline} trigger={
               <Button size="icon" variant="ghost" className="rounded-2xl h-11 w-11 hover:bg-zinc-100 dark:hover:bg-zinc-800">
@@ -132,8 +126,6 @@ export function Navigation() {
           </div>
         </div>
       </header>
-
-      {/* 📱 MOBILE NAVIGATION - FULL WIDTH BOTTOM */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-50">
         <div className="relative bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border-t border-zinc-200/50 dark:border-zinc-800/50 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
           <ul className="flex items-center justify-around h-16 px-2">

@@ -46,7 +46,12 @@ import { AppFooter } from "./footer";
 import { ChatIntegrado } from "./Mensagens";
 import { NotificationDropdownCostumer } from "./Notification/notif-dropdown-costumer";
 
+import { NegotiationPopUp } from "../../Prestadores-dash/NegociationPopup";
+import { PedidoStatusIndicator } from "./pedidosStatusIndicator";
+
 export function Home() {
+
+ 
   const categorias = [
     { image: servico3, title: 'Madeira & Oficios', to: '/madeira' },
     { image: servico1, title: 'Electricidade & Manuntenção', to: '/electricidade' },
@@ -156,7 +161,7 @@ export function Home() {
   return (
     <div className="h-screen w-full overflow-hidden bg-background flex flex-col antialiased">
       {/* HEADER FIXO */}
-      <header className="flex-none sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="flex-none sticky top-0 z-[100] w-full border-b  bg-white dark:bg-black">
   <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center gap-3 sm:gap-4">
     
      
@@ -183,7 +188,6 @@ export function Home() {
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
           </motion.button>
         </DialogTrigger>
-        {/* ... conteúdo do Dialog (mantido igual) ... */}
         <DialogContent className="max-w-md rounded-[2.5rem]">
           <DialogHeader><DialogTitle className="text-center">Minha Conta</DialogTitle></DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
@@ -283,15 +287,9 @@ export function Home() {
             </Link>
 
           <ChatIntegrado></ChatIntegrado>
+               <PedidoStatusIndicator></PedidoStatusIndicator>
           </div>
-
-
-          {/* SEÇÃO DE DESTAQUES (SLIDE AGORA FUNCIONA) */}
-        
-
-          {/* GRID DE CATEGORIAS */}
           <section className="space-y-4">
-            {/* <h2 className="text-xl font-black tracking-tighter px-1">Todas Categorias</h2> */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {categorias.map((o) => (
                 <Link to={o.to} key={o.title} className="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-muted shadow-sm hover:shadow-xl transition-all">
@@ -303,8 +301,7 @@ export function Home() {
                 </Link>
               ))}
             </div>
-
-              <section className="space-y-4">
+           <section className="space-y-4">
             <h2 className="text-xl font-black tracking-tighter flex items-center gap-2 px-1">
               <Sparkles className="text-orange-500" size={20} /> Melhores da Semana
             </h2>
@@ -320,10 +317,9 @@ export function Home() {
           </section>
           </section>
         </div>
-        {/* SEÇÃO DE DOWNLOAD (FOOTER) */}
-<AppFooter></AppFooter>
+      <AppFooter></AppFooter>
       </main>
-      
+      <NegotiationPopUp />
     </div>
   );
 }

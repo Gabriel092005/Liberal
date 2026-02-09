@@ -75,19 +75,34 @@ export function OrderCallSystem() {
 
   const handleDecision = async (status: 'accept' | 'reject') => {
     if (status === 'reject') {
+      // Exibe o toast no canto superior esquerdo (top-left)
+      toast.info("Vamos enviar outros pedidos disponíveis.", {
+        position: "top-left",
+        duration: 4000,
+      });
+  
       stopCall();
       return;
     }
-
+  
     try {
       setIsProcessing(true);
+      
+      // Executa a lógica de interesse
       await SeInteressar();
+      
+      // Notifica via socket
       socket.emit("respond_to_order", { 
         orderId: incomingOrder.id, 
         status: 'accepted' 
       });
+  
+      // Opcional: Toast de sucesso ao aceitar
+      toast.success("Candidatura enviada com sucesso!");
+  
     } catch (err) {
-      // Tratado no mutation
+      // Erro já tratado no mutation ou exiba um toast de erro aqui
+      toast.error("Não foi possível processar o pedido.");
     } finally {
       setIsProcessing(false);
     }
@@ -181,7 +196,7 @@ export function OrderCallSystem() {
                     ) : (
                       <>
                         <Check size={24} strokeWidth={4} className="text-white" />
-                        <span className="text-[9px] font-bold text-white uppercase">Trabalhar</span>
+                        <span className="text-[9px] font-bold text-white uppercase">Negociar</span>
                       </>
                     )}
                   </button>
