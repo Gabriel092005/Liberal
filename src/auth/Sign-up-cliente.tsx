@@ -138,14 +138,27 @@ export function SignUp() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-zinc-500 ml-1">NIF</Label>
-                    <Input {...register('nif', { required: true })} placeholder="000000000" className={`h-14 bg-zinc-50 dark:bg-zinc-900 border-2 rounded-2xl ${errors.nif ? 'border-red-500' : 'border-zinc-200 dark:border-zinc-800'}`} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-zinc-500 ml-1">Telefone</Label>
-                    <Input {...register('celular', { required: true })} placeholder="9xx..." className={`h-14 bg-zinc-50 dark:bg-zinc-900 border-2 rounded-2xl ${errors.celular ? 'border-red-500' : 'border-zinc-200 dark:border-zinc-800'}`} />
-                  </div>
+                <div className="space-y-2">
+  <Label className="text-xs font-bold uppercase tracking-widest text-zinc-500 ml-1">Telefone</Label>
+  <Input 
+    {...register('celular', { 
+      required: "O telefone é obrigatório",
+      pattern: {
+        value: /^9\d{8}$/,
+        message: "O telefone deve começar com 9 e ter 9 dígitos"
+      },
+      maxLength: {
+        value: 9,
+        message: "O telefone não pode ter mais de 9 dígitos"
+      }
+    })} 
+    placeholder="9xx..." 
+    className={`h-14 bg-zinc-50 dark:bg-zinc-900 border-2 rounded-2xl ${errors.celular ? 'border-red-500' : 'border-zinc-200 dark:border-zinc-800'}`} 
+  />
+  {errors.celular && (
+    <span className="text-xs text-red-500 ml-1">{errors.celular.message as string}</span>
+  )}
+</div>
                 </div>
 
                 <div className="space-y-2">
