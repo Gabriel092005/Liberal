@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
 
+
 const SOCKET_URL = window.location.hostname === "localhost" 
   ? "http://localhost:3333" 
   : "https://liberalconnect.org"; // Seu domínio real

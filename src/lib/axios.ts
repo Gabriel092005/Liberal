@@ -8,6 +8,7 @@ export const api = axios.create({
   withCredentials: true
 });
 
+
 // Interceptor para adicionar o token
   // if)
 api.interceptors.request.use(config => {
