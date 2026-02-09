@@ -8,7 +8,7 @@ import { Ban, Check, Loader2, MessageSquare, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-// --- Funções de API ---
+
 interface OrderActionRequest {
   pedidoId: number;
   prestadorId: number;

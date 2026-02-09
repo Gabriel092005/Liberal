@@ -3,8 +3,8 @@ import axios from 'axios';
 import {  redirect } from 'react-router-dom';
 
 export const api = axios.create({
-  // baseURL: 'https://liberalconnect.org/api',  
-  baseURL: 'http://localhost:3333', 
+  baseURL: 'https://liberalconnect.org/api',  
+  // baseURL: 'http://localhost:3333', 
   withCredentials: true
 });
 
