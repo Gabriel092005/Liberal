@@ -12,10 +12,10 @@ export const socket: Socket = io(SOCKET_URL, {
   autoConnect: false,
   withCredentials: true,
   query: {
-    userId:  localStorage.getItem("@liberal:userId")
+    userId:  localStorage.getItem("@liberal:userId") || 3
   },
   // Permita polling para que o handshake inicial funcione sempre
-  transports: ["polling", "websocket"], 
+  transports: ["polling"  , "websocket"], 
 });
 window.socket = socket;
 
