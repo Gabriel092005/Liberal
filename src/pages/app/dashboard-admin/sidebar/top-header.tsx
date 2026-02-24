@@ -44,13 +44,10 @@ import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
 import { NotificationDropdownAdmin } from "./notification-dropdown-admin";
 import { VitrineCardContent } from "./vitrine-card-content";
 
-
-
-
 interface Transacao {
   id: number;
   valor: number;
-  status: "PENDENTE" | "APROVADO" | "REJEITADO";
+  status: "PENDENTE" | "APROVADO" | "REJEITADO" | "CANCELADO";
   metodo: string;
   createdAt: string;
   usuario: { nome: string; email: string };
@@ -64,7 +61,6 @@ function TransacoesContent() {
   const [loading, setLoading] = useState(true);
   const [aprovando, setAprovando] = useState<number | null>(null);
 
-  // Busca as últimas 10
   async function fetchTransacoes() {
     try {
       setLoading(true);
@@ -77,12 +73,11 @@ function TransacoesContent() {
     }
   }
 
-  // Aprovar transação
   async function handleAprovar(transacaoId: number) {
     try {
       setAprovando(transacaoId);
       await api.post("/approvar", { transacaoId });
-      await fetchTransacoes(); // atualiza a lista
+      await fetchTransacoes();
     } catch (error) {
       console.error("Erro ao aprovar", error);
     } finally {
@@ -94,39 +89,41 @@ function TransacoesContent() {
     fetchTransacoes();
   }, []);
 
-  // Mapeia status do backend para o frontend
+  // CORREÇÃO: Adicionado a propriedade 'class' para cada status
   const statusConfig: Record<string, { label: string; icon: JSX.Element; class: string }> = {
     APROVADO: {
       label: "Concluído",
       icon: <CheckCircle2 size={13} />,
-      class: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40",
+      class: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
     },
     PENDENTE: {
       label: "Pendente",
       icon: <Clock size={13} />,
-      class: "text-amber-600 bg-amber-50 dark:bg-amber-950/40",
+      class: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+    },
+    REJEITADO: {
+      label: "Rejeitado",
+      icon: <XCircle size={13} />,
+      class: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
     },
     CANCELADO: {
       label: "Cancelado",
       icon: <XCircle size={13} />,
-      class: "text-rose-600 bg-rose-50 dark:bg-rose-950/40",
+      class: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400",
     },
   };
 
   const filtered = transacoes.filter((t) => {
     const matchSearch =
-      t.pacote.title.toLowerCase().includes(search.toLowerCase()) ||
-      t.usuario.nome.toLowerCase().includes(search.toLowerCase()) ||
+      t.pacote?.title?.toLowerCase().includes(search.toLowerCase()) ||
+      t.usuario?.nome?.toLowerCase().includes(search.toLowerCase()) ||
       String(t.id).includes(search);
     const matchStatus = filtroStatus === "todos" || t.status === filtroStatus;
     return matchSearch && matchStatus;
   });
 
-
-
   return (
     <div className="flex flex-col gap-4 h-full">
-      {/* Filtros */}
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -138,7 +135,7 @@ function TransacoesContent() {
           />
         </div>
         <select
-          className="h-9 text-sm border rounded-md px-2"
+          className="h-9 text-sm border rounded-md px-2 bg-background"
           value={filtroStatus}
           onChange={(e) => setFiltroStatus(e.target.value)}
         >
@@ -149,7 +146,6 @@ function TransacoesContent() {
         </select>
       </div>
 
-      {/* Lista */}
       <div className="flex flex-col gap-2 overflow-y-auto flex-1 pr-1">
         {loading ? (
           <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
@@ -162,7 +158,9 @@ function TransacoesContent() {
           </div>
         ) : (
           filtered.map((t) => {
-            const cfg = statusConfig[t.status];
+            // CORREÇÃO: Definindo a variável 'cfg' antes de usá-la no JSX
+            const cfg = statusConfig[t.status] || statusConfig["PENDENTE"];
+
             return (
               <div
                 key={t.id}
@@ -174,10 +172,10 @@ function TransacoesContent() {
                   </div>
                   <div className="flex flex-col min-w-0">
                     <span className="text-sm font-medium truncate max-w-[200px]">
-                      {t.pacote.title}
+                      {t.pacote?.title || "Pacote Indisponível"}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {t.usuario.nome} · {new Date(t.createdAt).toLocaleDateString("pt-AO")}
+                      {t.usuario?.nome} · {new Date(t.createdAt).toLocaleDateString("pt-AO")}
                     </span>
                   </div>
                 </div>
@@ -191,7 +189,6 @@ function TransacoesContent() {
                     +{Number(t.valor).toLocaleString("pt-AO", { style: "currency", currency: "AOA" })}
                   </span>
 
-                  {/* Só mostra botão se estiver pendente */}
                   {t.status === "PENDENTE" && (
                     <Button
                       variant="outline"
@@ -209,7 +206,6 @@ function TransacoesContent() {
         )}
       </div>
 
-      {/* Rodapé */}
       <div className="flex justify-between items-center pt-2 border-t text-xs text-muted-foreground">
         <span>{filtered.length} de {transacoes.length} transações</span>
         <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
@@ -220,23 +216,19 @@ function TransacoesContent() {
     </div>
   );
 }
-// ─── TopHeader Principal ───────────────────────────────────────────────────
+
 export function TopHeader() {
   const { data: profile } = useQuery({
     queryKey: ["profile"],
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchOnMount: true,
-    staleTime: 0,
     queryFn: GetUserProfile,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const { data: vitrine, isLoading: isLoadingVitrine } = useQuery({
     queryKey: ["v"],
     queryFn: FetchPostsVitrineAll,
     refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchOnMount: true,
     staleTime: 0,
   });
 
@@ -263,7 +255,6 @@ export function TopHeader() {
 
   return (
     <header className="hidden md:flex items-center justify-between px-8 py-3 dark:bg-zinc-900/95 bg-white/95 backdrop-blur-md border-b border-border/50 shadow-sm fixed top-0 left-0 right-0 z-50">
-      {/* Logo */}
       <Link to="/início" className="flex items-center gap-2 group">
         <div className="bg-gradient-to-br from-orange-400 to-pink-500 shadow-lg shadow-orange-200 dark:shadow-orange-900/30 rounded-xl p-2 group-hover:scale-105 transition-transform">
           <Handshake size={20} className="text-white" />
@@ -273,7 +264,6 @@ export function TopHeader() {
         </span>
       </Link>
 
-      {/* Nav */}
       <nav className="flex items-center gap-1">
         {navLinks.map(({ to, icon, label }) => (
           <Link
@@ -286,7 +276,6 @@ export function TopHeader() {
           </Link>
         ))}
 
-        {/* Transações — item de nav que abre dialog */}
         <Dialog>
           <DialogTrigger asChild>
             <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted px-3 py-2 rounded-lg transition-all">
@@ -311,14 +300,12 @@ export function TopHeader() {
         </Dialog>
       </nav>
 
-      {/* Ações direita */}
       <div className="flex items-center gap-2">
-        {/* Novo Pedido */}
         <Dialog>
           <DialogTrigger asChild>
             <Button
               size="sm"
-              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white hover:opacity-90 hover:shadow-md hover:shadow-orange-200 dark:hover:shadow-orange-900/30 transition-all"
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white hover:opacity-90 hover:shadow-md transition-all"
             >
               <Plus size={16} />
               <span>Novo Pedido</span>
@@ -327,7 +314,6 @@ export function TopHeader() {
           <FastFazerPedido />
         </Dialog>
 
-        {/* Vitrine */}
         <Dialog>
           <DialogTrigger asChild>
             <Button
@@ -364,17 +350,17 @@ export function TopHeader() {
           </DialogContent>
         </Dialog>
 
-        {/* Notificações */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <span />
+            {/* O botão de trigger deve ser um elemento real ou o componente de notificação */}
+            <div className="cursor-pointer">
+               <NotificationDropdownAdmin {...profile} />
+            </div>
           </DropdownMenuTrigger>
-          <NotificationDropdownAdmin {...profile} />
         </DropdownMenu>
 
         <ModeToggle />
 
-        {/* Perfil */}
         <div className="flex items-center gap-2 pl-2 border-l border-border/50">
           <Avatar className="h-8 w-8 ring-2 ring-orange-200 dark:ring-orange-900">
             <AvatarImage
@@ -389,7 +375,7 @@ export function TopHeader() {
               {profile.nome}
             </span>
             <span className="text-xs text-muted-foreground">
-              @{profile.role}
+              @{profile.role} {/* CORREÇÃO: De medmrole para role */}
             </span>
           </div>
         </div>
