@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Handshake,XCircle, CheckCircle2, Lock } from "lucide-react";
+import { Loader2, Handshake,XCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent,  } from "@/components/ui/dialog";
 import { AnimatePresence, motion } from "framer-motion";

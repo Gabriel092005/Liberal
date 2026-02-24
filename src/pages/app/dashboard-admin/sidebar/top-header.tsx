@@ -1,4 +1,9 @@
+import { FetchPostsVitrineAll } from "@/api/fetch-all-vitrine-data";
+import { GetUserProfile } from "@/api/get-profile";
+import { ModeToggle } from "@/components/theme/theme-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -8,111 +13,38 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Home,
-  Plus,
-  Users2,
-  BookMarked,
-  Handshake,
-  Briefcase,
-  Hammer,
-  ArrowLeftRight,
-  TrendingUp,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Search,
-  Filter,
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
-import { useQuery } from "@tanstack/react-query";
-import { GetUserProfile } from "@/api/get-profile";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { getInialts } from "@/lib/utils";
-import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ModeToggle } from "@/components/theme/theme-toggle";
-import { api } from "@/lib/axios";
-import { NotificationDropdownAdmin } from "./notification-dropdown-admin";
-import { Card } from "@/components/ui/card";
-import { FetchPostsVitrineAll } from "@/api/fetch-all-vitrine-data";
-import { VitrineCardContent } from "./vitrine-card-content";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/lib/axios";
+import { cn, getInialts } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  ArrowDownLeft,
+  ArrowLeftRight,
+  ArrowUpRight,
+  BookMarked,
+  Briefcase,
+  CheckCircle2,
+  Clock,
+  Filter,
+  Hammer,
+  Handshake,
+  Home,
+  Plus,
+  Search,
+  Users2,
+  XCircle
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
+import { FastFazerPedido } from "./DialogFastPrestadoresPedido";
+import { NotificationDropdownAdmin } from "./notification-dropdown-admin";
+import { VitrineCardContent } from "./vitrine-card-content";
 
-// ─── Mock de transações (substituir por query real) ────────────────────────
-const mockTransactions = [
-  {
-    id: "TXN-001",
-    descricao: "Pagamento - Serviço de Pintura",
-    valor: 450.0,
-    tipo: "entrada",
-    status: "concluido",
-    data: "2025-06-18",
-    cliente: "João Silva",
-  },
-  {
-    id: "TXN-002",
-    descricao: "Reembolso - Pedido #204",
-    valor: 80.0,
-    tipo: "saida",
-    status: "concluido",
-    data: "2025-06-17",
-    cliente: "Maria Costa",
-  },
-  {
-    id: "TXN-003",
-    descricao: "Pagamento - Instalação Elétrica",
-    valor: 1200.0,
-    tipo: "entrada",
-    status: "pendente",
-    data: "2025-06-16",
-    cliente: "Carlos Mendes",
-  },
-  {
-    id: "TXN-004",
-    descricao: "Taxa de Plataforma",
-    valor: 60.0,
-    tipo: "saida",
-    status: "concluido",
-    data: "2025-06-15",
-    cliente: "Sistema",
-  },
-  {
-    id: "TXN-005",
-    descricao: "Pagamento - Limpeza Residencial",
-    valor: 320.0,
-    tipo: "entrada",
-    status: "cancelado",
-    data: "2025-06-14",
-    cliente: "Ana Ribeiro",
-  },
-  {
-    id: "TXN-006",
-    descricao: "Pagamento - Reparação Canalização",
-    valor: 780.0,
-    tipo: "entrada",
-    status: "concluido",
-    data: "2025-06-13",
-    cliente: "Pedro Fonseca",
-  },
-];
 
-// ─── Componente de Transações ──────────────────────────────────────────────
 
 
 interface Transacao {
@@ -190,9 +122,7 @@ function TransacoesContent() {
     return matchSearch && matchStatus;
   });
 
-  const totalEntradas = transacoes
-    .filter((t) => t.status === "APROVADO")
-    .reduce((acc, t) => acc + Number(t.valor), 0);
+
 
   return (
     <div className="flex flex-col gap-4 h-full">
