@@ -70,14 +70,12 @@ export function EmptyInteressados({ isLoading }: EmptyStateProps) {
                 Ainda sem novos interessados
               </p>
               <p className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 max-w-[180px] mx-auto leading-tight uppercase">
-                Fica atento, os melhores pedidos aparecem em segundos!
+                Fica atento, os melhores prestadores aparecem em segundos!
               </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Decoração de fundo sutil */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
         <div className="absolute top-[-10%] left-[-10%] w-24 h-24 bg-orange-200 rounded-full blur-3xl" />
         <div className="absolute bottom-[-10%] right-[-10%] w-24 h-24 bg-orange-100 rounded-full blur-3xl" />

@@ -100,22 +100,22 @@ export function BotaoNegociar({ onClick, status, celular, isSucess,image_path, n
                     <p className="text-lg font-mono font-bold text-zinc-700 dark:text-zinc-300 tracking-wider">
                       +244 {celular}
                     </p>
+                     <div className="w-full">
+                    <CallButton phoneNumber={celular} />
+                  </div>
                   </div>
                   ):(
                      <div>
                              <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-4 mb-6 border border-zinc-100 dark:border-zinc-800">
                     <span className="text-xs text-zinc-400 uppercase font-bold tracking-widest block mb-1">Telemóvel</span>
                     <p className="text-lg font-mono font-bold text-zinc-700 dark:text-zinc-300 tracking-wider">
-                      <Lock></Lock>
-                      Número Indisponivél
+                      Número Indisponivél, aguarde o cliente confirmar
                     </p>
                   </div>
                      </div>
                   )}
 
-                  <div className="w-full">
-                    <CallButton phoneNumber={celular} />
-                  </div>
+                 
                 </div>
               </motion.div>
             ) : (

@@ -363,7 +363,7 @@ useEffect(() => {
         </header>
 
         {/* HEADER DE CONTEÚDO (Pedidos + Busca) */}
-        <CardHeader className="px-4 lg:px-8 pb-4 pt-4 lg:mt-5 lg:pt-6 shrink-0 bg-white dark:bg-zinc-950 border-b lg:border-none">
+        <CardHeader className="px-4 lg:px-8 pb-4 pt-4 lg:mt-9 lg:pt-6 shrink-0 bg-white dark:bg-zinc-950 border-b lg:border-none">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
   {/* Lado Esquerdo: Título e Refresh */}
   <div className="flex items-center lg:gap-6  justify-between">
