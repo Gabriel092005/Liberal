@@ -6,6 +6,7 @@ export const api = axios.create({
   baseURL: 'https://liberalconnect.org/api',  
   // baseURL: 'http://localhost:3333', 
   withCredentials: true
+  
 });
 
 
