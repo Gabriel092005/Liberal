@@ -48,7 +48,6 @@ import { toast } from "sonner";
 import z from "zod";
 import { NewCategorySheetContent } from "./new-categorySheet";
 
-// ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const packageSchema = z.object({
   title: z.string().min(1),
