@@ -161,7 +161,7 @@ export function Home() {
   return (
     <div className="h-screen w-full overflow-hidden bg-background flex flex-col antialiased">
       {/* HEADER FIXO */}
-      <header className="flex-none sticky top-0 z-[100] w-full border-b  bg-white dark:bg-black">
+      <header className="flex-none sticky top-0 z-[100] w-full   bg-white dark:bg-black">
   <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center gap-3 sm:gap-4">
     
      

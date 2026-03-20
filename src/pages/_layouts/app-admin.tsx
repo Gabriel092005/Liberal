@@ -1,4 +1,3 @@
-
 import { Outlet, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "@/lib/axios";
@@ -7,65 +6,69 @@ import { isAxiosError } from "axios";
 import { TopHeader } from "../app/dashboard-admin/sidebar/top-header";
 import { GetUserProfile } from "@/api/get-profile";
 import { useQuery } from "@tanstack/react-query";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
+export function AppLayoutAdmin() {
+  const navigate = useNavigate();
 
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
+    staleTime: 0,
+    queryFn: GetUserProfile,
+  });
 
-export  function AppLayoutAdmin(){
-    const navigate = useNavigate();
+  // Redireccionamentos por role — dentro de useEffect para evitar
+  // chamadas durante o render (viola as regras dos hooks)
+  useEffect(() => {
+    if (!profile) return;
 
-     
-      const { data: profile } = useQuery({
-        queryKey: ["profile"],
-        refetchOnWindowFocus: true,     // Rebusca ao voltar ao foco
-        refetchOnReconnect: true,       // Rebusca se a internet voltar
-        refetchOnMount: true,           // Rebusca sempre que o componente monta
-        staleTime: 0,    
-        queryFn: GetUserProfile,
-        });
-        
-              if(profile?.role =='CLIENTE_COLECTIVO' || profile?.role=='CLIENTE_INDIVIDUAL'){
-         navigate("/servicos")
-      }
-    
-                 if(profile?.role =='PRESTADOR_COLECTIVO' || profile?.role=='PRESTADOR_INDIVIDUAL'){
-         navigate("/servicos")
-      }
-      //    if(profile?.role=='ADMIN'){
-      //    navigate("/início")
-      // }
-    
+    const clienteRoles = ["CLIENTE_COLECTIVO", "CLIENTE_INDIVIDUAL"];
+    const prestadorRoles = ["PRESTADOR_COLECTIVO", "PRESTADOR_INDIVIDUAL"];
 
-  useEffect(()=>{
+    if (clienteRoles.includes(profile.role) || prestadorRoles.includes(profile.role)) {
+      navigate("/servicos", { replace: true });
+    }
+  }, [profile, navigate]);
 
+  // Interceptor de 401
+  useEffect(() => {
     const interceptorId = api.interceptors.response.use(
-      response=>response,
-      error=>{
-        if(isAxiosError(error)){
-          
-          const status = error.response?.status
-          const code = error.response?.data.code
+      (response) => response,
+      (error) => {
+        if (isAxiosError(error)) {
+          const status = error.response?.status;
+          const code = error.response?.data.code;
 
-          if(status===401 || code==='UNAUTHORIZED'){
-            navigate('/sign-in', {replace:true})
-            toast.warning('Faça login novamente')
-            // replace para nao permitir o usuario nao voltar a dashboard caso ele nao esteja autenticado
+          if (status === 401 || code === "UNAUTHORIZED") {
+            navigate("/sign-in", { replace: true });
+            toast.warning("Faça login novamente");
           }
         }
       }
-    )
-    return ()=>{
-      api.interceptors.response.eject(interceptorId)
-    }
-    //interceptando as respostas http para redirecionar o usuario no componente de autenticação
-  },[navigate])
-  return(
-    <div className="flex min-h-screen fixed  w-full right-5   antialiased ">
-      <TopHeader></TopHeader>
-         <div className="flex ml-[40px]    flex-1 flex-col ">
-          {/* <Header></Header> */}
-        <Outlet/>
+    );
+    return () => {
+      api.interceptors.response.eject(interceptorId);
+    };
+  }, [navigate]);
+
+  return (
+    <div className="fixed inset-0 flex antialiased">
+      <TopHeader />
+
+      {/*
+        O ScrollArea do shadcn precisa de uma altura concreta para funcionar —
+        não herda via flex-1 sozinho. Solução:
+          1. div com flex-1 + h-full recebe as dimensões do fixed inset-0
+          2. ScrollArea com h-full + w-full preenche esse div
+      */}
+      <div className="flex-1 h-full ml-[4px]">
+        <ScrollArea className="h-full w-full">
+          <Outlet />
+        </ScrollArea>
       </div>
     </div>
-  )
-
+  );
 }
