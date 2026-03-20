@@ -1,5 +1,5 @@
-import { GetCategory } from "@/api/get-categories";
 import { GraphicsSales } from "@/api/fetch-graphics";
+import { GetCategory } from "@/api/get-categories";
 import { RegisterNewProfission } from "@/api/new-profissionts";
 import { newPackage } from "@/api/novo-pacote";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,8 +32,7 @@ import {
   CreditCard,
   Layers,
   Loader2,
-  Plus,
-  TrendingUp,
+  TrendingUp
 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import {

@@ -1,10 +1,9 @@
 import { GetUserProfile } from "@/api/get-profile";
 import { InteressarPedidos } from "@/api/interessar-pedido";
 import { SearchNearOrders } from "@/api/search-nearOrders";
+import logo from "@/assets/logo-01.png";
 import { ModeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -27,11 +26,10 @@ import {
   Home,
   Loader2,
   MapPin,
-  Menu,
   Search,
   Sparkles,
   User,
-  WifiOff,
+  WifiOff
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -41,7 +39,6 @@ import { NotificationDropdown } from "../dashboard-admin/sidebar/Notification/no
 import { SkeletonsDemo } from "./NearClientsSearch";
 import { OrderCallSystem } from "./order-call-system";
 import { Vitrine } from "./Vitrine";
-import logo from "@/assets/logo-01.png";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 

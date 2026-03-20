@@ -1,28 +1,28 @@
-import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
-import { X, Search, Loader2, ChevronDown, SlidersHorizontal, UserCheck, UserX, ShieldAlert, Trash2, Eye } from "lucide-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatNotificationDate, getInialts } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { api } from "@/lib/axios";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Delete } from "@/api/delete-user";
-import { toast } from "sonner";
-import { DesativarConta } from "@/api/desativarConta";
 import { AtivarConta } from "@/api/desativar-conta";
-import { SuspenderConta } from "@/api/suspender-conta";
+import { DesativarConta } from "@/api/desativarConta";
 import { getPrestadores } from "@/api/fetch-prestadores";
+import { SuspenderConta } from "@/api/suspender-conta";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { api } from "@/lib/axios";
+import { formatNotificationDate, getInialts } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { Eye, Loader2, Search, ShieldAlert, SlidersHorizontal, Trash2, UserCheck, UserX, X } from "lucide-react";
+import { toast } from "sonner";
 import { PacientTableSkeleton } from "../Clients/clientes-skeleton";
 import { Pagination } from "../Clients/pagination";
 import { PrestadoresDetailsDialog } from "../Clients/prestadores-details";
-import { motion } from "framer-motion";
 
 type MunicipalityMap = Record<string, string[]>;
 

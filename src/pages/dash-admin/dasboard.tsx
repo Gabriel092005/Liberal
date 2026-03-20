@@ -27,12 +27,11 @@ import {
   Building2,
   ChevronDown,
   CreditCard,
-  Loader2,
   MapPin,
   Phone,
   Search,
   TrendingUp,
-  Users2,
+  Users2
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
